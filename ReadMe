@@ -1,0 +1,38 @@
+
+
+########  ########  ####  ######  ######## ########  
+##     ## ##     ##  ##  ##    ## ##       ##     ## 
+##     ## ##     ##  ##  ##       ##       ##     ## 
+########  ########   ##  ##       ######   ########  
+##        ##   ##    ##  ##       ##       ##   ##   
+##        ##    ##   ##  ##    ## ##       ##    ##  
+##        ##     ## ####  ######  ######## ##     ## 
+
+
+
+0. Running on VM on cloud
+1. If it is running the first time > Set values in the log file
+	a. First Name
+	b. Location of chromeDriver
+	c. Google sheet pricer link
+	d. sheet name
+	c. BO login and ID file location
+	d. Optional RedShift details file
+
+2. When started with above and second time onwards:
+	a. Ask what you want to do, options: upload a file with checks, upload a file without checks, alignments (B2B or Partner).
+
+3. Uploading to BO
+	### Make it password protected
+
+	a. Check if chromeDriver is working fine
+	b. BO login worked
+	c. Upload status
+	d. Check if BO is stuck
+	e. Upload data
+
+4. Add logging functionality
+5. 
+
+
+Logging of usage and errors

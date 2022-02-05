@@ -1,0 +1,9 @@
+pandas
+numpy
+tabulate
+termcolor
+pyfiglet
+google
+googleapiclient
+selenium
+ipykernel
