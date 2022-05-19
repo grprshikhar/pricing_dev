@@ -14,8 +14,8 @@ def Create_Service(client_secret_file, api_name, api_version, *scopes):
     SCOPES = scopes[0]
     #print(SCOPES)
     # path = r"/Users/shikharsrivastava/Documents/APIs"
-    path = r"/home/ubuntu/pricing_wizard/APIs"
-    os.chdir(path)
+    # path = r"/home/ubuntu/pricing_wizard/APIs"
+    # os.chdir(path)
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first

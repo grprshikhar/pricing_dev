@@ -18,9 +18,9 @@ def gsheet_api_check(SCOPES):
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
-    path = r"/home/ubuntu/pricing_wizard/APIs"
+#    path = r"/home/ubuntu/pricing_wizard/APIs"
     # path = r"/Users/shikharsrivastava/Documents/APIs"
-    os.chdir(path)
+#    os.chdir(path)
 
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -65,4 +65,4 @@ if __name__ == '__main__':
     DATA_TO_PULL = 'Export!A:M'
     data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
     df = pd.DataFrame(data[1:], columns=data[0])
-
+    print (df.head(20))

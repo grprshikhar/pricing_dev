@@ -1,26 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pandas as pd
 import os
 import numpy as np
-# import difflib
 import re
 import getpass
 import sys
-# import click
-# import six
 from tabulate import tabulate
-# try:
-#     import colorama
-#     colorama.init(strip=not sys.stdout.isatty())
-# except ImportError:
-#     colorama = None
-
 from termcolor import colored,cprint
 from pyfiglet import figlet_format
 import warnings
-# import logging
-# from sqlite import sqlite
 
 
 cprint(figlet_format('\n',font='straight'),'white', 'on_grey', attrs=['bold']) 
@@ -32,13 +21,11 @@ import ph_catman_utils as phcu
 import ph_gsheet_connect as pgc
 import ph_sanity_checks as psc
 import ph_priceupload as ppu
-import ph_gdrive_handler as phgdh
+# import ph_gdrive_handler as phgdh
 import logging
-path = r"/home/ubuntu/pricing_wizard"
-os.chdir(path)
-import logger_setup
-import getpass
-from sqlite import sqlite 
+# import logger_setup
+# import getpass
+# from sqlite import sqlite 
 from getpass import getpass
 
 
@@ -76,6 +63,8 @@ try:
 except FileNotFoundError:
     print('\n'+colored(sheet_name+' : No such file exists', 'red')+'\n')
     sys.exit()
+
+print (df.to_string())
 
 df.columns = [x.lower() for x in df.columns]
 df['category'] = df['category'].str.lower()

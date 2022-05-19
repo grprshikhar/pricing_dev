@@ -18,7 +18,10 @@ export_dict = {
             'US Catman GM':''},
     'Shikhar' : {'E-Price':'1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8',
             'Catman GM' : '', 
-            'US Catman GM':''}
+            'US Catman GM':''},
+    'Ian' : {'E-Price': '1r_LxoZd33ewZhPt9hp8lda4RPU05F94PWrgML1-PocU',
+            'Catman GM' : '', 
+            'US Catman GM':''},
 }
 
 
@@ -40,7 +43,7 @@ question_user = [
     inquirer.List(
         "user",
         message="Who are you?",
-        choices=["Achille", "Geet", "Marco", "Mert", "Shikhar" , "None of the above"],
+        choices=list(export_dict.keys()) + ["None of the above"],
     ),
 ]
 
@@ -52,8 +55,10 @@ def get_user():
         print("\n")
         answer_user = inquirer.prompt(question_user,theme=inq_theme)
         print("\nYou entered: " + colored(answer_user['user'],'green')+"\n")
-        confirm_user = input("Is this correct (yes/no/exit) (exit program): ")
-        confirm_user=confirm_user.lower()
+        confirm_user = input("Is this correct ([yes]/no/exit) : ")
+        confirm_user = confirm_user.lower()
+        if confirm_user == "" :
+            confirm_user = "yes"
         if confirm_user not in ['yes','no','exit']:
             print(colored("Incorrect response!",'red'),"\n\nPlease use only (yes/no/exit)\n")
             confirm_user='no'
@@ -81,8 +86,10 @@ def get_sheet(user,export_dict):
         print("\n")
         answer_sheet = inquirer.prompt(sheet_output(user),theme=inq_theme)
         print("\nYou entered: " + colored(answer_sheet['sheet_name'],'green')+"\n")
-        confirm_sheet = input("Is this correct (yes/no/exit): ")
-        confirm_sheet=confirm_sheet.lower()
+        confirm_sheet = input("Is this correct ([yes]/no/exit): ")
+        confirm_sheet = confirm_sheet.lower()
+        if confirm_sheet == "":
+            confirm_sheet = "yes"
         if confirm_sheet not in ['yes','no','exit']:
             print(colored("Incorrect response!",'red'),"\n\nPlease use only (yes/no/exit)\n")
             confirm_sheet='no'
