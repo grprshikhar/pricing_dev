@@ -45,6 +45,15 @@ class options_handler(object):
         					"selection_cursor": "->"}
         					})
 
+	# Useful function for simple binary question
+	def yn_question(self, question):
+		question = [inquirer.List("yn", message=question, choices=["Yes","No"])]
+		answer = inquirer.prompt(question, theme=self._theme)
+		if answer["yn"] == "Yes":
+			return True
+		else:
+			return False
+
 	def validate_user(self):
 		# User validation expected to match existing data
 		# Get the local username for validation
@@ -82,10 +91,10 @@ class options_handler(object):
 			if answer["yn"] == "Update":
 				new_id = input(f"Provide new id for {self.current_sheet_type} : ")
 				self.user_data[self.current_user][self.current_sheet_type] = new_id
+				self.current_sheet = new_id
 				# Save updated data
-				question = [inquirer.List("yn", message="Save updated data to disk :", choices=["Yes","No"])]
-				answer = inquirer.prompt(question, theme=self._theme)
-				if answer["yn"] == "Yes":
+				answer_yes = self.yn_question("Save updated data to disk :")
+				if answer_yes:
 					with open(self.user_data_path, 'w') as fp:
 						json.dump(self.user_data, fp, indent=4)
 				else:
@@ -112,9 +121,8 @@ class options_handler(object):
 		print (f"{name} : {self.user_data[name]}")
 
 		# Save data to disk or work in memory
-		question = [inquirer.List("yn", message="Save updated data to disk :", choices=["Yes","No"])]
-		answer = inquirer.prompt(question, theme=self._theme)
-		if answer["yn"] == "Yes":
+		answer_yes = self.yn_question("Save updated data to disk :")
+		if answer_yes:
 			with open(self.user_data_path, 'w') as fp:
 				json.dump(self.user_data, fp, indent=4)
 		else:
@@ -153,7 +161,5 @@ class options_handler(object):
 			for opt in sorted(self.user_data[user]):
 				print (f"    \\-- {opt} : {self.user_data[user][opt]}")
 		print ("---------------------")
-
-
 
 

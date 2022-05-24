@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import sys
 
 # Scope variable
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -48,14 +49,23 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     # Create sheet service
     sheet = service.spreadsheets()
     # Access and pull spreadsheet data result object
-    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=DATA_TO_PULL).execute()
+    try:
+        result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=DATA_TO_PULL).execute()
+    except HttpError as e:
+        print ("")
+        print (f"{e}")
+        print ("")
+        print (f"This error was returned while trying to access data in spreadsheet [{SPREADSHEET_ID}]")
+        print (f"Please ensure that this spreadsheet is shared with 'Grover' in the share options.")
+        sys.exit(1)
+
     # Get data
     values = result.get('values', [])
     
     # Check output
     if not values:
-        print('No data found.')
+        print(f"No data found [{SPREADSHEET_ID}].")
         return None
     else:
-        print ("Data pulled from spreadsheet.")
+        print (f"Data pulled from spreadsheet [{SPREADSHEET_ID}].")
         return values

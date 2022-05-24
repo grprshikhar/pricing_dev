@@ -22,14 +22,14 @@ def check_dataType(df):
             raise ValueError("\nSKU column has empty values\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
     if df.category.isnull().values.any():
         try:
             raise ValueError("\nCategory column has empty values\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
 
     if df.subcategory.isnull().values.any():
@@ -37,7 +37,7 @@ def check_dataType(df):
             raise ValueError("\nSubcategory column has empty values\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
 
     if df.bulky.isnull().values.any():
@@ -45,7 +45,7 @@ def check_dataType(df):
             raise ValueError("\nBulky column has empty values\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
 
     if not isinstance(df.sku.values[0],str): 
@@ -53,7 +53,7 @@ def check_dataType(df):
             raise TypeError("\nSKUs are not string data type! Check input file again.\n\n")
         except TypeError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
 
     if not isinstance(df.category.values[0],str): 
@@ -61,32 +61,29 @@ def check_dataType(df):
             raise TypeError("\nCategories are not string data type! Check input file again.\n\n")
         except TypeError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
     if not isinstance(df.subcategory.values[0],str): 
         try:
             raise TypeError("\nCategories are not string data type! Check input file again.\n\n")
         except TypeError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
     if isinstance(df.bulky.values[0],str) or (~df.bulky.isin([0,1]).values).any():
         try:
             raise TypeError("\nBulky column has incorrect values! Check input file again.\n\n")
         except TypeError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
     if isinstance(df.rrp.values[0],str) or (df.rrp==0).values.any() or df.rrp.isnull().values.any(): 
         try:
             raise TypeError("\nRRP is not correctly filled! Check input file again.\n")
         except TypeError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
     
-    
-
-
 
 #### Cat and sub-cat name and combination checks
 def check_catnames(df):
@@ -96,7 +93,7 @@ def check_catnames(df):
             raise ValueError("\n"+out_error+"\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
+            sys.exit(1)
 
 
     if (~df['subcategory'].isin(phcu.sub_cat_list).values).any():
@@ -105,26 +102,7 @@ def check_catnames(df):
             raise ValueError("\n"+out_error+"\n\n")
         except ValueError as v:
             print(v.args[0])
-            sys.exit()
-
-''' check_cat_subcat_map = df.merge(phcu.df_cat_dict.drop_duplicates(), on=['category','subcategory'], 
-                       how='left', indicator=True)
-
-    if (check_cat_subcat_map['_merge'] == 'left_only').any():
-        dt_err = check_cat_subcat_map[check_cat_subcat_map['_merge'] == 'left_only']
-        dt_err['combined'] = dt_err[['category','subcategory']].apply(lambda row: ' <> '.join(row.values.astype(str)), axis=1)
-        out_error = "Incorrect Category & Subcategory match: "+dt_err['combined'].values
-        try:
-            raise ValueError("\n"+out_error+"\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit()
-''' 
-#return print("\nCorrect cat, sub-cat names  - ",colored("Check",'green')+"\n")    
-
-
-
-
+            sys.exit(1)
 
 #### Cat and sub-cat name and combination checks
 
@@ -178,9 +156,6 @@ def clean_store_plan(df):
     return df_td
 
 
-
-
-
 # If discount is present then check if it's for all plans or not
 def check_discounts(df_td):
     if df_td[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0)].values.any():
@@ -191,10 +166,6 @@ def check_discounts(df_td):
         except ValueError as v:
             print(v.args[0])
             sys.exit()
-  
-
-
-
 
 def check_plan_hierarchy(df_td):
     # Longer plan active values can't be more expensive than shorter
