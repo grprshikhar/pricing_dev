@@ -1,6 +1,5 @@
 import inquirer
 from inquirer.themes import load_theme_from_dict
-from termcolor import colored,cprint
 import json
 import getpass
 import sys
@@ -13,17 +12,21 @@ class options_handler(object):
 		self.user_data_path     = "user_data.json"
 		self.user_data          = None
 		self.users              = None
+		self.stage              = None
 		self._theme             = None
 		# Call setup
 		self.setup()
 
 	def setup(self):
+		# Any setup options can go here rather than in init
+
 		# Read json data
 		try:
 			self.user_data = json.load(open(self.user_data_path))
 			self.users     = list(self.user_data.keys()) 
 		except:
 			print (f"Error reading user data from {self.user_data_path}")
+
 		# Set theme for questions
 		self._theme = load_theme_from_dict({
     					"Question": {
@@ -33,8 +36,17 @@ class options_handler(object):
 					        "selection_color": "black_on_bright_green",
         					"selection_cursor": "->"}
         					})
+		self._theme2 = load_theme_from_dict({
+    					"Question": {
+        					"mark_color": "yellow",
+        					"brackets_color": "normal",},
+    					"List": {
+					        "selection_color": "black_on_bright_red",
+        					"selection_cursor": "->"}
+        					})
 
 	def validate_user(self):
+		# User validation expected to match existing data
 		# Get the local username for validation
 		local_username = getpass.getuser()
 		# Create question
@@ -80,7 +92,6 @@ class options_handler(object):
 					print (f"Data for [{self.current_user}] stored just for this session.")
 
 
-
 	def add_user_to_json(self):
 		# Take inputs and add to existing data
 		name     = input("Please provide name : ")
@@ -109,6 +120,17 @@ class options_handler(object):
 		else:
 			print (f"Data for [{self.current_user}] stored just for this session.")
 
+	def get_running_stage(self):
+		# This option can control the flow of the program
+		# Just keep the order the same but can rename these without breaking code
+		# Ensure "Exit" is last option as this looks best in terminal option
+		stages = ["Upload e-price sheet", "Suggest price review SKUs", "Review Pricing Wizard data", "Exit"]
+		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
+		answer = inquirer.prompt(question, theme=self._theme2)
+		self.stage = stages.index(answer["stage"])
+		# Handle exit here
+		if answer["stage"] == "Exit":
+			sys.exit(0)
 
 	# Getter functions
 	def get_user(self):
