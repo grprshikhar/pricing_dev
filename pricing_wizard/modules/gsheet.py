@@ -56,10 +56,9 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     
     # Check output
     if not values:
-        print(f"No data found [{SPREADSHEET_ID}].")
-        return None
+        raise ValueError(f"No data found in spreadsheet : [{SPREADSHEET_ID}].")
     else:
-        print (f"Data pulled from spreadsheet [{SPREADSHEET_ID}].")
+        print (f"Data pulled from spreadsheet : [{SPREADSHEET_ID}].")
         return values
 
 # This is the function the user will need to call
