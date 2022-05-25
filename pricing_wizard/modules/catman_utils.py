@@ -102,19 +102,11 @@ class catman_utils(object):
 	def check_catnames(self, df):
 		if (~df['category'].isin(self.cat_list).values).any():
 			out_error = "Incorrect category values: "+str((df[~df['category'].isin(self.cat_list)]['category'].values))
-			try:
-				raise ValueError("\n"+out_error+"\n\n")
-			except ValueError as v:
-				print(v.args[0])
-				sys.exit(1)
+			raise ValueError(out_error)
 
 		if (~df['subcategory'].isin(self.sub_cat_list).values).any():
 			out_error = "Incorrect Subcategory values: "+str((df[~df['subcategory'].isin(self.sub_cat_list)]['subcategory'].values))
-			try:
-				raise ValueError("\n"+out_error+"\n\n")
-			except ValueError as v:
-				print(v.args[0])
-				sys.exit(1)
+			raise ValueError(out_error)
 
 	# Cleaning the store plan
 	def clean_store_plan(self, df):
@@ -122,11 +114,7 @@ class catman_utils(object):
 
 		if (~df_init['store code'].isin(self.store_code_list).values).any():
 			out_error = "Incorrect store code values: "+str((df_init[~df_init['store code'].isin(self.store_code_list)]['store code'].values))
-			try:
-				raise ValueError("\n"+out_error+"\n\n")
-			except ValueError as v:
-				print(v.args[0])
-				sys.exit(1)
+			raise ValueError(out_error)
 
 		df_init = df_init.merge(self.df_csp.drop_duplicates(), on=['category','subcategory','store code','bulky'])
 
@@ -139,12 +127,7 @@ class catman_utils(object):
 			regex = str(subplan)+r',|'+str(subplan)+r'\)'
 			sku_list = df_td.loc[(df_td[act_price_col].isnull()) & (df_td['duration_plan'].str.contains(regex)),['sku','store code']]
 			if len(sku_list)>0:
-				# print('Missing %d Month price plans for SKUs :\n\n' % subplan,sku_list)
-				try:
-					raise ValueError("\n"+'Missing %d Month price plans for SKUs : \n'%subplan +str(sku_list)+"\n\n")
-				except ValueError as v:
-					print(v.args[0])
-					sys.exit(1)
+				raise ValueError('Missing %d Month price plans for SKUs : '%subplan + str(sku_list) )
 
     	## if plan price is there but not in plan allowed > Remove plan price
 		for subplan in [1,3,6,12,18,24]:

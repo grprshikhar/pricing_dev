@@ -64,7 +64,7 @@ class eprice_validator(object):
 			12 : [0.034, 0.078],
 			18 : [0.03,  0.054],
 			24 : [0.025, 0.041]}
-		answer_yes = run_opts.yn_question("Check RRP\% guidelines :")
+		answer_yes = run_opts.yn_question("Check RRP% guidelines :")
 		if answer_yes:
 			sanity_checks.check_rrp_perc(self.df_td, plan_limit_dict)
 

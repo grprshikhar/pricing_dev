@@ -67,9 +67,7 @@ class options_handler(object):
 			self.add_user_to_json()
 		# Validate
 		if self.user_data[self.current_user]["local_username"] != local_username:
-			print (f"Error selecting {self.current_user} as local username is {local_username}.")
-			print ("Please verify these details are correct.")
-			sys.exit(1)
+			raise ValueError(f"Error selecting {self.current_user}.\nLocal username is {local_username}.\nPlease verify these details are correct.")
 		else:
 			print (f"User [{self.current_user}] verified.")
 

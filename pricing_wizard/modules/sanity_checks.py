@@ -90,25 +90,42 @@ plan_limit_dict = {
 '''
 
 def check_rrp_perc(df_td,plan_limit_dict):
-
+    # Print out the options being used
+    print("RRP% guidelines being checked\n")
+    print(tabulate(plan_limit_dict,
+                   headers=[str(x)+"M" for x in plan_limit_dict.keys()],
+                   showindex=["min %","max %"]))
+    print("")
+    # Error tracker
+    any_errors = []
     for k, dk in plan_limit_dict.items():
         act_pp = "act_perc_pp_"+str(k)
         low_limit = dk[0] 
         high_limit = dk[1]
         if df_td.loc[(df_td[act_pp]<=low_limit)].empty!=True:
             sku = df_td.loc[(df_td[act_pp]<=low_limit),'sku']
-            raise ValueError(str(k)+"M Plan Price is too cheap for SKUs : "+str(sku.values))
+            any_errors.append( str(k)+"M Plan Price is too cheap for SKUs : "+str(sku.values) )
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
             sku = f_td.loc[(df_td[act_pp]>=high_limit),'sku']
-            raise ValueError(str(k)+"M Plan Price is too expensive for SKUs : "+str(sku.values))
+            any_errors.append( str(k)+"M Plan Price is too expensive for SKUs : "+str(sku.values) )
+
+    # Track all cases of RRP issues to better inform the user
+    if any_errors:
+        raise ValueError("\n".join(any_errors))
 
 def last_digit_9 (df_td):
+    # Error tracker
+    any_errors = []
     for plan in [1,3,6,12,18,24]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9)].empty!=True:
             sku = df_td.loc[(df_td[pc]*10%10<9) & (df_td[pc]*10%10>9),'sku']
-            raise ValueError(str(plan)+"M Plan has non Charm prices for SKUs : "+str(sku.values))
+            any_errors.append( str(plan)+"M Plan has non Charm prices for SKUs : "+str(sku.values) )
+
+    # Track all cases of charm pricing not used to better inform the user
+    if any_errors:
+        raise ValueError("\n".join(any_errors))
             
 
 #### Summarize data

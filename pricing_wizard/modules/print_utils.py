@@ -26,20 +26,26 @@ def exception_hook(exctype, value, tb):
         print_green_bold("PricingWizard : User requested to end session.\n")
         sys.exit(0)
     elif exctype == ValueError:
-        print_red_bold("PricingWizard : ValueError : "+value.args[0]+"\n")
+        print_red_bold("PricingWizard : ValueError")
+        print_red_bold("--------------------------")
+        print_red_bold(value.args[0]+"\n")
         # List of traceback
         # err_details = traceback.format_tb(tb)
         # print_red(" ---> "+err_details[-1].strip())
         sys.exit(1)
     elif exctype == TypeError:
-        print_red_bold("PricingWizard : TypeError : "+value.args[0]+"\n")
+        print_red_bold("PricingWizard : TypeError")
+        print_red_bold("-------------------------")
+        print_red_bold(value.args[0]+"\n")
         # List of traceback
         # err_details = traceback.format_tb(tb)
         # print_red(" ---> "+err_details[-1].strip())
         sys.exit(2)
     elif exctype == NameError:
         # Usually indicates a coding problem (print stacktrace too)
-        print_red_bold("PricingWizard : NameError : "+value.args[0]+"\n")
+        print_red_bold("PricingWizard : NameError")
+        print_red_bold("-------------------------")
+        print_red_bold(value.args[0]+"\n")
         err_details = traceback.format_tb(tb)
         print_red(" ---> "+err_details[-1].strip()+"\n")
         sys.exit(3)
