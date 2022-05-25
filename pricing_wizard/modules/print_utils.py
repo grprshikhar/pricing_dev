@@ -23,7 +23,7 @@ def print_red_bold(msg):
 
 def exception_hook(exctype, value, tb):
     if exctype == KeyboardInterrupt:
-        print_green_bold("PricingWizard : User requested to end session.\n")
+        print_green_bold(f"PricingWizard : Ending session! {value}\n")
         sys.exit(0)
     elif exctype == ValueError:
         print_red_bold("PricingWizard : ValueError")

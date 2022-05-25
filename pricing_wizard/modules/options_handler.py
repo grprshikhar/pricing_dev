@@ -137,7 +137,7 @@ class options_handler(object):
 		self.stage = stages.index(answer["stage"])
 		# Handle exit here
 		if answer["stage"] == "Exit":
-			sys.exit(0)
+			raise KeyboardInterrupt(f"Bye {getpass.getuser()}!")
 
 	# Getter functions
 	def get_user(self):
@@ -147,18 +147,33 @@ class options_handler(object):
 		return self.current_sheet
 
 	def info(self):
-		print ("---------------------")
+		# This is data loaded
+		print ("------------------------------------------")
 		print ("Data Summary")
-		print ("---------------------")
+		print ("------------------------------------------")
 		print (f"Current user        : {self.current_user}")
 		print (f"Selected sheet type : {self.current_sheet_type}")
 		print (f"Sheet ID            : {self.current_sheet}")
-		print ("---------------------")
-		print ("All loaded data...")
+		print ("------------------------------------------")
+
+		# Show all data in a prettified tabulated format
+		headers  = []
+		rowindex = []
+		data     = []
+		# Collect all keys by iteration (protect against some users having unique keys)
+		# Get all users
 		for user in self.user_data:
-			print (f"--> {user}")
+			rowindex.append(user)
+			# Get all the sub-keys
 			for opt in sorted(self.user_data[user]):
-				print (f"    \\-- {opt} : {self.user_data[user][opt]}")
-		print ("---------------------")
+				headers.append(opt)
+		# Remove the duplicates sub-keys (list->set->list)
+		headers = list(set(headers))
+		# Generate the data in a fixed format with null entries if sub-key is not in the user dict
+		for user in rowindex:
+			data.append( [self.user_data[user][h] if h in self.user_data[user] else "" for h in headers]  )
+
+		import tabulate
+		print (tabulate.tabulate( data, headers=headers, showindex=rowindex, tablefmt="psql"  ) )
 
 

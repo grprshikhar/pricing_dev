@@ -94,7 +94,7 @@ def check_rrp_perc(df_td,plan_limit_dict):
     print("RRP% guidelines being checked\n")
     print(tabulate(plan_limit_dict,
                    headers=[str(x)+"M" for x in plan_limit_dict.keys()],
-                   showindex=["min %","max %"]))
+                   showindex=["min %","max %"], tablefmt="psql"))
     print("")
     # Error tracker
     any_errors = []
