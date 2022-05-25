@@ -90,7 +90,7 @@ class catman_utils(object):
 				df_out = pd.concat([df_out.reset_index(drop=True), df_subplanwise.reset_index(drop=True)], axis=1)
 
 		df_copy['check'] = pd.Series(df_copy[[col for col in df_copy.columns if re.search(r'plan\d+', col)]].fillna('').values.tolist()).str.join('')
-		df_copy['check']= df_copy['check'].fillna('')
+		df_copy['check'] = df_copy['check'].fillna('')
 		df_copy['comma_count'] = df_copy.check.str.count(',')
 		df_copy['comma_count_plan'] = df_copy.duration_plan.str.count(',')
 		df_copy = df_copy.drop(columns=[col for col in df_copy.columns if re.search(r'plan\d+', col)]).copy()

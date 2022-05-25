@@ -21,6 +21,8 @@ def validate_and_upload_eprice(run_opts):
 	validator = eprice_validator(run_opts.current_sheet, data_range)
 	# Check output
 	validator.summarise(run_opts)
+	# Next step would be upload...
+	# validator.upload(run_opts)
 
 
 

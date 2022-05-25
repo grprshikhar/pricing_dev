@@ -37,11 +37,24 @@ def check_dataType(df):
         raise TypeError("RRP is not correctly filled! Check input file again.")
         
 
-# If discount is present then check if it's for all plans or not
 def check_discounts(df_td):
+    any_errors = []
+    # Check that a discount present is available on all rental price plans
     if df_td[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0)].values.any():
         SKU = df_td.loc[(df_td.comma_count!=df_td.comma_count_plan+1),'sku']
-        raise ValueError("Discount is missing for "+str(SKU.values))
+        any_errors.append("Discount is missing for "+str(SKU.values))
+
+    # We should also validate that the discount amount is less than the full price (ie reprice being entered as discount)
+    for plan in [1,3,6,12,18,24]:
+        active_plan_name = f"active_plan{plan}"
+        high_plan_name   = f"high_plan{plan}"
+        if df_td[(df_td[active_plan_name] >= df_td[high_plan_name])].values.any():
+            SKU = df_td.loc[(df_td[active_plan_name] >= df_td[high_plan_name]), 'sku']
+            any_errors.append(f"{plan}M plan has active price >= high price for {SKU.values}")
+
+    if any_errors:
+        raise ValueError("\n".join(any_errors))
+
         
 def check_plan_hierarchy(df_td):
     # Longer plan active values can't be more expensive than shorter
@@ -91,10 +104,12 @@ plan_limit_dict = {
 
 def check_rrp_perc(df_td,plan_limit_dict):
     # Print out the options being used
-    print("RRP% guidelines being checked\n")
-    print(tabulate(plan_limit_dict,
-                   headers=[str(x)+"M" for x in plan_limit_dict.keys()],
-                   showindex=["min %","max %"], tablefmt="psql"))
+    print("RRP% guidelines being checked (in lieu of PP)\n")
+    # Convert dict to 100* value for better comprehension when printed out
+    plan_limit_dict_print = {k: [100*x for x in v] for k, v in plan_limit_dict.items()}
+    print(colored(tabulate(plan_limit_dict_print,
+                headers=[str(x)+"M" for x in plan_limit_dict_print.keys()],
+                showindex=["min %","max %"], tablefmt="psql"),attrs=["reverse"]))
     print("")
     # Error tracker
     any_errors = []
@@ -103,12 +118,12 @@ def check_rrp_perc(df_td,plan_limit_dict):
         low_limit = dk[0] 
         high_limit = dk[1]
         if df_td.loc[(df_td[act_pp]<=low_limit)].empty!=True:
-            sku = df_td.loc[(df_td[act_pp]<=low_limit),'sku']
-            any_errors.append( str(k)+"M Plan Price is too cheap for SKUs : "+str(sku.values) )
+            sku = df_td.loc[(df_td[act_pp]<=low_limit),['sku',act_pp]]
+            any_errors.append( str(k)+"M Plan Price is too cheap for SKUs \n"+str(sku.values) )
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
-            sku = f_td.loc[(df_td[act_pp]>=high_limit),'sku']
-            any_errors.append( str(k)+"M Plan Price is too expensive for SKUs : "+str(sku.values) )
+            sku = f_td.loc[(df_td[act_pp]>=high_limit),['sku',act_pp]]
+            any_errors.append( str(k)+"M Plan Price is too expensive for SKUs \n"+str(sku.values) )
 
     # Track all cases of RRP issues to better inform the user
     if any_errors:
