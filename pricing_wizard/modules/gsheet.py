@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import sys
+import pandas
 
 # Scope variable
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -69,3 +70,24 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     else:
         print (f"Data pulled from spreadsheet [{SPREADSHEET_ID}].")
         return values
+
+# This is the function the user will need to call
+def get_dataframe(sheet_id, data_range):
+    # Get data from gsheet
+    data = pull_sheet_data(SCOPES, sheet_id, data_range)
+    # Convert data (arrays) into dataframe
+    df = pandas.DataFrame(data)
+    # Extract first row as header
+    header = df.iloc[0]
+    # Remove first row from dataframe
+    df = df[1:]
+    # Set column names
+    df.columns = header
+    # Reset indexing after removing row
+    df = df.reset_index(drop=True).copy()
+    # Clean any NaN
+    df.fillna("",inplace=True)
+    # Convert header names to consistent capitalisation
+    df.columns = [x.lower() for x in df.columns]
+    # Return the dataframe
+    return df

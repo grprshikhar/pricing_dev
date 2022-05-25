@@ -4,6 +4,7 @@ import json
 import getpass
 import sys
 
+# This class will handle user input and direct and track program flow
 class options_handler(object):
 	def __init__(self):
 		self.current_user       = None

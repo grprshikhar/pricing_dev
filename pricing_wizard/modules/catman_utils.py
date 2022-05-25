@@ -1,5 +1,5 @@
 import re
-import modules.gsheet_to_dataframe as gsheet_to_dataframe
+import modules.gsheet as gsheet
 import pandas as pd
 import sys
 
@@ -8,7 +8,7 @@ class catman_utils(object):
 		# Rental plan sheet
 		self.sheet_id = '1VhyEO0BRVXp3mJ9abXJ0EYiF34Fhu50qv6m9nuldIPI'
 		self.data_range = 'CSV Export!A:K'
-		self.df = gsheet_to_dataframe.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
 		self.sanitise()
 
 	def sanitise(self):

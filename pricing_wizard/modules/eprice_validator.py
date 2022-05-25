@@ -1,4 +1,4 @@
-import modules.gsheet_to_dataframe as gsheet_to_dataframe
+import modules.gsheet as gsheet
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 from tabulate import tabulate
@@ -13,7 +13,7 @@ class eprice_validator(object):
 
 	def get_data(self):
 		# Pull data and get dataframe
-		self.df = gsheet_to_dataframe.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
 		# Run santisation of data
 		self.sanitise()
 		# Create the catman utils class object and attach
