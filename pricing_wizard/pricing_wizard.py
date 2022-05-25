@@ -1,8 +1,12 @@
 #! /usr/bin/env python3
+# Regular modules
+import sys
 # Import the option handler for managing user input
 from modules.options_handler import options_handler as opts
 # Import the eprice_validator for validating inputs
 from modules.eprice_validator import eprice_validator
+# Error handling
+from modules.print_utils import exception_hook
 
 # ------------------------------------------------------------------------ #
 # Functions managing calls for each stage of the program flow
@@ -34,14 +38,16 @@ def print_title():
 # Main program - control program flow
 # ------------------------------------------------------------------------ #
 if __name__ == "__main__":
-	# Print out the title
-	print_title()
+	# Set exception hook for main program
+	sys.excepthook = exception_hook
 
 	# Create object
 	run_opts = opts()
 
 	# Simple looping flow
 	while True:
+		# Print out the title when we restart loop
+		print_title()
 		# User provides a starting option (provides exit option)
 		run_opts.get_running_stage()
 

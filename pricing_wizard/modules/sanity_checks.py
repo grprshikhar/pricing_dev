@@ -1,7 +1,7 @@
-import sys
 from tabulate import tabulate
 from termcolor import colored,cprint
 try:
+    import sys
     import colorama
     colorama.init(strip=not sys.stdout.isatty())
 except:
@@ -10,83 +10,39 @@ except:
 # These are just functions for checking dataframes
 def check_dataType(df):
     if df.sku.isnull().values.any() or (~df.sku.str.contains('GR').values).any():
-        try:
-            raise ValueError("\nSKU column has empty values\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise ValueError("SKU column has empty values")
+        
     if df.category.isnull().values.any():
-        try:
-            raise ValueError("\nCategory column has empty values\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise ValueError("Category column has empty values")
 
     if df.subcategory.isnull().values.any():
-        try:
-            raise ValueError("\nSubcategory column has empty values\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise ValueError("Subcategory column has empty values")
 
     if df.bulky.isnull().values.any():
-        try:
-            raise ValueError("\nBulky column has empty values\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise ValueError("Bulky column has empty values")
 
     if not isinstance(df.sku.values[0],str): 
-        try:
-            raise TypeError("\nSKUs are not string data type! Check input file again.\n\n")
-        except TypeError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise TypeError("SKUs are not string data type! Check input file again.")
 
     if not isinstance(df.category.values[0],str): 
-        try:
-            raise TypeError("\nCategories are not string data type! Check input file again.\n\n")
-        except TypeError as v:
-            print(v.args[0])
-            sys.exit(1)
+        raise TypeError("Categories are not string data type! Check input file again.")
 
     if not isinstance(df.subcategory.values[0],str): 
-        try:
-            raise TypeError("\nCategories are not string data type! Check input file again.\n\n")
-        except TypeError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise TypeError("Categories are not string data type! Check input file again.")
+        
     if isinstance(df.bulky.values[0],str) or (~df.bulky.isin([0,1]).values).any():
-        try:
-            raise TypeError("\nBulky column has incorrect values! Check input file again.\n\n")
-        except TypeError as v:
-            print(v.args[0])
-            sys.exit(1)
-
+        raise TypeError("Bulky column has incorrect values! Check input file again.")
+        
     if isinstance(df.rrp.values[0],str) or (df.rrp==0).values.any() or df.rrp.isnull().values.any(): 
-        try:
-            raise TypeError("\nRRP is not correctly filled! Check input file again.\n")
-        except TypeError as v:
-            print(v.args[0])
-            sys.exit(1)
+        raise TypeError("RRP is not correctly filled! Check input file again.")
+        
 
 # If discount is present then check if it's for all plans or not
 def check_discounts(df_td):
     if df_td[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0)].values.any():
         SKU = df_td.loc[(df_td.comma_count!=df_td.comma_count_plan+1),'sku']
-        # print('Inconsistent discounts for SKUs :\n\n',sku_list)
-        try:
-            raise ValueError("\n"+"Discount is missing for \n"+str(SKU.values)+"\n\n")
-        except ValueError as v:
-            print(v.args[0])
-            sys.exit()
-
+        raise ValueError("Discount is missing for "+str(SKU.values))
+        
 def check_plan_hierarchy(df_td):
     # Longer plan active values can't be more expensive than shorter
     list_plans = [1,3,6,12,18,24]
@@ -101,11 +57,7 @@ def check_plan_hierarchy(df_td):
         
         if df_td.loc[(df_td[agnst]!='') & (df_td[pc]!='') & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
             sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            try:
-                raise ValueError("\n"+str(plan)+"M Plan Price is Expensive than \n"+str(ag)+"M for "+str(sku.values)+"\n\n")
-            except ValueError as v:
-                print(v.args[0])
-                sys.exit()
+            raise ValueError(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
 
 
     # Longer plan high values can't be more expensive than shorter
@@ -120,11 +72,8 @@ def check_plan_hierarchy(df_td):
         
         if df_td.loc[(df_td[agnst].str.contains(',')) & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
             sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            try:
-                raise ValueError("\n"+str(plan)+"M Plan High Price is Expensive than \n"+str(ag)+"M for "+str(sku.values)+"\n\n")
-            except ValueError as v:
-                print(v.args[0])
-                sys.exit()
+            raise ValueError(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+            
 
 ### Setting plan wise Hard boundaries in %RRP
 
@@ -148,38 +97,25 @@ def check_rrp_perc(df_td,plan_limit_dict):
         high_limit = dk[1]
         if df_td.loc[(df_td[act_pp]<=low_limit)].empty!=True:
             sku = df_td.loc[(df_td[act_pp]<=low_limit),'sku']
-            try:
-                raise ValueError("\n"+str(k)+"M Plan Price is too cheap for SKUs : \n"+str(sku.values)+"\n\n")
-            except ValueError as v:
-                print(v.args[0])
-                sys.exit()
+            raise ValueError(str(k)+"M Plan Price is too cheap for SKUs : "+str(sku.values))
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
             sku = f_td.loc[(df_td[act_pp]>=high_limit),'sku']
-            try:
-                raise ValueError("\n"+str(k)+"M Plan Price is too expensive for SKUs : \n"+str(sku.values)+"\n\n")
-            except ValueError as v:
-                print(v.args[0])
-                sys.exit()
+            raise ValueError(str(k)+"M Plan Price is too expensive for SKUs : "+str(sku.values))
 
 def last_digit_9 (df_td):
     for plan in [1,3,6,12,18,24]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9)].empty!=True:
             sku = df_td.loc[(df_td[pc]*10%10<9) & (df_td[pc]*10%10>9),'sku']
-            try:
-                raise ValueError("\n"+str(plan)+"M Plan has non Charm prices for SKUs : \n"+str(sku.values)+"\n\n")
-            except ValueError as v:
-                print(v.args[0])
-                sys.exit()
-   
-
+            raise ValueError(str(plan)+"M Plan has non Charm prices for SKUs : "+str(sku.values))
+            
 
 #### Summarize data
 
 def show_summary(df_td):
     desc_prices = df_td.describe(exclude=['object','int'])
-    print("\n")
+    print("")
     cprint("$$  Total Price Uploads - "+str(len(df_td))+"  $$",'white','on_blue', attrs=['bold','blink'])
     print(colored("\n\n>>## Total Bulky Items - ",'green'),colored(str(sum(df_td.bulky)),'yellow')+"\n")  
     print(colored(">>$$ Total RRP > 2000 Items - ",'green'),colored(str((df_td.rrp>2000).count()),'yellow')+"\n\n")  
@@ -192,6 +128,9 @@ def show_summary(df_td):
     a=df_td['subcategory'].value_counts().rename_axis('Subcategory').reset_index(name='Price uploads')
     print(colored("Number of uploads for each Subcategory\n",'green')+colored(tabulate(a, headers='keys', tablefmt='psql'),'yellow')+"\n")
 
+def show_stats(df_td):
+    desc_prices = df_td.describe(exclude=['object','int'])
+    print("")
     pp_dt = desc_prices[[col for col in desc_prices.columns if 'act_perc_pp' in col]]
     pp_dt.columns = pp_dt.columns.str.replace("act_perc_pp_", "Act PP % ")
     print(colored("New Active PP Percentage data summary\n",'green')+colored(tabulate(pp_dt, headers='keys', tablefmt='psql'),'yellow')+"\n")

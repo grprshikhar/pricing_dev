@@ -48,7 +48,7 @@ class options_handler(object):
 	# Useful function for simple binary question
 	def yn_question(self, question):
 		question = [inquirer.List("yn", message=question, choices=["Yes","No"])]
-		answer = inquirer.prompt(question, theme=self._theme)
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		if answer["yn"] == "Yes":
 			return True
 		else:
@@ -60,7 +60,7 @@ class options_handler(object):
 		local_username = getpass.getuser()
 		# Create question
 		question = [inquirer.List("user", message="Please select your name :", choices=self.users + ["None of the above"])]
-		answer   = inquirer.prompt(question,theme=self._theme)
+		answer   = inquirer.prompt(question,theme=self._theme, raise_keyboard_interrupt=True)
 		if answer["user"] != "None of the above":
 			self.current_user = answer["user"]
 		else:
@@ -79,7 +79,7 @@ class options_handler(object):
 		# Remove local_username used for verification
 		sheet_options.remove("local_username")
 		question = [inquirer.List("type", message="Select input type :", choices=sheet_options + ["Other"])]
-		answer = inquirer.prompt(question, theme=self._theme)
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		self.current_sheet_type = answer["type"]
 		if answer["type"] == "Other":
 			self.current_sheet = input("Please enter SPREADSHEET_ID : ")
@@ -87,7 +87,7 @@ class options_handler(object):
 			self.current_sheet = self.user_data[self.current_user][answer["type"]]
 			print (f"Selected {self.current_sheet_type} : {self.current_sheet}")
 			question = [inquirer.List("yn", message="Proceed or update option :", choices=["Proceed","Update"])]
-			answer = inquirer.prompt(question, theme=self._theme)
+			answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 			if answer["yn"] == "Update":
 				new_id = input(f"Provide new id for {self.current_sheet_type} : ")
 				self.user_data[self.current_user][self.current_sheet_type] = new_id
@@ -134,7 +134,7 @@ class options_handler(object):
 		# Ensure "Exit" is last option as this looks best in terminal option
 		stages = ["Upload e-price sheet", "Suggest price review SKUs", "Review Pricing Wizard data", "Exit"]
 		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
-		answer = inquirer.prompt(question, theme=self._theme2)
+		answer = inquirer.prompt(question, theme=self._theme2, raise_keyboard_interrupt=True)
 		self.stage = stages.index(answer["stage"])
 		# Handle exit here
 		if answer["stage"] == "Exit":
