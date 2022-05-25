@@ -57,7 +57,7 @@ def create_connection():
     API_VERSION = 'v3'
     SCOPES = ['https://www.googleapis.com/auth/drive']
     
-    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    service = _create_service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
     
     # driveQuery = "(mimeType = 'application/'"
     
