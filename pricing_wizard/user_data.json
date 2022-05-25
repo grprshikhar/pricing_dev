@@ -32,13 +32,7 @@
     "Ian": {
         "E-Price": "1Y5kDiBejYkFzr3pE7R3Iv18odR8DX1pLDuvT1p75h44",
         "Catman GM": "",
-        "US Catman GM": "hello new",
+        "US Catman GM": "",
         "local_username": "ian"
-    },
-    "Testboy": {
-        "local_username": "ian",
-        "E-Price": "100",
-        "Catman GM": "200",
-        "US Catman GM": "300"
     }
 }

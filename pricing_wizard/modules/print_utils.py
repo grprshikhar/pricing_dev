@@ -1,6 +1,7 @@
 import sys
 import traceback
 from termcolor import colored
+from googleapiclient.errors import HttpError
 
 # Print utility
 def print_check(msg):
@@ -49,5 +50,11 @@ def exception_hook(exctype, value, tb):
         err_details = traceback.format_tb(tb)
         print_red(" ---> "+err_details[-1].strip()+"\n")
         sys.exit(3)
+    elif exctype == HttpError:
+        print_red_bold("PricingWizard : HttpError from Google API")
+        print_red_bold("-----------------------------------------")
+        print_red_bold(value)
+        print_green_bold("Please ensure that this spreadsheet is shared with 'Grover' in the share options.\n")
+        sys.exit(4)
     else:
         sys.__excepthook__(exctype, value, tb)

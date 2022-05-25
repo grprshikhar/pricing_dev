@@ -50,16 +50,7 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     # Create sheet service
     sheet = service.spreadsheets()
     # Access and pull spreadsheet data result object
-    try:
-        result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=DATA_TO_PULL).execute()
-    except HttpError as e:
-        print ("")
-        print (f"{e}")
-        print ("")
-        print (f"This error was returned while trying to access data in spreadsheet [{SPREADSHEET_ID}]")
-        print (f"Please ensure that this spreadsheet is shared with 'Grover' in the share options.")
-        sys.exit(1)
-
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=DATA_TO_PULL).execute()
     # Get data
     values = result.get('values', [])
     
