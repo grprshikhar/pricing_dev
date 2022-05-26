@@ -6,14 +6,31 @@ from termcolor import colored,cprint
 from modules.print_utils import print_check
 
 class eprice_validator(object):
-	def __init__(self, sheet_id, data_range='Export!A:N'):
-		self.sheet_id   = sheet_id
-		self.data_range = data_range
-		self.get_data()
+	# initialise with gsheet read or dataframe assignment (use named arguments!)
+	def __init__(self, sheet_id='default', data_range='Export!A:N', dataframe=None):
+		if not dataframe:
+			self.sheet_id   = sheet_id
+			self.data_range = data_range
+			self.get_data()
+		else:
+			self.sheet_id   = None
+			self.data_range = None
+			self.set_data(dataframe)		
 
+	# Assign dataframe
+	def set_data(self, df):
+		# Set data, then do the rest
+		self.df = df
+		self.checks()
+
+	# Pull dataframe
 	def get_data(self):
 		# Pull data and get dataframe
 		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		self.checks()
+		
+	# Run consistent checks regardless of how dataframe is created
+	def checks(self):
 		# Run santisation of data
 		self.sanitise()
 		# Create the catman utils class object and attach
