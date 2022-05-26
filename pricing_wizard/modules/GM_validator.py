@@ -12,9 +12,9 @@ class GM_validator(object):
 	# Pull data and get dataframe
 	def get_data(self):	
 		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		print_check(f"Pulled data for {self.market}")
 		self.rename_columns()
-		print (self.df.head())
-		print (self.df.dtypes)
+		print_check(f"Found {self.df.shape[0]} new SKUs")
 
 
 	def rename_columns(self):
@@ -45,3 +45,30 @@ class GM_validator(object):
 		
 		# Reassign
 		self.df.columns = header
+
+	def select_SKUs(self, SKUs):
+		# Build a query string
+		query = "|".join(SKUs)
+		# Pull out the dataframe the subset of data which matches
+		df_skus = self.df[self.df['sku'].str.contains(query)]
+		# Perform some validation about the request and response
+		n_requested = len(SKUs)
+		n_found     = df_skus.shape[0]
+		# If we match the number requested and number found
+		if n_requested == n_found:
+			print_check("Found all requested SKUs")
+		else:
+			# Generate a set difference
+			missing_skus = set(SKUs) - set(df_skus['sku'])
+			# If it is empty, indicates we had duplicates provided by user
+			if len(missing_skus) == 0:
+				raise ValueError("Duplicate SKUs were provided.")
+			# Otherwise we have some SKUs requested which were not in the sheet (maybe EU/US or mistyped)
+			raise ValueError(f"Not all requested SKUs were found in {self.market} pricing sheet.\nMissing SKUs: {missing_skus}")
+		
+		print (df_skus.head())
+
+
+
+
+

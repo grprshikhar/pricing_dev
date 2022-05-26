@@ -179,7 +179,7 @@ class options_handler(object):
 			answer = inquirer.prompt(question_loop, theme=self._theme)
 			loop = True if answer["continue"] == "Yes" else False
 
-
+		return SKUs
 
 	# -------------------------------
 	# Control the program flow

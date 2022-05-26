@@ -40,6 +40,8 @@ def price_new_skus(run_opts):
 	validator = GM_validator(run_opts.current_sheet, data_range, run_opts.new_price_market)
 	# Ask for SKUs if we have loaded the sheet
 	SKUs = run_opts.get_SKUs()
+	# Select the data
+	validator.select_SKUs(SKUs)
 
 
 def something_with_redshift(pricing_wizard):
