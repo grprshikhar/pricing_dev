@@ -27,9 +27,18 @@ def print_yellow_bold(msg):
     print (f"{colored(msg,'yellow',attrs=['bold'])}")
 
 def print_warning(msg):
+    # Import the option handler in a limited use case to avoid circular reference
+    from modules.options_handler import options_handler
     print_yellow_bold("PricingWizard : Warning")
     print_yellow_bold("-----------------------")
     print_yellow(msg)
+    print_yellow_bold("-----------------------")
+    __run_opts = options_handler()
+    answer = __run_opts.yn_question("Acknowledge this warning and continue :")
+    if not answer:
+        print_green_bold("Please investigate this warning.")
+        raise KeyboardInterrupt
+
 
 def tabulate_dataframe(df):
     print(colored(tabulate(df, headers='keys', tablefmt='psql'),'blue')+"\n\n") 

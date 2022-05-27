@@ -43,6 +43,7 @@ def price_new_skus(run_opts):
 	SKUs = run_opts.get_SKUs()
 	# Select the data
 	validator.select_SKUs(SKUs)
+	# Create e-price dataframe
 
 
 def something_with_redshift(run_opts):

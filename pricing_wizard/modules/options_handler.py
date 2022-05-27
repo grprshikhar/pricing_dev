@@ -3,6 +3,7 @@ from inquirer.themes import load_theme_from_dict
 import json
 import getpass
 import sys
+from modules.print_utils import print_check
 
 # This class will handle user input and direct and track program flow
 class options_handler(object):
@@ -77,7 +78,7 @@ class options_handler(object):
 		if self.user_data[self.current_user]["local_username"] != local_username:
 			raise ValueError(f"Error selecting {self.current_user}.\nLocal username is {local_username}.\nPlease verify these details are correct.")
 		else:
-			print (f"User [{self.current_user}] verified.")
+			print_check (f"User [{self.current_user}] verified.")
 
 	# -------------------------------
 	# Setup the e-price URL
@@ -99,7 +100,7 @@ class options_handler(object):
 				with open(self.user_data_path, 'w') as fp:
 					json.dump(self.user_data, fp, indent=4)
 			else:
-				print (f"Data for [{self.current_user}] stored just for this session.")
+				print_check (f"Data for [{self.current_user}] stored just for this session.")
 
 	# -------------------------------
 	# Setup the new pricing (GM) URL
@@ -129,7 +130,7 @@ class options_handler(object):
 				with open(self.user_data_path, 'w') as fp:
 					json.dump(self.user_data, fp, indent=4)
 			else:
-				print (f"Data for [{self.current_user}] stored just for this session.")
+				print_check (f"Data for [{self.current_user}] stored just for this session.")
 
 	# -------------------------------
 	# Add a new user to the settings
@@ -150,8 +151,8 @@ class options_handler(object):
 			self.user_data[name][s] = user_sheet
 
 		# Ask for confirmation
-		print ("Provided data...")
-		print (f"{name} : {self.user_data[name]}")
+		print_check ("Provided data...")
+		print_check (f"{name} : {self.user_data[name]}")
 
 		# Save data to disk or work in memory
 		answer_yes = self.yn_question("Save updated data to disk :")
@@ -159,7 +160,7 @@ class options_handler(object):
 			with open(self.user_data_path, 'w') as fp:
 				json.dump(self.user_data, fp, indent=4)
 		else:
-			print (f"Data for [{self.current_user}] stored just for this session.")
+			print_check (f"Data for [{self.current_user}] stored just for this session.")
 
 	def get_SKUs(self):
 		SKUs = []
@@ -174,7 +175,7 @@ class options_handler(object):
 				for __sku in _sku.split():
 					SKUs.append(__sku)
 			# Print current data
-			print (f"SKUs provided so far : {SKUs}")
+			print_check (f"SKUs provided so far : {SKUs}")
 			# Check if we keep taking more data
 			answer = inquirer.prompt(question_loop, theme=self._theme)
 			loop = True if answer["continue"] == "Yes" else False

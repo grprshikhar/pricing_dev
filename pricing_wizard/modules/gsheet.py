@@ -51,7 +51,6 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     sheet = service.spreadsheets()
     # Access and pull spreadsheet data result object
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=DATA_TO_PULL).execute()
-    # Get data
     values = result.get('values', [])
     
     # Check output
