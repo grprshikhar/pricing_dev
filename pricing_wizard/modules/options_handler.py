@@ -189,7 +189,7 @@ class options_handler(object):
 		# This option can control the flow of the program
 		# Just keep the order the same but can rename these without breaking code
 		# Ensure "Exit" is last option as this looks best in terminal option
-		stages = ["Upload e-price sheet", "Price new SKUs", "Suggest price review SKUs", "Review Pricing Wizard data", "Exit"]
+		stages = ["Reprice SKUs", "Price new SKUs", "Suggest price review SKUs", "Review Pricing Wizard data", "Exit"]
 		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
 		answer = inquirer.prompt(question, theme=self._theme2, raise_keyboard_interrupt=True)
 		self.stage = stages.index(answer["stage"])
