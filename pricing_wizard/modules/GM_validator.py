@@ -123,7 +123,7 @@ class GM_validator(object):
 		# Bulky does not seem to set very often (ever?) so will use the look up that eprice does
 		any_errors = []
 		any_warnings = []
-		
+
 		# If it is not present, we will set a value based on best knowledge
 		if self.df_skus["bulky?"].isnull().values.any():
 			skus = self.df_skus.loc[(self.df_skus["bulky?"].isnull()),"sku"]
@@ -171,7 +171,7 @@ class GM_validator(object):
 			col_name = f"new prices pp pct {rp}"
 			if self.df_skus.loc[(self.df_skus[col_name] < ppp)].empty != True:
 				skus = self.df_skus.loc[(self.df_skus[col_name] < ppp), 'sku']
-				any_errors.append(f"{rp:2}M PP% is below the expected pricing threshold ({ppp}%) for SKUs : {skus.values}")
+				any_errors.append(f"{rp:2}M - PP% is below the expected pricing threshold ({ppp}%) for SKUs : {skus.values}")
 
 		return any_errors
 
