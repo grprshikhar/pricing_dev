@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # Regular modules
 import sys
+import readchar
 # Import the option handler for managing user input
 from modules.options_handler import options_handler as opts
 # Import the eprice_validator for validating inputs
@@ -44,7 +45,7 @@ def price_new_skus(run_opts):
 	validator.select_SKUs(SKUs)
 
 
-def something_with_redshift(pricing_wizard):
+def something_with_redshift(run_opts):
 	pass
 
 def print_title():
@@ -54,13 +55,21 @@ def print_title():
 	# Removed upper/lower bands because this does not respect user colour scheme
 	cprint(figlet_format('  Pricing\n  Wizard!\n',font='starwars',width = 200 ), 'red', attrs=['bold'])
 
+def reassign_backspace():
+	# It seems some platforms indicate backspace differently
+	# inquirer uses readchar to catch inputs
+	# OSX - uses \x7F not \x08
+	if sys.platform == "darwin":
+		readchar.key.BACKSPACE = '\x7F'
+
 # ------------------------------------------------------------------------ #
 # Main program - control program flow
 # ------------------------------------------------------------------------ #
 if __name__ == "__main__":
 	# Set exception hook for main program
 	sys.excepthook = exception_hook
-
+	# Reassign backspace key based on OS - WIP
+	reassign_backspace()
 	# Create object
 	run_opts = opts()
 

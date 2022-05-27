@@ -1,9 +1,7 @@
 import modules.gsheet as gsheet
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
-from tabulate import tabulate
-from termcolor import colored,cprint
-from modules.print_utils import print_check
+from modules.print_utils import print_check, print_green, tabulate_dataframe
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
@@ -67,6 +65,9 @@ class eprice_validator(object):
 		# Check charm pricing (number ends in 9)
 		sanity_checks.last_digit_9(self.df_td)
 		print_check("Decimal digit ends with 9")
+		# Check price plans are not below a threshold
+		sanity_checks.check_minimum(self.df_td, 5)
+		print_check("Rental plans larger than minimum requirement")
 		# Clean any NaN (check if this is just generating empty string columns)
 		self.df_td['new']= self.df_td['new'].fillna('')
 		print_check("Passed all checks\n")
@@ -100,7 +101,8 @@ class eprice_validator(object):
 		answer_yes = run_opts.yn_question("View full upload data :")
 		if answer_yes:
 			disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
-			print(colored("Full upload data\n",'green')+colored(tabulate(disc_dt, headers='keys', tablefmt='psql'),'blue')+"\n\n") 
+			print_green("Full upload data")
+			tabulate_dataframe(disc_dt)
 
 
 

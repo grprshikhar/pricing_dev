@@ -1,11 +1,12 @@
 import sys
 import traceback
 from termcolor import colored
+from tabulate import tabulate
 from googleapiclient.errors import HttpError
 
 # Print utility
 def print_check(msg):
-    print(" - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+msg)
+    print(" - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+colored(msg, 'blue'))
 
 def print_green(msg):
     print (f"{colored(msg,'green')}")
@@ -19,6 +20,19 @@ def print_red(msg):
 def print_red_bold(msg):
     print (f"{colored(msg,'red',attrs=['bold'])}")
 
+def print_yellow(msg):
+    print (f"{colored(msg,'yellow')}")
+
+def print_yellow_bold(msg):
+    print (f"{colored(msg,'yellow',attrs=['bold'])}")
+
+def print_warning(msg):
+    print_yellow_bold("PricingWizard : Warning")
+    print_yellow_bold("-----------------------")
+    print_yellow(msg)
+
+def tabulate_dataframe(df):
+    print(colored(tabulate(df, headers='keys', tablefmt='psql'),'blue')+"\n\n") 
 
 # Error handling utility
 

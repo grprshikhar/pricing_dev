@@ -141,6 +141,16 @@ def last_digit_9 (df_td):
     # Track all cases of charm pricing not used to better inform the user
     if any_errors:
         raise ValueError("\n".join(any_errors))
+
+def check_minimum(df_td, minval):
+    any_errors = []
+    for plan in [1,3,6,12,18,24]:
+        pc = "active_plan"+str(plan)
+        if df_td.loc[(df_td[pc]<minval)].empty != True:
+           sku = df_td.loc[(df_td[pc]<minval), 'sku']
+           any_errors.append( str(plan) + f"M Plan has low price (below {minval}€ or {minval}$) : " + str(sku.values) )
+    if any_errors:
+        raise ValueError("\n".join(any_errors))
             
 
 #### Summarize data
