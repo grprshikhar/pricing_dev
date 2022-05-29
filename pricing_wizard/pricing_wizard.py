@@ -10,6 +10,8 @@ from modules.eprice_validator import eprice_validator
 from modules.GM_validator import GM_validator
 # Error handling
 from modules.print_utils import exception_hook
+# Import module holding reports
+from modules.report_runner import report_runner
 
 # ------------------------------------------------------------------------ #
 # Functions managing calls for each stage of the program flow
@@ -46,8 +48,13 @@ def price_new_skus(run_opts):
 	# Create e-price dataframe
 
 
-def something_with_redshift(run_opts):
-	pass
+def redshift_report(run_opts):
+	# Class to manage setting up report options
+	reports = report_runner()
+	# User selects the report
+	report_key = run_opts.choice_question("Select report :", reports.get_reports())
+	# Run the report requested
+	reports.run_report(report_key)
 
 def print_title():
 	# Imports for title
@@ -89,11 +96,15 @@ if __name__ == "__main__":
 		if run_opts.stage == 1:
 			price_new_skus(run_opts)
 
-		# 2 : Provide potential to expand into redshift checks and suggest SKUs to be checked
+		# 2 : Run a redshift-based report
 		if run_opts.stage == 2:
-			something_with_redshift(run_opts)
+			redshift_report(run_opts)
 
-		# 3 : Just print out the data stored in the json file for cross-checks on-the-fly
+		# 3 : Separate option for pricing review
 		if run_opts.stage == 3:
+			pass
+
+		# 4 : Just print out the data stored in the json file for cross-checks on-the-fly
+		if run_opts.stage == 4:
 			run_opts.info()
 
