@@ -1,5 +1,6 @@
 from tabulate import tabulate
 from termcolor import colored,cprint
+from modules.print_utils import print_exclaim
 try:
     import sys
     import colorama
@@ -104,7 +105,7 @@ plan_limit_dict = {
 
 def check_rrp_perc(df_td,plan_limit_dict):
     # Print out the options being used
-    print("RRP% guidelines being checked (in lieu of PP)\n")
+    print_exclaim("Price % guidelines being checked \n")
     # Convert dict to 100* value for better comprehension when printed out
     plan_limit_dict_print = {k: [100*x for x in v] for k, v in plan_limit_dict.items()}
     print(colored(tabulate(plan_limit_dict_print,

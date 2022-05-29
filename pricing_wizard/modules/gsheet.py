@@ -8,6 +8,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import sys
 import pandas
+from modules.print_utils import print_check
 
 # Scope variable
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -57,7 +58,7 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     if not values:
         raise ValueError(f"No data found in spreadsheet : [{SPREADSHEET_ID}].")
     else:
-        print (f"Data pulled from spreadsheet : [{SPREADSHEET_ID}].")
+        print_check (f"Data pulled from spreadsheet : [{SPREADSHEET_ID}].")
         return values
 
 # This is the function the user will need to call

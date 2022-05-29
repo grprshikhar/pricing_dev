@@ -1,7 +1,7 @@
 import modules.gsheet as gsheet
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
-from modules.print_utils import print_check, print_green, tabulate_dataframe
+from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
@@ -47,7 +47,7 @@ class eprice_validator(object):
 
 	def sanity_check(self):
 		# Use catman utils and sanity check functions to ensure format is valid
-		print("\nApplying sanity checks to pricing sheet\n")
+		print_exclaim("Applying sanity checks to pricing sheet")
 		# Column type checks
 		sanity_checks.check_dataType(self.df)
 		print_check("No empty cells")
@@ -70,7 +70,7 @@ class eprice_validator(object):
 		print_check("Rental plans larger than minimum requirement")
 		# Clean any NaN (check if this is just generating empty string columns)
 		self.df_td['new']= self.df_td['new'].fillna('')
-		print_check("Passed all checks\n")
+		print_exclaim("Passed all checks\n")
 
 
 	def summarise(self, run_opts):

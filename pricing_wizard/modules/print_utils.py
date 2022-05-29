@@ -8,6 +8,10 @@ from googleapiclient.errors import HttpError
 def print_check(msg):
     print(" - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+colored(msg, 'blue'))
 
+def print_exclaim(msg):
+    print(" - "+colored('!', 'green', attrs=['bold'])+" - "+colored(msg, 'blue', attrs=['bold']))
+
+
 def print_green(msg):
     print (f"{colored(msg,'green')}")
 
