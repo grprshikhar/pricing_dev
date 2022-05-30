@@ -57,9 +57,11 @@ class GM_validator(object):
 		# Assign the renamed header to dataframe
 		self.df.columns = header
 
-		# Create a new 'bulky?' in US dataframe and set to 0
+		# Create a new 'bulky?' in US dataframe
+		# Either set to 0 - fixed no-bulky
+		# Or set to None which will generate a check
 		if self.market == "US":
-			self.df["bulky?"] = 0
+			self.df["bulky?"] = None
 
 	# User provides SKUs which defines a subset of main dataframe
 	def select_SKUs(self, SKUs):
@@ -127,10 +129,13 @@ class GM_validator(object):
 		# If it is not present, we will set a value based on best knowledge
 		if self.df_skus["bulky?"].isnull().values.any():
 			skus = self.df_skus.loc[(self.df_skus["bulky?"].isnull()),"sku"]
-			any_warnings.append(f"Attempting to check bulky status for : {skus.values}")
+			any_warnings.append(f"Checking bulky status for : {skus.values}")
+			any_warnings.append(f"New bulky flag options")
 			# If not set, we will try and look it up
 			for sku in skus:
 				self.df_skus.loc[(self.df_skus["sku"]==sku),"bulky?"] = self.bulky_checker.is_it_bulky(sku)
+				# Report the changes as well
+				any_warnings.append(f'{self.df_skus.loc[(self.df_skus["sku"]==sku),["sku","bulky?"]].values}')
 
 		# If a value was set, we check that it was 0 or 1
 		if ~self.df_skus["bulky?"].isin([0,1]).values.any():
