@@ -7,7 +7,7 @@ import redshift_connector
 # Password 
 import getpass
 # Modules
-from modules.print_utils import print_check
+from modules.print_utils import print_check, print_exclaim
 
 class report_base(ABC):
 
@@ -21,7 +21,7 @@ class report_base(ABC):
 	@property # Shared property in derived classes
 	@final    # Cannot be changed in derived classes
 	def conn(self):
-		print_check("Configure RedShift connection.")
+		print_exclaim("Configure RedShift connection.")
 		user = input("Enter username : ")
 		pwd  = getpass.getpass()
 		# Make connection (required VPN)

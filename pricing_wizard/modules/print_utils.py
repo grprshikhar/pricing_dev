@@ -88,8 +88,13 @@ def exception_hook(exctype, value, tb):
     elif exctype == InterfaceError:
         print_red_bold("PricingWizard : InterfaceError from RedShift")
         print_red_bold("--------------------------------------------")
-        print_red_bold(value)
-        print_green_bold("Please ensure your Pritunl is currently active to access RedShift database.\n")
+        # Handle both connection timeout error and invalid username/password errors here
+        try:
+            print_red_bold (value.args[0]['M'])
+            print_green_bold("Please ensure your username and password are valid.\n")
+        except:
+            print_red_bold(f"{' - '.join([str(x) for x in value.args])}")
+            print_green_bold("Please ensure your Pritunl VPN is currently active to access RedShift database.\n")
         sys.exit(5)
 
     else:
