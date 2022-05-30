@@ -173,7 +173,7 @@ class options_handler(object):
 
 	def get_SKUs(self):
 		SKUs = []
-		question_sku  = [inquirer.Text("sku", message="Enter SKUs (space or comma separated) :")]
+		question_sku  = [inquirer.Text("sku", message="Enter SKUs (space, comma, new-line separated) :")]
 		question_loop = [inquirer.List("continue",message="Enter more SKUs :",choices=["Yes","No"])]
 		loop = True
 		while loop:
@@ -183,11 +183,12 @@ class options_handler(object):
 			for _sku in answer["sku"].split(","):
 				for __sku in _sku.split():
 					SKUs.append(__sku)
-			# Print current data
-			print_check (f"SKUs provided so far : {SKUs}")
-			# Check if we keep taking more data
-			answer = inquirer.prompt(question_loop, theme=self._theme)
-			loop = True if answer["continue"] == "Yes" else False
+			if answer["sku"].strip() == "":
+				# Print current data
+				print_check (f"SKUs provided so far : {SKUs}")
+				# Check if we keep taking more data
+				answer = inquirer.prompt(question_loop, theme=self._theme)
+				loop = True if answer["continue"] == "Yes" else False
 
 		return SKUs
 
