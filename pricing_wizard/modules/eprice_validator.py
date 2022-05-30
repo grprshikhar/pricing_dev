@@ -1,11 +1,13 @@
 import modules.gsheet as gsheet
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
+import modules.redshift_manager as redshift_manager
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
 	def __init__(self, sheet_id=None, data_range=None, dataframe=None):
+		self.redshift = None
 		if sheet_id and data_range:
 			self.sheet_id   = sheet_id
 			self.data_range = data_range
@@ -69,12 +71,26 @@ class eprice_validator(object):
 		# Check price plans are not below a threshold
 		sanity_checks.check_minimum(self.df_td, 5)
 		print_check("Rental plans larger than minimum requirement")
-		# Clean any NaN (check if this is just generating empty string columns)
+		# Clean NaN in new columns and set to empty strings
 		self.df_td['new']= self.df_td['new'].fillna('')
 		print_exclaim("Passed all checks\n")
 
 
 	def summarise(self, run_opts):
+		# Check against RedShift pricing history
+		answer_yes = run_opts.yn_question("Check historical price points :")
+		if answer_yes:
+			# Create RedShift database manager
+			self.redshift = redshift_manager.redshift_manager()
+			# Connect the database
+			self.redshift.connect()
+			# Get the list of SKU for quicker request
+			skus = self.df_td["sku"].unique().tolist()
+			# Retrieve a dataframe of historical prices
+			historical_sku_df = self.redshift.get_price_history(skus)
+			# Now we need to process this data and check the recent high prices
+			# TO-DO
+
 		# Check the RRP% using min/max limits
 		plan_limit_dict = {
 			1 :  [0.085, 0.5],

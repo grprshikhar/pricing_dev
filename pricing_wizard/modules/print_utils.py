@@ -3,7 +3,7 @@ import traceback
 from termcolor import colored
 from tabulate import tabulate
 from googleapiclient.errors import HttpError
-from redshift_connector.error import InterfaceError
+from redshift_connector.error import InterfaceError, ProgrammingError
 
 # Print utility
 def print_check(msg):
@@ -95,6 +95,15 @@ def exception_hook(exctype, value, tb):
         except:
             print_red_bold(f"{' - '.join([str(x) for x in value.args])}")
             print_green_bold("Please ensure your Pritunl VPN is currently active to access RedShift database.\n")
+        sys.exit(5)
+    elif exctype == ProgrammingError:
+        print_red_bold("PricingWizard : ProgrammingError from RedShift")
+        print_red_bold("----------------------------------------------")
+        try:
+            print_red_bold (value.args[0]['M'])
+            print_green_bold("Please check database access rights and configuration.\n")
+        except:
+            print_red_bold(f"{' - '.join([str(x) for x in value.args])}")
         sys.exit(5)
 
     else:
