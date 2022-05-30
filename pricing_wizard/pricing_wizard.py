@@ -46,6 +46,11 @@ def price_new_skus(run_opts):
 	# Select the data
 	validator.select_SKUs(SKUs)
 	# Create e-price dataframe
+	eprice_df = validator.generate_eprice_dataframe()
+	# Pass into e-price validator
+	ep_validator = eprice_validator(dataframe=eprice_df)
+	# Check output
+	ep_validator.summarise(run_opts)
 
 
 def redshift_report(run_opts):

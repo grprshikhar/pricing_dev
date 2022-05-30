@@ -5,12 +5,13 @@ from modules.print_utils import print_check, print_exclaim, print_green, tabulat
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
-	def __init__(self, sheet_id='default', data_range='Export!A:N', dataframe=None):
-		if not dataframe:
+	def __init__(self, sheet_id=None, data_range=None, dataframe=None):
+		if sheet_id and data_range:
 			self.sheet_id   = sheet_id
 			self.data_range = data_range
 			self.get_data()
 		else:
+			print ("Test")
 			self.sheet_id   = None
 			self.data_range = None
 			self.set_data(dataframe)		
@@ -85,6 +86,7 @@ class eprice_validator(object):
 		answer_yes = run_opts.yn_question("Check RRP% guidelines :")
 		if answer_yes:
 			sanity_checks.check_rrp_perc(self.df_td, plan_limit_dict)
+			print_check("Passed price % guidelines")
 
 		# Breakdown the output for review
 		# - Summary of category/plans

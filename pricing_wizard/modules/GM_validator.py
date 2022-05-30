@@ -186,7 +186,6 @@ class GM_validator(object):
 		for rp in [1,3,6,12,18,24]:
 			sku_rp = self.df_skus.set_index('sku')[[f"new prices {rp}", f"new prices pp pct {rp}", f"gross margin pct {rp}"]]
 			tabulate_dataframe(sku_rp)
-		print (self.df_skus.dtypes)
 
 
 	# --------------------------------------------
@@ -222,14 +221,46 @@ class GM_validator(object):
 	# Functions to handle creation of e-price data
 	# --------------------------------------------
 	def generate_eprice_dataframe(self):
-		# Columns used for eprice dataframe
-		columns = ["sku","category", "subcategory", "bulky", "store code", "new", "months_old", "rrp", 
-				   "plan1", "plan3", "plan6", "plan12", "plan18", "plan24", 
-				   "old_low_plan1", "old_low_plan3", "old_low_plan6", "old_low_plan12", "old_low_plan18", "old_low_plan24",
-				   "old_high_plan1", "old_high_plan3", "old_high_plan6", "old_high_plan12", "old_high_plan18", "old_high_plan24"]
+		# Columns : GM -> eprice export
+		columns = {"sku"             : "sku",
+				   "category"        : "category level 1", 
+				   "subcategory"     : "category level 2", 
+				   "bulky"           : "bulky?", 
+				   "store code"      : "internationals", 
+				   "new"             : "",
+				   "months_old"      : "", 
+				   "rrp"             : "rrp", 
+				   "plan1"           : "new prices 1",
+				   "plan3"           : "new prices 3", 
+				   "plan6"           : "new prices 6", 
+				   "plan12"          : "new prices 12",
+				   "plan18"          : "new prices 18", 
+				   "plan24"          : "new prices 24", 
+				   "old_low_plan1"   : "",
+				   "old_low_plan3"   : "", 
+				   "old_low_plan6"   : "",
+				   "old_low_plan12"  : "", 
+				   "old_low_plan18"  : "", 
+				   "old_low_plan24"  : "",
+				   "old_high_plan1"  : "", 
+				   "old_high_plan3"  : "", 
+				   "old_high_plan6"  : "", 
+				   "old_high_plan12" : "", 
+				   "old_high_plan18" : "", 
+				   "old_high_plan24" : ""}
 		# Create dataframe with columns
-		df_eprice = pandas.DataFrame(columns=columns)
+		df_eprice = pandas.DataFrame(columns=columns.keys())
 		# Process our selected data
+		for eprice_col in columns:
+			gm_col = columns[eprice_col]
+			if gm_col != "":
+				df_eprice[eprice_col] = self.df_skus[gm_col]
+
+		# Now set "newness"
+		df_eprice["new"] = "new"
+		return df_eprice
+
+
 
 
 
