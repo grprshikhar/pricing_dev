@@ -30,8 +30,10 @@ class report_base(ABC):
 			port=5439,
 			database='dev',
 			user=user,
-			password=pwd
+			password=pwd,
+			timeout=5
 			)
+		# Note - We will timeout with InterfaceError if the vpn is not active
 		print_check("RedShift connection active.")
 
 	# Cursor from the redshift conection

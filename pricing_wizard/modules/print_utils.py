@@ -3,6 +3,7 @@ import traceback
 from termcolor import colored
 from tabulate import tabulate
 from googleapiclient.errors import HttpError
+from redshift_connector.error import InterfaceError
 
 # Print utility
 def print_check(msg):
@@ -84,5 +85,12 @@ def exception_hook(exctype, value, tb):
         print_red_bold(value)
         print_green_bold("Please ensure that this spreadsheet is shared with 'Grover' in the share options.\n")
         sys.exit(4)
+    elif exctype == InterfaceError:
+        print_red_bold("PricingWizard : InterfaceError from RedShift")
+        print_red_bold("--------------------------------------------")
+        print_red_bold(value)
+        print_green_bold("Please ensure your Pritunl is currently active to access RedShift database.\n")
+        sys.exit(5)
+
     else:
         sys.__excepthook__(exctype, value, tb)
