@@ -74,13 +74,13 @@ class GM_validator(object):
 		n_found     = df_skus.shape[0]
 		# If we match the number requested and number found
 		if n_requested == n_found:
-			print_check("Found all requested SKUs")
+			print_check(f"Found all ({n_requested}) requested SKUs")
 		else:
 			# Generate a set difference
 			missing_skus = set(SKUs) - set(df_skus['sku'])
 			# If it is empty, indicates we had duplicates provided by user
 			if len(missing_skus) == 0:
-				print_warning("Duplicate SKUs were provided and removed.")
+				print_warning(f"Duplicate SKUs were provided and removed ({df_skus.shape[0]} SKUs kept).")
 			else:
 				# Otherwise we have some SKUs requested which were not in the sheet (maybe EU/US or mistyped)
 				raise ValueError(f"Not all requested SKUs were found in {self.market} pricing sheet.\nMissing SKUs: {missing_skus}")
@@ -156,11 +156,11 @@ class GM_validator(object):
 			col_name = f"gross margin pct {rp}"
 			if self.df_skus.loc[(self.df_skus[col_name] < min_threshold)].empty != True:
 				skus = self.df_skus.loc[(self.df_skus[col_name] < min_threshold),'sku']
-				any_errors.append(f"{rp:2}M - gross margin % is below the minimum threshold ({min_threshold}%) for SKUs : {skus.values}")
+				any_errors.append(f"{rp:2}M - gross margin % is below the minimum threshold ({min_threshold}%) for {skus.shape[0]} SKUs : {skus.values}")
 
 			if self.df_skus.loc[(self.df_skus[col_name] >= min_threshold) & (self.df_skus[col_name] < threshold)].empty != True:
 				skus = self.df_skus.loc[(self.df_skus[col_name] >= min_threshold) & (self.df_skus[col_name] < threshold),'sku']
-				any_warnings.append(f"{rp:2}M - gross margin % is low ({min_threshold} < GM% < {threshold}) for SKUs : {skus.values}")
+				any_warnings.append(f"{rp:2}M - gross margin % is low ({min_threshold} < GM% < {threshold}) for {skus.shape[0]} SKUs : {skus.values}")
 
 		return any_errors, any_warnings
 
@@ -176,7 +176,7 @@ class GM_validator(object):
 			col_name = f"new prices pp pct {rp}"
 			if self.df_skus.loc[(self.df_skus[col_name] < ppp)].empty != True:
 				skus = self.df_skus.loc[(self.df_skus[col_name] < ppp), 'sku']
-				any_errors.append(f"{rp:2}M - PP% is below the expected pricing threshold ({ppp}%) for SKUs : {skus.values}")
+				any_errors.append(f"{rp:2}M - PP% is below the expected pricing threshold ({ppp}%) for {skus.shape[0]} SKUs : {skus.values}")
 
 		return any_errors
 

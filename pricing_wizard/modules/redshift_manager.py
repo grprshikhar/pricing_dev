@@ -3,7 +3,6 @@
 from modules.print_utils import print_exclaim, print_check
 from getpass import getpass
 import redshift_connector
-from socket import timeout
 import pandas
 import datetime
 
@@ -12,8 +11,6 @@ class redshift_manager(object):
 		self.connection = None
 
 	def connect(self):
-		# Set a longer SSL timeout
-		timeout(20)
 		# Check if we already made a connection
 		if self.connection:
 			print_check("Reusing active database connection")
@@ -28,7 +25,7 @@ class redshift_manager(object):
 						database='dev',
 						user=user,
 						password=pwd,
-						timeout=5
+						timeout=15
 						)
 		print_check("RedShift connection made.")
 

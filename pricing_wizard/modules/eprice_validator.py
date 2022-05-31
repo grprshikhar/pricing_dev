@@ -14,7 +14,6 @@ class eprice_validator(object):
 			self.data_range = data_range
 			self.get_data()
 		else:
-			print ("Test")
 			self.sheet_id   = None
 			self.data_range = None
 			self.set_data(dataframe)		
