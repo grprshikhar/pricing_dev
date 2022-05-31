@@ -3,6 +3,7 @@ import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
+from modules.eprice_update_utils import check_discount_anchor
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
@@ -86,10 +87,14 @@ class eprice_validator(object):
 			self.redshift.connect()
 			# Get the list of SKU for quicker request
 			skus = self.df_td["sku"].unique().tolist()
-			# Retrieve a dataframe of historical prices
+			# Retrieve a dataframe consisting of min_high and max_high prices
 			historical_sku_df = self.redshift.get_price_history(skus)
 			# Now we need to process this data and check the recent high prices
 			# TO-DO
+			# If discount being applied, high price needs to be min_high
+			check_discount_anchor(self.df_td, historical_sku_df)
+
+			# If repricing being applied, high price _can_ be max_high
 
 		# Check the RRP% using min/max limits
 		plan_limit_dict = {
