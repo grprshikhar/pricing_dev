@@ -15,13 +15,6 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # This function authorises against the Google API
 def gsheet_api_check(SCOPES):
-    # Best to use relative paths or provide the path
-    # we need through an environment variable
-
-    # path = r"/home/ubuntu/pricing_wizard/APIs"
-    # path = r"/Users/shikharsrivastava/Documents/APIs"
-    # os.chdir(path)
-
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first

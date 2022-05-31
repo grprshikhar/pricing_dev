@@ -104,12 +104,14 @@ class GM_validator(object):
 
 		# Check the gross margin percentages for all active plans
 		gm_err, gm_warn = self.check_gross_margins(15,20) # 15% minimum, 20%+ ideal
-		any_errors.extend(gm_err)
+		#any_errors.extend(gm_err)
 		any_warnings.extend(gm_warn)
+		any_warnings.extend(gm_err)  # Don't exit on errors for now
 
 		# Check the purchase price percentages for all active plans
 		ppp_err = self.check_pp_perc()
-		any_errors.extend(ppp_err)
+		#any_errors.extend(ppp_err)
+		any_warnings.extend(ppp_err) # Don't exit on errors for now
 
 		# Finalise the validation
 		if any_warnings:
