@@ -39,6 +39,7 @@ def upload(fileout_name):
     # Credentials
     creds     = gdrive_api_check(SCOPES)
     service   = build('drive', 'v3', credentials=creds)
+    # We may want to adjust this to a pricing wizard folder
     folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
     mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -49,6 +50,7 @@ def upload(fileout_name):
 def list_folder():
     creds = gdrive_api_check(SCOPES)
     service = build('drive', 'v3', credentials=creds)
+    # We may want to adjust this to a pricing wizard folder
     folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
     # List files in the parent folder (weird syntax...)
     results = service.files().list(q=f"'{folder_id}' in parents", spaces="drive", ).execute()
