@@ -4,7 +4,7 @@ from modules.bulky_checker import bulky_checker
 import pandas
 import numpy
 
-class GM_validator(object):
+class new_price_validator(object):
 	# initialise with gsheet read
 	def __init__(self, sheet_id, data_range='GM!A:AX', market='EU'):
 		self.sheet_id      = sheet_id

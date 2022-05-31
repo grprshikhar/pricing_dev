@@ -7,7 +7,7 @@ from modules.options_handler import options_handler as opts
 # Import the eprice_validator for validating inputs
 from modules.eprice_validator import eprice_validator
 # Import the GM_validator for validating new pricing
-from modules.GM_validator import GM_validator
+from modules.new_price_validator import new_price_validator
 # Error handling
 from modules.print_utils import exception_hook
 # Import module holding reports
@@ -40,7 +40,7 @@ def price_new_skus(run_opts):
 	if run_opts.new_price_market == "EU":
 		data_range = '3.GM!A8:AX'
 	# Set up validation tool
-	validator = GM_validator(run_opts.current_sheet, data_range, run_opts.new_price_market)
+	validator = new_price_validator(run_opts.current_sheet, data_range, run_opts.new_price_market)
 	# Ask for SKUs if we have loaded the sheet
 	SKUs = run_opts.get_SKUs()
 	# Select the data
