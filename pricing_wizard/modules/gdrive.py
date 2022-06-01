@@ -1,14 +1,14 @@
-import os
+import os, io
 # Google API
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from apiclient.http import MediaFileUpload
+from apiclient.http import MediaFileUpload, MediaIoBaseDownload
 from googleapiclient.errors import HttpError
-from modules.print_utils import print_check
+from modules.print_utils import print_check, print_exclaim
 
-# Scope variable
+# Scope variable - Can probably be placed into the api check on its own
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 # This function authorises against the Google API
@@ -39,7 +39,7 @@ def upload(fileout_name):
     # Credentials
     creds     = gdrive_api_check(SCOPES)
     service   = build('drive', 'v3', credentials=creds)
-    # We may want to adjust this to a pricing wizard folder
+    # 'Price Upload - Sanity Checked' folder ID
     folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
     mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -47,6 +47,22 @@ def upload(fileout_name):
     media = MediaFileUpload(fileout_name, mimetype = mime_type)
     file  = service.files().create(body=body, media_body=media).execute()
 
+# General download request function
+def download(file_id):
+    # Credentials
+    creds      = gdrive_api_check(SCOPES)
+    service    = build('drive', 'v3', credentials=creds)
+    request    = service.files().get_media(fileId=file_id)
+    fh         = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+        print_exclaim (f"Download in progress {100*int(status.progress()):3}%")
+    print_check("Download complete")
+    return fh
+
+# Helper functions - List contents of folder
 def list_folder(folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'):
     creds = gdrive_api_check(SCOPES)
     service = build('drive', 'v3', credentials=creds)
@@ -55,31 +71,49 @@ def list_folder(folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'):
     items   = results.get('files', [])
     return items
 
+# Helper function - Allow user to download a selected file from a list
 def download_from_list(folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'):
     from modules.options_handler import options_handler
     run_opts        = options_handler()
     folder_files    = list_folder(folder_id)
-    select_template = run_opts.choice_question("Select template file :", [x["name"] for x in folder_files])
-    matching_file   = next(filter(lambda x : x['name'] == select_template, folder_files), None)
-    if matching_file:
-        file_id = matching_file["id"]
-        return file_id
-    else:
+    select_file     = run_opts.choice_question("Select template file :", [x["name"] for x in folder_files])
+    matching_file   = next(filter(lambda x : x['name'] == select_file, folder_files), None)
+    if not matching_file:
         return None
+    # File information is good
+    file_id = matching_file["id"]
+    # Download file id
+    file_bytes = download(file_id)
+    # Save file
+    with open(select_file,'wb') as f:
+        f.write(file_bytes.getbuffer())
+        f.close()
+    print_check(f"File downloaded as [{select_file}]")
 
+# Helper function - Fixed procedure to download the template file
 def download_store_template():
     # Fixed - Pricing/Templates
     folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'
     # Fixed - File name
-    file_name = '1template_stores.xlsx'
+    file_name = 'template_stores.xlsx'
     # Fixed - File ID
     file_id   = '11fb3mtzptYOmGOC-YnUtcK3YX-0BIiWD'
-    # Check the information
+    # Perform a check that this data matches before proceeding
     files = list_folder(folder_id)
     matching_file   = next(filter(lambda x : x['name'] == file_name and x['id'] == file_id, files), None)
     if not matching_file:
         raise ValueError(f"The template file [{file_name}] does not match the expected id [{file_id}].\nCheck the details in modules/gdrive.py")
-
+    # Everything is okay so get the file
+    file_bytes = download(file_id)
+    # Bytes are stored, now persist into a file
+    file_name = 'template.xlsx'
+    with open(file_name,'wb') as f:
+        f.write(file_bytes.getbuffer())
+        f.close()
+    print_check(f"Template file saved as [{file_name}].")
+    # Return the file name for use elsewhere
+    return file_name
+    
 
 
 
