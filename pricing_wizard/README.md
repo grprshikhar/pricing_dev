@@ -1,4 +1,9 @@
+# Pricing Wizard
+
+## Table of Contents
+
 - [Pricing Wizard](#pricing-wizard)
+  * [Table of Contents](#table-of-contents)
   * [Introduction](#introduction)
   * [Systems](#systems)
     + [Mac OSX](#mac-osx)
@@ -10,7 +15,6 @@
     + [Suggest price review SKUs](#suggest-price-review-skus)
     + [Review Pricing Wizard data](#review-pricing-wizard-data)
 
-# Pricing Wizard
 
 ## Introduction
 
