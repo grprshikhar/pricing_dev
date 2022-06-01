@@ -14,6 +14,7 @@
     + [Run report](#run-report)
     + [Suggest price review SKUs](#suggest-price-review-skus)
     + [Review Pricing Wizard data](#review-pricing-wizard-data)
+  * [Unit Tests](#unit-tests)
 
 
 ## Introduction
@@ -104,6 +105,19 @@ The aim here would be to process data from RedShift for specified categories and
 ### Review Pricing Wizard data
 
 This will provide a summary of the data stored in `user_data.json`
+
+## Unit Tests
+
+There are some small tests which have been written to check different packages are working as intended. The intended outcome here is not to have any errors. To run them, copy the following into your terminal.
+
+```
+for ut in `ls ut*.py`; do
+  python3 $ut
+  if [[ $? != 0 ]]; then
+    echo "Failed test for $ut"
+  fi
+done
+```
 
 
 
