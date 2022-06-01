@@ -51,6 +51,8 @@ def price_new_skus(run_opts):
 	ep_validator = eprice_validator(dataframe=eprice_df)
 	# Check output
 	ep_validator.summarise(run_opts)
+	# Upload output
+	ep_validator.upload(run_opts)
 
 
 def redshift_report(run_opts):
