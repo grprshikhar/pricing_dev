@@ -32,14 +32,16 @@ This tool has been developed on OSX and should therefore not require much work f
 
  - python3
    - Install using [homebrew](https://brew.sh/)
-   - `brew install python3` and follow the finalisation instructions
+   - `brew install python3` and follow the finalisation instructions `eval "$(/opt/homebrew/bin/brew shellenv)"`
+     - You may need to check you have the terminal profile. If you do not, do `touch ~/.bash_profile` or equivalent for zsh and copy the command again.
    - Install requirements using `pip3 -r requirements`
+     - If you get a message to update pip3, please follow the instructions.
 
 ### Windows
 
 This is where things might be bumpy at first. The best working solution is to use [Windows subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) which is available for Windows 10/11. This is a Microsoft supported system which allows a Linux installation to be made within the Windows environment. Further information regarding setup can be found in [this article](https://pbpython.com/wsl-python.html).
 
-Moving forwards, the most sensible Linux OS to choose is `Ubuntu 20.X`. Some information regarding setting up `python3` is available in [this article](https://linuxize.com/post/how-to-install-python-3-9-on-ubuntu-20-04/). 
+Moving forwards, the most sensible Linux OS to choose is `Ubuntu 22` which is the latest release and available on the [Microsoft Store](https://apps.microsoft.com/store/detail/ubuntu-2204-lts/9PN20MSR04DW?hl=en-us&gl=US). Some information regarding setting up `python3` is available in [this article](https://linuxize.com/post/how-to-install-python-3-9-on-ubuntu-20-04/) specifically written for `Ubuntu 20` but should be equally applicable to `Ubuntu 22.04` as can be seen in [this article](https://www.linuxcapable.com/how-to-install-python-3-9-on-ubuntu-22-04-lts/#Install_Python_39_-_PPA_Method). 
 
 A brief summary is:
  - `sudo apt-get update`
@@ -50,8 +52,11 @@ A brief summary is:
    - This will add the repository which contains modern python3.X releases
  - `sudo apt-get install python3.9`
    - This will ask the package manager to install python3.9.
+ - `sudo apt install python3-pip`
+   - This will install `pip3` for python package management
  - `pip3 -r requirements`
    - This should be the same as the OSX instructions to install the required modules.
+   - If you get a message to update pip3, please follow the instructions.
 
 ## Usage
 
