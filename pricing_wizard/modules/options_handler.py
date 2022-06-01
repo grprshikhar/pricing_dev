@@ -68,6 +68,14 @@ class options_handler(object):
 		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		return answer["choice"]
 
+	# -------------------------------
+	# Text question function
+	# -------------------------------
+	def text_question(self, question):
+		question = [inquirer.Text("text", message=question)]
+		answer = inquirer.prompt(question, theme=self._theme)
+		return answer["text"]
+
 
 	# -------------------------------
 	# Validate the username

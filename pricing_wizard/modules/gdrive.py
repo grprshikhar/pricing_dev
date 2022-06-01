@@ -35,7 +35,7 @@ def gdrive_api_check(SCOPES):
 
 # Expect this to be the only function needed to be called from outside this module
 # Need to check if this creates a link to gdrive and a path we can write to
-def upload(fileout_name):
+def upload(out_filename):
     # Credentials
     creds     = gdrive_api_check(SCOPES)
     service   = build('drive', 'v3', credentials=creds)
@@ -43,8 +43,8 @@ def upload(fileout_name):
     folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
     mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
-    body  = {'name': fileout_name, 'parents':[folder_id],'mimeType': mime_type}
-    media = MediaFileUpload(fileout_name, mimetype = mime_type)
+    body  = {'name': out_filename, 'parents':[folder_id],'mimeType': mime_type}
+    media = MediaFileUpload(out_filename, mimetype = mime_type)
     file  = service.files().create(body=body, media_body=media).execute()
 
 # General download request function

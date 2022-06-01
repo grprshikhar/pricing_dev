@@ -1,9 +1,15 @@
+# System imports
+import datetime
+import pandas
+# Module imports
 import modules.gsheet as gsheet
+import modules.gdrive as gdrive
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 from modules.eprice_update_utils import check_discount_anchor
+
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
@@ -125,6 +131,42 @@ class eprice_validator(object):
 			disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
 			print_green("Full upload data")
 			tabulate_dataframe(disc_dt)
+
+	def upload(self, run_opts):
+		# Download the template file
+		template_name = gdrive.download_store_template()
+		# Read template into dataframe
+		template_df   = pandas.read_excel(template_name, sheet_name=None)
+		# Get the rental plan sheet
+		rental_plans  = template_df["rental_plans"]
+		# Fill data from our dataframe
+		rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+		# Clean any NaN again
+		rental_plans  = rental_plans.fillna('')
+		# Configure output file name
+		# Today date matching existing format could also use .date().isoformat()
+		today_date    = datetime.datetime.today().strftime("%Y%m%d")
+		# The user who is doing work
+		username      = run_opts.current_user
+		# Construct the file name
+		out_filename  = f"{today_date}_{username}"
+		# Ask for an optional additional descriptor to the filename
+		description   = run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xlsx] :")
+		if description != "":
+			out_filename += "_"+description+".xlsx"
+		else:
+			out_filename += ".xlsx"
+		print_exclaim(f"Output file will be named [{out_filename}]")
+		# Now save the file locally
+		with pandas.ExcelWriter(out_filename) as writer:
+			rental_plans.to_excel(writer, sheet_name="rental_plans",index=False)
+		print_check("File written locally")
+		# Now upload the file
+		gdrive.upload(out_filename)
+		# Should be done!
+		print_check("File uploaded to Google Drive")
+
+
 
 
 

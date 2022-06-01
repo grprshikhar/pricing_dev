@@ -27,7 +27,7 @@ def validate_and_upload_eprice(run_opts):
 	# Check output
 	validator.summarise(run_opts)
 	# Next step would be upload...
-	# validator.upload(run_opts)
+	validator.upload(run_opts)
 
 def price_new_skus(run_opts):
 	# Validate the user information
