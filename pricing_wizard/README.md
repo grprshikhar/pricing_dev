@@ -1,3 +1,15 @@
+- [Pricing Wizard](#pricing-wizard)
+  * [Introduction](#introduction)
+  * [Systems](#systems)
+    + [Mac OSX](#mac-osx)
+    + [Windows](#windows)
+  * [Usage](#usage)
+    + [Reprice SKUs](#reprice-skus)
+    + [Price new SKUs](#price-new-skus)
+    + [Run report](#run-report)
+    + [Suggest price review SKUs](#suggest-price-review-skus)
+    + [Review Pricing Wizard data](#review-pricing-wizard-data)
+
 # Pricing Wizard
 
 ## Introduction
