@@ -8,3 +8,5 @@ pyfiglet
 google
 google_auth_oauthlib
 google-api-python-client
+gql[all]
+
