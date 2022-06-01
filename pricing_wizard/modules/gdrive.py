@@ -47,15 +47,60 @@ def upload(fileout_name):
     media = MediaFileUpload(fileout_name, mimetype = mime_type)
     file  = service.files().create(body=body, media_body=media).execute()
 
-def list_folder():
+def list_folder(folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'):
     creds = gdrive_api_check(SCOPES)
     service = build('drive', 'v3', credentials=creds)
-    # We may want to adjust this to a pricing wizard folder
-    folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
     # List files in the parent folder (weird syntax...)
     results = service.files().list(q=f"'{folder_id}' in parents", spaces="drive", ).execute()
     items   = results.get('files', [])
-    for i in items:
-        print (i)
+    return items
+
+def download_from_list(folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'):
+    from modules.options_handler import options_handler
+    run_opts        = options_handler()
+    folder_files    = list_folder(folder_id)
+    select_template = run_opts.choice_question("Select template file :", [x["name"] for x in folder_files])
+    matching_file   = next(filter(lambda x : x['name'] == select_template, folder_files), None)
+    if matching_file:
+        file_id = matching_file["id"]
+        return file_id
+    else:
+        return None
+
+def download_store_template():
+    # Fixed - Pricing/Templates
+    folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'
+    # Fixed - File name
+    file_name = '1template_stores.xlsx'
+    # Fixed - File ID
+    file_id   = '11fb3mtzptYOmGOC-YnUtcK3YX-0BIiWD'
+    # Check the information
+    files = list_folder(folder_id)
+    matching_file   = next(filter(lambda x : x['name'] == file_name and x['id'] == file_id, files), None)
+    if not matching_file:
+        raise ValueError(f"The template file [{file_name}] does not match the expected id [{file_id}].\nCheck the details in modules/gdrive.py")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
