@@ -26,7 +26,7 @@ def validate_and_upload_eprice(run_opts):
 	validator = eprice_validator(sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Check output
 	validator.summarise(run_opts)
-	# Next step would be upload...
+	# Upload output to google drive
 	validator.upload(run_opts)
 
 def price_new_skus(run_opts):
@@ -51,7 +51,7 @@ def price_new_skus(run_opts):
 	ep_validator = eprice_validator(dataframe=eprice_df)
 	# Check output
 	ep_validator.summarise(run_opts)
-	# Upload output
+	# Upload output to google drive
 	ep_validator.upload(run_opts)
 
 
@@ -70,7 +70,7 @@ def print_title():
 	# Removed upper/lower bands because this does not respect user colour scheme
 	cprint(figlet_format('  Pricing\n  Wizard!\n',font='starwars',width = 200 ), 'red', attrs=['bold'])
 
-def reassign_backspace():
+def reassign_keystrokes():
 	# It seems some platforms indicate backspace differently
 	# inquirer uses readchar to catch inputs
 	# OSX - uses \x7F not \x08
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 	# Set exception hook for main program
 	sys.excepthook = exception_hook
 	# Reassign backspace key based on OS - WIP
-	reassign_backspace()
+	reassign_keystrokes()
 	# Create object
 	run_opts = opts()
 
