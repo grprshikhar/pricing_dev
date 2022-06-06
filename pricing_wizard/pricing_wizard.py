@@ -28,7 +28,7 @@ def validate_and_upload_eprice(run_opts):
 	validator.post_sanity_checks(run_opts)
 	# Display the output
 	validator.summarise(run_opts)
-	# Upload output to google drive
+	# Upload output to google drive and admin panel
 	validator.upload(run_opts)
 
 def price_new_skus(run_opts):
@@ -55,7 +55,7 @@ def price_new_skus(run_opts):
 	ep_validator.post_sanity_checks(run_opts)
 	# Display the output
 	ep_validator.summarise(run_opts)
-	# Upload output to google drive
+	# Upload output to google drive and admin panel
 	ep_validator.upload(run_opts)
 
 
