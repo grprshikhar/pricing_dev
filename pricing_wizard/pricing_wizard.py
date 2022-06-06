@@ -24,7 +24,9 @@ def validate_and_upload_eprice(run_opts):
 	# Create eprice validator and runs checks
 	data_range = 'Export!A:N'
 	validator = eprice_validator(sheet_id=run_opts.current_sheet, data_range=data_range)
-	# Check output
+	# Run post-sanity checks
+	validator.post_sanity_checks(run_opts)
+	# Display the output
 	validator.summarise(run_opts)
 	# Upload output to google drive
 	validator.upload(run_opts)
@@ -49,7 +51,9 @@ def price_new_skus(run_opts):
 	eprice_df = validator.generate_eprice_dataframe()
 	# Pass into e-price validator
 	ep_validator = eprice_validator(dataframe=eprice_df)
-	# Check output
+	# Run post-sanity checks
+	ep_validator.post_sanity_checks(run_opts)
+	# Display the output
 	ep_validator.summarise(run_opts)
 	# Upload output to google drive
 	ep_validator.upload(run_opts)

@@ -1,38 +1,42 @@
 {
     "Achille": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
-        "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": ""
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Geet": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
-        "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": ""
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Marco": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
-        "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": ""
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Mert": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
-        "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": ""
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Shikhar": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
-        "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": ""
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Ian": {
         "E-Price": "1Y5kDiBejYkFzr3pE7R3Iv18odR8DX1pLDuvT1p75h44",
+        "local_username": "ian",
+        "redshift_username": "ian_connelly",
+        "adminpanel_username": "ian.connelly@grover.com"
+    },
+    "Global": {
         "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",
-        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ",
-        "local_username": "ian"
+        "US Catman GM": "1i-NC-vN4uh0oS1AQ5kiiz7d9oO9kjQOV0GrnBAl1fKQ"
     }
 }

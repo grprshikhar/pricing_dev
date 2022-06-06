@@ -7,6 +7,7 @@ import modules.gdrive as gdrive
 import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
+import modules.admin_panel as admin_panel
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 from modules.eprice_update_utils import check_discount_anchor
 
@@ -14,7 +15,12 @@ from modules.eprice_update_utils import check_discount_anchor
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
 	def __init__(self, sheet_id=None, data_range=None, dataframe=None):
-		self.redshift = None
+		# Tools
+		self.redshift   = None
+		self.admin_panel = None
+		# Template file name when created
+		self.template_filename = ""
+		# Input for data
 		if sheet_id and data_range:
 			self.sheet_id   = sheet_id
 			self.data_range = data_range
@@ -82,12 +88,13 @@ class eprice_validator(object):
 		print_exclaim("Passed all checks\n")
 
 
-	def summarise(self, run_opts):
+	def post_sanity_checks(self, run_opts):
 		# Check against RedShift pricing history
 		answer_yes = run_opts.yn_question("Check historical price points :")
 		if answer_yes:
-			# Create RedShift database manager
-			self.redshift = redshift_manager.redshift_manager()
+			# Create RedShift database manager (if not created)
+			if not self.redshift:
+				self.redshift = redshift_manager.redshift_manager(run_opts)
 			# Connect the database
 			self.redshift.connect()
 			# Get the list of SKU for quicker request
@@ -114,6 +121,7 @@ class eprice_validator(object):
 			sanity_checks.check_rrp_perc(self.df_td, plan_limit_dict)
 			print_check("Passed price % guidelines")
 
+	def summarise(self, run_opts):
 		# Breakdown the output for review
 		# - Summary of category/plans
 		answer_yes = run_opts.yn_question("View upload data summary :")
@@ -132,7 +140,12 @@ class eprice_validator(object):
 			print_green("Full upload data")
 			tabulate_dataframe(disc_dt)
 
+	# Main "upload" function which manages the google drive and then admin panel uploads
 	def upload(self, run_opts):
+		self.upload_template_to_gdrive(run_opts)
+		self.upload_template_to_adminpanel(run_opts)
+
+	def upload_template_to_gdrive(self, run_opts):
 		# Download the template file
 		template_name = gdrive.download_store_template()
 		# Read template into dataframe
@@ -161,10 +174,56 @@ class eprice_validator(object):
 		with pandas.ExcelWriter(out_filename) as writer:
 			rental_plans.to_excel(writer, sheet_name="rental_plans",index=False)
 		print_check("File written locally")
+		# Store the local tempalte filename
+		self.template_filename = out_filename
 		# Now upload the file
 		gdrive.upload(out_filename)
 		# Should be done!
 		print_check("File uploaded to Google Drive")
+
+	def upload_template_to_adminpanel(self, run_opts):
+		# Create the admin panel tool (if not created)
+		if not self.admin_panel:
+			self.admin_panel = admin_panel.admin_panel(run_opts)
+		# Generate standardized Admin Panel naming
+		time_now        = datetime.datetime.today()
+		today_date      = time_now.strftime("%Y%m%d")
+		username        = run_opts.current_user
+		adminPanelName  = f"PriWiz_{today_date}_{username}"
+		description     = run_opts.text_question(f"Add optional descriptor to Admin Panel name [{adminPanelName}_<...>] :")
+		if description != "":
+			adminPanelName += "_"+description
+		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
+		scheduledTime = (time_now + datetime.timedelta(minutes=5)).isoformat(timespec='milliseconds')+"Z"
+		print_exclaim(f"Scheduled upload for 5 minutes time : {scheduledTime}")
+		# Ask if we want a specific time
+		answer_yes = run_opts.yn_question("Schedule upload for a specific time :")
+		if answer_yes:
+			time_string = run_opts.text_question("Provide the specificed date/time with format [YY-MM-dd:hh.mm] :")
+			try:
+				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
+			except:
+				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
+		# All information available so now we can proceed with passing to admin panel
+		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
+								        adminPanelName  = adminPanelName,
+								        scheduledTime   = scheduledTime)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

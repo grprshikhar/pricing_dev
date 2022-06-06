@@ -5,7 +5,7 @@ import json
 url    = 'https://apiqa.getgrover.com/api/v1/oauth/token'
 header = {'Content-Type': 'application/json'}
 # Provide username and password in plain text here for now
-body   = {"email": "ian.connelly@grover.com", "password": "", "grant_type": "password" }
+body   = {"email": "ian.connelly@grover.com", "password": "cxv.yjd3ueu6qme*JUZ", "grant_type": "password" }
 y = json.dumps(body)
 
 x = requests.post(url, headers=header, data=y)

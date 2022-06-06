@@ -7,8 +7,9 @@ import pandas
 import datetime
 
 class redshift_manager(object):
-	def __init__(self):
+	def __init__(self, run_opts):
 		self.connection = None
+		self.run_opts   = run_opts
 
 	def connect(self):
 		# Check if we already made a connection
@@ -17,7 +18,7 @@ class redshift_manager(object):
 			return
 		# Otherwise set up the connection
 		print_exclaim("Preparing connection to RedShift database")
-		user = input("Enter RedShift username :: ")
+		user = self.run_opts.get_redshift_username()
 		pwd  = getpass("Enter RedShift password :: ")
 		self.connection = redshift_connector.connect(
 						host='datawarehouse-production.cpbbk0zu5qod.eu-central-1.redshift.amazonaws.com',

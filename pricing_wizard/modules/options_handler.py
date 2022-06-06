@@ -27,7 +27,7 @@ class options_handler(object):
 		# Read json data
 		try:
 			self.user_data = json.load(open(self.user_data_path))
-			self.users     = list(self.user_data.keys()) 
+			self.users     = sorted(list(set(list(self.user_data.keys())) - {"Global"}))
 		except:
 			raise ValueError(f"Error reading user data from {self.user_data_path}")
 
@@ -73,7 +73,7 @@ class options_handler(object):
 	# -------------------------------
 	def text_question(self, question):
 		question = [inquirer.Text("text", message=question)]
-		answer = inquirer.prompt(question, theme=self._theme)
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		return answer["text"]
 
 
@@ -136,10 +136,10 @@ class options_handler(object):
 		question = [inquirer.List("yn", message=f"Use default or update {answer['type']} pricing sheet URL :", choices=["Use default","Update"])]
 		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		if answer["yn"] == "Use default":
-			self.current_sheet = self.user_data[self.current_user][self.current_sheet_type]
+			self.current_sheet = self.user_data["Global"][self.current_sheet_type]
 		if answer["yn"] == "Update":
 			new_id = input(f"Provide new id for {self.current_sheet_type} : ")
-			self.user_data[self.current_user][self.current_sheet_type] = new_id
+			self.user_data["Global"][self.current_sheet_type] = new_id
 			self.current_sheet = new_id
 			# Save updated data
 			answer_yes = self.yn_question("Save updated data to disk :")
@@ -179,6 +179,9 @@ class options_handler(object):
 		else:
 			print_check (f"Data for [{self.current_user}] stored just for this session.")
 
+	# -------------------------------
+	# Get a list of SKUs
+	# -------------------------------
 	def get_SKUs(self):
 		SKUs = []
 		question_sku  = [inquirer.Text("sku", message="Enter SKUs (space, comma, new-line separated) :")]
@@ -186,7 +189,7 @@ class options_handler(object):
 		loop = True
 		while loop:
 			# Get data
-			answer = inquirer.prompt(question_sku, theme=self._theme)
+			answer = inquirer.prompt(question_sku, theme=self._theme, raise_keyboard_interrupt=True)
 			# Parse data
 			for _sku in answer["sku"].split(","):
 				for __sku in _sku.split():
@@ -195,7 +198,7 @@ class options_handler(object):
 				# Print current data
 				print_check (f"SKUs provided so far : {SKUs}")
 				# Check if we keep taking more data
-				answer = inquirer.prompt(question_loop, theme=self._theme)
+				answer = inquirer.prompt(question_loop, theme=self._theme, raise_keyboard_interrupt=True)
 				loop = True if answer["continue"] == "Yes" else False
 
 		return SKUs
@@ -225,10 +228,26 @@ class options_handler(object):
 	def get_sheet(self):
 		return self.current_sheet
 
+	def get_redshift_username(self):
+		redshift_username = self.user_data[self.current_user]["redshift_username"]
+		if redshift_username == "":
+			print_exclaim(f"RedShift username not stored in [{self.user_data_path}]")
+			redshift_username = self.text_question("Enter RedShift username :")
+		return redshift_username
+
+	def get_adminpanel_username(self):
+		adminpanel_username = self.user_data[self.current_user]["adminpanel_username"]
+		if adminpanel_username == "":
+			print_exclaim(f"Admin Panel username not stored in [{self.user_data_path}]")
+			adminpanel_username = self.text_question("Enter Admin Panel username :")
+		return adminpanel_username
+
+
 	# -------------------------------
 	# Print out the available info
 	# -------------------------------
 	def info(self):
+		import tabulate
 		# This is data loaded
 		print ("------------------------------------------")
 		print ("Data Summary")
@@ -242,9 +261,10 @@ class options_handler(object):
 		headers  = []
 		rowindex = []
 		data     = []
+
 		# Collect all keys by iteration (protect against some users having unique keys)
-		# Get all users
-		for user in self.user_data:
+		# Get all users (not "Global")
+		for user in self.users:
 			rowindex.append(user)
 			# Get all the sub-keys
 			for opt in sorted(self.user_data[user]):
@@ -255,7 +275,22 @@ class options_handler(object):
 		for user in rowindex:
 			data.append( [self.user_data[user][h] if h in self.user_data[user] else "" for h in headers]  )
 
-		import tabulate
+		# Print prettified
 		print (tabulate.tabulate( data, headers=headers, showindex=rowindex, tablefmt="psql"  ) )
+
+		# Get data for "Global" setting
+		headers  = []
+		rowindex = []
+		data     = []
+		rowindex.append("Global")
+		for opt in sorted(self.user_data["Global"]):
+			headers.append(opt)
+		headers = list(set(headers))
+		for user in rowindex:
+			data.append( [self.user_data[user][h] if h in self.user_data[user] else "" for h in headers]  )
+
+		# Print prettified
+		print (tabulate.tabulate( data, headers=headers, showindex=rowindex, tablefmt="psql"  ) )
+
 
 
