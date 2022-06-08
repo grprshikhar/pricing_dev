@@ -16,7 +16,10 @@ class CallStackFormatter(logging.Formatter):
                        *(frame.function
                          for frame
                          in stack[1:-9]))
-        return '::'.join(stack_names)
+        if stack_names:
+            return '::'.join([x for x in stack_names if x])
+        else:
+            return ""
 
     def format(self, record):
         record.message = record.getMessage()
@@ -46,7 +49,6 @@ def get_stream_handler():
     stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(FORMATTER)
     return stream_handler
-
 
 # File handler - Stream to file
 def get_file_handler(logger_name):
