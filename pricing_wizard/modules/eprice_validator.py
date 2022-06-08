@@ -184,9 +184,14 @@ class eprice_validator(object):
 		print_check("File uploaded to Google Drive")
 
 	def upload_template_to_adminpanel(self):
+		# Need the user to select Staging or Production version of site
+		answer = self.run_opts.choice_question("Please select Admin Panel version for upload",["Staging", "Production"])
+		to_production = (answer == "Production")
+
 		# Create the admin panel tool (if not created)
 		if not self.admin_panel:
-			self.admin_panel = admin_panel.admin_panel(self.run_opts)
+			self.admin_panel = admin_panel.admin_panel(self.run_opts, to_production)
+			
 		# Generate standardized Admin Panel naming
 		time_now        = datetime.datetime.today()
 		today_date      = time_now.strftime("%Y%m%d")
