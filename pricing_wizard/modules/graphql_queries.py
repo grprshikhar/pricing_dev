@@ -1,11 +1,27 @@
 # This file can hold any GraphQL queries needed for pricing in Admin Panel
 # Note for f-strings, we use double braces for a single brace in the string
 
-def upload_to_S3(filename):
+def upload_to_S3_staging(filename):
 	query_string = f"""
 		mutation {{
 			createS3PresignedUrl(input: {{
-				bucket: "catalog_jobs_uploads_staging",
+				bucket: "catalog-jobs-uploads-staging",
+				fileName: "{filename}"
+			}}) {{
+				... on PresignedUrl {{
+					fileUri
+				}}
+			}}
+
+		}}
+	"""
+	return query_string
+
+def upload_to_S3_production(filename):
+	query_string = f"""
+		mutation {{
+			createS3PresignedUrl(input: {{
+				bucket: "catalog-jobs-uploads-production",
 				fileName: "{filename}"
 			}}) {{
 				... on PresignedUrl {{
