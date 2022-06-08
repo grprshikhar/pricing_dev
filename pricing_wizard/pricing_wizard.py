@@ -85,6 +85,8 @@ def suppress_pandas_xlwt_warning():
 	# Asked to use .xls for AdminPanel upload
 	# `xlwt` package required to write but deprecated in favour of .xlsx writing
 	# This option suppresses the warning otherwise written
+	import warnings
+	warnings.simplefilter(action='ignore', category=FutureWarning)
 	import pandas
 	pandas.options.io.excel.xls.writer = 'xlwt'
 
