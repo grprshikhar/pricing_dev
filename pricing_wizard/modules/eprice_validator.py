@@ -14,8 +14,9 @@ from modules.eprice_update_utils import check_discount_anchor
 
 class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
-	def __init__(self, sheet_id=None, data_range=None, dataframe=None):
+	def __init__(self, run_opts, sheet_id=None, data_range=None, dataframe=None):
 		# Tools
+		self.run_opts = run_opts
 		self.redshift   = None
 		self.admin_panel = None
 		# Template file name when created
@@ -88,13 +89,13 @@ class eprice_validator(object):
 		print_exclaim("Passed all checks\n")
 
 
-	def post_sanity_checks(self, run_opts):
+	def post_sanity_checks(self):
 		# Check against RedShift pricing history
-		answer_yes = run_opts.yn_question("Check historical price points :")
+		answer_yes = self.run_opts.yn_question("Check historical price points :")
 		if answer_yes:
 			# Create RedShift database manager (if not created)
 			if not self.redshift:
-				self.redshift = redshift_manager.redshift_manager(run_opts)
+				self.redshift = redshift_manager.redshift_manager(self.run_opts)
 			# Connect the database
 			self.redshift.connect()
 			# Get the list of SKU for quicker request
@@ -116,36 +117,36 @@ class eprice_validator(object):
 			12 : [0.034, 0.078],
 			18 : [0.03,  0.054],
 			24 : [0.025, 0.041]}
-		answer_yes = run_opts.yn_question("Check RRP% guidelines :")
+		answer_yes = self.run_opts.yn_question("Check RRP% guidelines :")
 		if answer_yes:
 			sanity_checks.check_rrp_perc(self.df_td, plan_limit_dict)
 			print_check("Passed price % guidelines")
 
-	def summarise(self, run_opts):
+	def summarise(self):
 		# Breakdown the output for review
 		# - Summary of category/plans
-		answer_yes = run_opts.yn_question("View upload data summary :")
+		answer_yes = self.run_opts.yn_question("View upload data summary :")
 		if answer_yes:
 			sanity_checks.show_summary(self.df_td)
 
 		# - Summary of statistics of data
-		answer_yes = run_opts.yn_question("View upload data statistics :")
+		answer_yes = self.run_opts.yn_question("View upload data statistics :")
 		if answer_yes:
 			sanity_checks.show_stats(self.df_td)
 
 		# - Show the sheet for final check
-		answer_yes = run_opts.yn_question("View full upload data :")
+		answer_yes = self.run_opts.yn_question("View full upload data :")
 		if answer_yes:
 			disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
 			print_green("Full upload data")
 			tabulate_dataframe(disc_dt)
 
 	# Main "upload" function which manages the google drive and then admin panel uploads
-	def upload(self, run_opts):
-		self.upload_template_to_gdrive(run_opts)
-		self.upload_template_to_adminpanel(run_opts)
+	def upload(self):
+		self.upload_template_to_gdrive()
+		self.upload_template_to_adminpanel()
 
-	def upload_template_to_gdrive(self, run_opts):
+	def upload_template_to_gdrive(self):
 		# Download the template file
 		template_name = gdrive.download_store_template()
 		# Read template into dataframe
@@ -160,11 +161,11 @@ class eprice_validator(object):
 		# Today date matching existing format could also use .date().isoformat()
 		today_date    = datetime.datetime.today().strftime("%Y%m%d")
 		# The user who is doing work
-		username      = run_opts.current_user
+		username      = self.run_opts.current_user
 		# Construct the file name
 		out_filename  = f"{today_date}_{username}"
 		# Ask for an optional additional descriptor to the filename
-		description   = run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xlsx] :")
+		description   = self.run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xlsx] :")
 		if description != "":
 			out_filename += "_"+description+".xlsx"
 		else:
@@ -181,25 +182,25 @@ class eprice_validator(object):
 		# Should be done!
 		print_check("File uploaded to Google Drive")
 
-	def upload_template_to_adminpanel(self, run_opts):
+	def upload_template_to_adminpanel(self):
 		# Create the admin panel tool (if not created)
 		if not self.admin_panel:
-			self.admin_panel = admin_panel.admin_panel(run_opts)
+			self.admin_panel = admin_panel.admin_panel(self.run_opts)
 		# Generate standardized Admin Panel naming
 		time_now        = datetime.datetime.today()
 		today_date      = time_now.strftime("%Y%m%d")
-		username        = run_opts.current_user
+		username        = self.run_opts.current_user
 		adminPanelName  = f"PriWiz_{today_date}_{username}"
-		description     = run_opts.text_question(f"Add optional descriptor to Admin Panel name [{adminPanelName}_<...>] :")
+		description     = self.run_opts.text_question(f"Add optional descriptor to Admin Panel name [{adminPanelName}_<...>] :")
 		if description != "":
 			adminPanelName += "_"+description
 		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
 		scheduledTime = (time_now + datetime.timedelta(minutes=5)).isoformat(timespec='milliseconds')+"Z"
 		print_exclaim(f"Scheduled upload for 5 minutes time : {scheduledTime}")
 		# Ask if we want a specific time
-		answer_yes = run_opts.yn_question("Schedule upload for a specific time :")
+		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time :")
 		if answer_yes:
-			time_string = run_opts.text_question("Provide the specificed date/time with format [YY-MM-dd:hh.mm] :")
+			time_string = self.run_opts.text_question("Provide the specificed date/time with format [YY-MM-dd:hh.mm] :")
 			try:
 				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
 			except:

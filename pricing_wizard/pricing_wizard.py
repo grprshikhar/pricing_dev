@@ -23,13 +23,13 @@ def validate_and_upload_eprice(run_opts):
 	run_opts.select_eprice_sheet()
 	# Create eprice validator and runs checks
 	data_range = 'Export!A:N'
-	validator = eprice_validator(sheet_id=run_opts.current_sheet, data_range=data_range)
+	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Run post-sanity checks
-	validator.post_sanity_checks(run_opts)
+	validator.post_sanity_checks()
 	# Display the output
-	validator.summarise(run_opts)
+	validator.summarise()
 	# Upload output to google drive and admin panel
-	validator.upload(run_opts)
+	validator.upload()
 
 def price_new_skus(run_opts):
 	# Validate the user information
@@ -50,13 +50,13 @@ def price_new_skus(run_opts):
 	# Create e-price dataframe
 	eprice_df = validator.generate_eprice_dataframe()
 	# Pass into e-price validator
-	ep_validator = eprice_validator(dataframe=eprice_df)
+	ep_validator = eprice_validator(run_opts=run_opts, dataframe=eprice_df)
 	# Run post-sanity checks
-	ep_validator.post_sanity_checks(run_opts)
+	ep_validator.post_sanity_checks()
 	# Display the output
-	ep_validator.summarise(run_opts)
+	ep_validator.summarise()
 	# Upload output to google drive and admin panel
-	ep_validator.upload(run_opts)
+	ep_validator.upload()
 
 
 def redshift_report(run_opts):

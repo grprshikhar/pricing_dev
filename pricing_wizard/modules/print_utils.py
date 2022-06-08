@@ -4,32 +4,48 @@ from termcolor import colored
 from tabulate import tabulate
 from googleapiclient.errors import HttpError
 from redshift_connector.error import InterfaceError, ProgrammingError
+import modules.logger as logger
 
 # Print utility
 def print_check(msg):
-    print(" - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+colored(msg, 'blue'))
+    msg_fmt = " - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+colored(msg, 'blue')
+    print( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
 
 def print_exclaim(msg):
-    print(" - "+colored('!', 'green', attrs=['bold'])+" - "+colored(msg, 'blue', attrs=['bold']))
-
+    msg_fmt = " - "+colored('!', 'green', attrs=['bold'])+" - "+colored(msg, 'blue', attrs=['bold'])
+    print( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
 
 def print_green(msg):
-    print (f"{colored(msg,'green')}")
+    msg_fmt = f"{colored(msg,'green')}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
 
 def print_green_bold(msg):
-    print (f"{colored(msg,'green',attrs=['bold'])}")
+    msg_fmt = f"{colored(msg,'green',attrs=['bold'])}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
 
 def print_red(msg):
-    print (f"{colored(msg,'red')}")
+    msg_fmt = f"{colored(msg,'red')}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).error( msg_fmt )
 
 def print_red_bold(msg):
-    print (f"{colored(msg,'red',attrs=['bold'])}")
+    msg_fmt = f"{colored(msg,'red',attrs=['bold'])}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).error( msg_fmt )
 
 def print_yellow(msg):
-    print (f"{colored(msg,'yellow')}")
+    msg_fmt = f"{colored(msg,'yellow')}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).warning( msg_fmt )
 
 def print_yellow_bold(msg):
-    print (f"{colored(msg,'yellow',attrs=['bold'])}")
+    msg_fmt = f"{colored(msg,'yellow',attrs=['bold'])}"
+    print ( msg_fmt )
+    logger.get_logger("PriWiz",to_file=True).warning( msg_fmt )
 
 def print_warning(msg):
     # Import the option handler in a limited use case to avoid circular reference
