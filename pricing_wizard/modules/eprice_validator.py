@@ -165,13 +165,14 @@ class eprice_validator(object):
 		# Construct the file name
 		out_filename  = f"{today_date}_{username}"
 		# Ask for an optional additional descriptor to the filename
-		description   = self.run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xlsx] :")
+		description   = self.run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xls] :")
 		if description != "":
-			out_filename += "_"+description+".xlsx"
+			out_filename += "_"+description+".xls"
 		else:
-			out_filename += ".xlsx"
+			out_filename += ".xls"
 		print_exclaim(f"Output file will be named [{out_filename}]")
 		# Now save the file locally
+		# NOTE - If we need xls output, we use xlwt package which is deprecated
 		with pandas.ExcelWriter(out_filename) as writer:
 			rental_plans.to_excel(writer, sheet_name="rental_plans",index=False)
 		print_check("File written locally")

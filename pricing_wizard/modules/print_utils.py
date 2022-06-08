@@ -10,42 +10,42 @@ import modules.logger as logger
 def print_check(msg):
     msg_fmt = " - "+colored(u'\u2713', 'green', attrs=['bold'])+" - "+colored(msg, 'blue')
     print( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).info( msg_fmt )
 
 def print_exclaim(msg):
     msg_fmt = " - "+colored('!', 'green', attrs=['bold'])+" - "+colored(msg, 'blue', attrs=['bold'])
     print( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).info( msg_fmt )
 
 def print_green(msg):
     msg_fmt = f"{colored(msg,'green')}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).info( msg_fmt )
 
 def print_green_bold(msg):
     msg_fmt = f"{colored(msg,'green',attrs=['bold'])}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).info( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).info( msg_fmt )
 
 def print_red(msg):
     msg_fmt = f"{colored(msg,'red')}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).error( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).error( msg_fmt )
 
 def print_red_bold(msg):
     msg_fmt = f"{colored(msg,'red',attrs=['bold'])}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).error( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).error( msg_fmt )
 
 def print_yellow(msg):
     msg_fmt = f"{colored(msg,'yellow')}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).warning( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).warning( msg_fmt )
 
 def print_yellow_bold(msg):
     msg_fmt = f"{colored(msg,'yellow',attrs=['bold'])}"
     print ( msg_fmt )
-    logger.get_logger("PriWiz",to_file=True).warning( msg_fmt )
+    logger.get_logger("pricing_wizard",to_file=True).warning( msg_fmt )
 
 def print_warning(msg):
     # Import the option handler in a limited use case to avoid circular reference

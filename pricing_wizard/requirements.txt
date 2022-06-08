@@ -1,6 +1,7 @@
 inquirer
 pandas
 openpyxl
+xlwt
 numpy
 tabulate
 termcolor

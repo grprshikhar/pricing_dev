@@ -81,6 +81,13 @@ def reassign_keystrokes():
 	if sys.platform == "darwin":
 		readchar.key.BACKSPACE = '\x7F'
 
+def suppress_pandas_xlwt_warning():
+	# Asked to use .xls for AdminPanel upload
+	# `xlwt` package required to write but deprecated in favour of .xlsx writing
+	# This option suppresses the warning otherwise written
+	import pandas
+	pandas.options.io.excel.xls.writer = 'xlwt'
+
 # ------------------------------------------------------------------------ #
 # Main program - control program flow
 # ------------------------------------------------------------------------ #
@@ -89,6 +96,8 @@ if __name__ == "__main__":
 	sys.excepthook = exception_hook
 	# Reassign backspace key based on OS - WIP
 	reassign_keystrokes()
+	# Suppress xls warning once
+	suppress_pandas_xlwt_warning()
 	# Create object
 	run_opts = opts()
 
