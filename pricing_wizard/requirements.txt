@@ -1,9 +1,13 @@
+inquirer
 pandas
+openpyxl
+xlwt
 numpy
 tabulate
 termcolor
 pyfiglet
 google
 google_auth_oauthlib
-selenium
-inquirer
+google-api-python-client
+gql[all]
+google-cloud-logging
