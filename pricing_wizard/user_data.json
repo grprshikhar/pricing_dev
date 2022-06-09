@@ -5,7 +5,7 @@
         "redshift_username": "",
         "adminpanel_username": ""
     },
-    "Geet": {
+    "Shikhar": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
         "local_username": "",
         "redshift_username": "",
@@ -17,13 +17,13 @@
         "redshift_username": "",
         "adminpanel_username": ""
     },
-    "Mert": {
+    "Geet": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
         "local_username": "",
         "redshift_username": "",
         "adminpanel_username": ""
     },
-    "Shikhar": {
+    "Mert": {
         "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
         "local_username": "",
         "redshift_username": "",
@@ -34,6 +34,18 @@
         "local_username": "ian",
         "redshift_username": "ian_connelly",
         "adminpanel_username": "ian.connelly@grover.com"
+    },
+    "Mahmoud": {
+        "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
+    },
+    "Mihir": {
+        "E-Price": "1xNa_gKhmPXaXI2_gTULOPQ5z_jG6xoVKg7G9I5OXIj8",
+        "local_username": "",
+        "redshift_username": "",
+        "adminpanel_username": ""
     },
     "Global": {
         "Catman GM": "1EHJeWfJOg2-FSw4Tt2YiTcvXnVF24Yarg3aOgZ0iuJc",

@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from termcolor import colored,cprint
-from modules.print_utils import print_exclaim
+from modules.print_utils import print_exclaim, print_warning
 try:
     import sys
     import colorama
@@ -108,27 +108,27 @@ def check_rrp_perc(df_td,plan_limit_dict):
     print_exclaim("Price % guidelines being checked \n")
     # Convert dict to 100* value for better comprehension when printed out
     plan_limit_dict_print = {k: [100*x for x in v] for k, v in plan_limit_dict.items()}
-    print(colored(tabulate(plan_limit_dict_print,
-                headers=[str(x)+"M" for x in plan_limit_dict_print.keys()],
-                showindex=["min %","max %"], tablefmt="psql"),attrs=["reverse"]))
-    print("")
+    # print(colored(tabulate(plan_limit_dict_print,
+    #             headers=[str(x)+"M" for x in plan_limit_dict_print.keys()],
+    #             showindex=["min %","max %"], tablefmt="psql"),attrs=["reverse"]))
+    # print("")
     # Error tracker
-    any_errors = []
+    any_warnings = []
     for k, dk in plan_limit_dict.items():
         act_pp = "act_perc_pp_"+str(k)
         low_limit = dk[0] 
         high_limit = dk[1]
         if df_td.loc[(df_td[act_pp]<=low_limit)].empty!=True:
-            sku = df_td.loc[(df_td[act_pp]<=low_limit),['sku',act_pp]]
-            any_errors.append( str(k)+"M Plan Price is too cheap for SKUs \n"+str(sku.values) )
+            sku = df_td.loc[(df_td[act_pp]<=low_limit),['store code','sku',act_pp]]
+            any_warnings.append( str(k)+"M Plan Price is too cheap for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
-            sku = f_td.loc[(df_td[act_pp]>=high_limit),['sku',act_pp]]
-            any_errors.append( str(k)+"M Plan Price is too expensive for SKUs \n"+str(sku.values) )
+            sku = f_td.loc[(df_td[act_pp]>=high_limit),['store code','sku',act_pp]]
+            any_warnings.append( str(k)+"M Plan Price is too expensive for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
 
     # Track all cases of RRP issues to better inform the user
-    if any_errors:
-        raise ValueError("\n".join(any_errors))
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
 
 def last_digit_9 (df_td):
     # Error tracker

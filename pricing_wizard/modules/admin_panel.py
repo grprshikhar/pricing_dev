@@ -24,8 +24,8 @@ class admin_panel(object):
 			self.authorisation_url = "https://apiqa.getgrover.com/api/v1/oauth/token"
 			self.graphql_url       = "https://graphql-staging.grover.com/graphql"
 		print_check(f"Configured Admin Panel tool for {'Production' if self.to_production else 'Staging'} site")
-		print_check(f"Authorisation URL : {self.authorisation_url}")
-		print_check(f"GraphQL URL       : {self.graphql_url}")
+		# print_check(f"Authorisation URL : {self.authorisation_url}")
+		# print_check(f"GraphQL URL       : {self.graphql_url}")
 
 	def authorise(self):
 		if self.auth_token:

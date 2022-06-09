@@ -21,6 +21,14 @@ class eprice_validator(object):
 		self.admin_panel = None
 		# Template file name when created
 		self.template_filename = ""
+		# Plan limit dictionary
+		self.plan_limit_dict = {
+			1 :  [0.085, 0.5],
+			3 :  [0.068, 0.3],
+			6 :  [0.055, 0.16],
+			12 : [0.034, 0.078],
+			18 : [0.03,  0.054],
+			24 : [0.025, 0.041]}	
 		# Input for data
 		if sheet_id and data_range:
 			self.sheet_id   = sheet_id
@@ -29,7 +37,8 @@ class eprice_validator(object):
 		else:
 			self.sheet_id   = None
 			self.data_range = None
-			self.set_data(dataframe)		
+			self.set_data(dataframe)
+			
 
 	# Assign dataframe
 	def set_data(self, df):
@@ -84,6 +93,9 @@ class eprice_validator(object):
 		# Check price plans are not below a threshold
 		sanity_checks.check_minimum(self.df_td, 5)
 		print_check("Rental plans larger than minimum requirement")
+		# Check against plan limit dict
+		sanity_checks.check_rrp_perc(self.df_td, self.plan_limit_dict)
+		print_check("Checked price % guidelines")
 		# Clean NaN in new columns and set to empty strings
 		self.df_td['new']= self.df_td['new'].fillna('')
 		print_exclaim("Passed all checks\n")
@@ -106,21 +118,8 @@ class eprice_validator(object):
 			# TO-DO
 			# If discount being applied, high price needs to be min_high
 			check_discount_anchor(self.df_td, historical_sku_df)
-
 			# If repricing being applied, high price _can_ be max_high
-
-		# Check the RRP% using min/max limits
-		plan_limit_dict = {
-			1 :  [0.085, 0.5],
-			3 :  [0.068, 0.3],
-			6 :  [0.055, 0.16],
-			12 : [0.034, 0.078],
-			18 : [0.03,  0.054],
-			24 : [0.025, 0.041]}
-		answer_yes = self.run_opts.yn_question("Check RRP% guidelines :")
-		if answer_yes:
-			sanity_checks.check_rrp_perc(self.df_td, plan_limit_dict)
-			print_check("Passed price % guidelines")
+			
 
 	def summarise(self):
 		# Breakdown the output for review
@@ -143,6 +142,7 @@ class eprice_validator(object):
 
 	# Main "upload" function which manages the google drive and then admin panel uploads
 	def upload(self):
+		print_exclaim("Preparing to upload prices (use [CTRL+C] to cancel)")
 		self.upload_template_to_gdrive()
 		self.upload_template_to_adminpanel()
 
@@ -191,26 +191,25 @@ class eprice_validator(object):
 		# Create the admin panel tool (if not created)
 		if not self.admin_panel:
 			self.admin_panel = admin_panel.admin_panel(self.run_opts, to_production)
+			self.admin_panel.configure()
 			
 		# Generate standardized Admin Panel naming
-		time_now        = datetime.datetime.today()
-		today_date      = time_now.strftime("%Y%m%d")
-		username        = self.run_opts.current_user
-		adminPanelName  = f"PriWiz_{today_date}_{username}"
-		description     = self.run_opts.text_question(f"Add optional descriptor to Admin Panel name [{adminPanelName}_<...>] :")
-		if description != "":
-			adminPanelName += "_"+description
+		adminPanelName  = self.template_filename
+
 		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
-		scheduledTime = (time_now + datetime.timedelta(minutes=5)).isoformat(timespec='milliseconds')+"Z"
-		print_exclaim(f"Scheduled upload for 5 minutes time : {scheduledTime}")
+		print_exclaim(f"Scheduling upload for 1 minutes time")
 		# Ask if we want a specific time
-		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time :")
+		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time instead :")
 		if answer_yes:
 			time_string = self.run_opts.text_question("Provide the specificed date/time with format [YY-MM-dd:hh.mm] :")
 			try:
 				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
 			except:
 				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
+		else:
+			time_now      = datetime.datetime.today()
+			scheduledTime = (time_now + datetime.timedelta(minutes=1)).isoformat(timespec='milliseconds')+"Z"
+
 		# All information available so now we can proceed with passing to admin panel
 		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
 								        adminPanelName  = adminPanelName,
