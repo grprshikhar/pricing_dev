@@ -40,7 +40,7 @@ class CallStackFormatter(logging.Formatter):
 
 # You can customize the formatter according to your needs.
 FORMATTER = CallStackFormatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(stack_info)s - %(message)s"
+    "%(asctime)s > %(name)s > %(levelname)s > %(stack_info)s > %(message)s"
 )
 
 # Stream handler - Stream to terminal
