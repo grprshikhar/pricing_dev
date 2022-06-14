@@ -81,9 +81,6 @@ class options_handler(object):
 	# Validate the username
 	# -------------------------------
 	def validate_user(self):
-		# User validation expected to match existing data
-		# Get the local username for validation
-		local_username = getpass.getuser()
 		# Create question
 		question = [inquirer.List("user", message="Please select your name :", choices=self.users + ["None of the above"])]
 		answer   = inquirer.prompt(question,theme=self._theme, raise_keyboard_interrupt=True)
@@ -91,11 +88,7 @@ class options_handler(object):
 			self.current_user = answer["user"]
 		else:
 			self.add_user_to_json()
-		# Validate
-		if self.user_data[self.current_user]["local_username"] != local_username:
-			raise ValueError(f"Error selecting {self.current_user}.\nLocal username is {local_username}.\nPlease verify these details are correct.")
-		else:
-			print_check (f"User [{self.current_user}] verified.")
+		print_check (f"User [{self.current_user}] selected.")
 
 	# -------------------------------
 	# Setup the e-price URL
@@ -155,14 +148,10 @@ class options_handler(object):
 	def add_user_to_json(self):
 		# Take inputs and add to existing data
 		name     = input("Please provide name : ")
-		self.current_user = name
+		self.current_user    = name
 		self.user_data[name] = {}
-		username = getpass.getuser()
-		self.user_data[name]["local_username"] = username
 		# Take template structure from Shikhar
 		sheets = list(self.user_data["Shikhar"].keys())
-		# Remove local_username used for verification
-		sheets.remove("local_username")
 		for s in sheets:
 			user_sheet = input(f"Provide ID for {s} : ")
 			self.user_data[name][s] = user_sheet
