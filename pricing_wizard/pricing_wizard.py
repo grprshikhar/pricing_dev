@@ -22,7 +22,7 @@ def validate_and_upload_eprice(run_opts):
 	# Verify the URL to be used
 	run_opts.select_eprice_sheet()
 	# Create eprice validator and runs checks
-	data_range = 'Export!A:N'
+	data_range = 'Export!A:P'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Run post-sanity checks
 	validator.post_sanity_checks()
