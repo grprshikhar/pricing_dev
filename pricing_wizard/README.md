@@ -9,6 +9,8 @@
     + [Mac OSX](#mac-osx)
     + [Windows](#windows)
   * [Usage](#usage)
+    + [User Data](#user-data)
+    + [Logging](#logging)
     + [Reprice SKUs](#reprice-skus)
     + [Price new SKUs](#price-new-skus)
     + [Run report](#run-report)
@@ -77,6 +79,14 @@ This will start the tool and provide a list of options:
 4) Suggest price review SKUs
 5) Review Pricing Wizard data
 6) Exit
+
+### User Data
+
+Pricing Wizard will need to know your `redshift` username and your `admin panel` username. You can either enter these when the program is running, or you can edit the `user_data.json` file and edit the fields for your user. If these are filled in, you will only be asked for your passwords when running. These are not stored in any file when they are entered for security.
+
+### Logging
+
+Currently, Pricing Wizard will write out a local log file only (`pricing_wizard.log`). We will work on a method for updating a central log file in the future in case we need to check when a particular update was made and whether there were any warning which were overlooked or whether we can improve the checks/warnings/errors in the future.
 
 ### Reprice SKUs
 
