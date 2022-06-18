@@ -3,7 +3,7 @@ from inquirer.themes import load_theme_from_dict
 import json
 import getpass
 import sys
-from modules.print_utils import print_check
+from modules.print_utils import print_check, print_exclaim
 
 # This class will handle user input and direct and track program flow
 class options_handler(object):
