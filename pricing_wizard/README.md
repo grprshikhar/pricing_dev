@@ -54,13 +54,18 @@ A brief summary is:
    - This will update the package manager.
 
 Check if your Ubuntu installation contains a recent python3 version 
+
  - `python3 --version`
+
 If this says `Python 3.9.X` or greater, then you just need to ensure the python package manager is available:
+
  - `sudo apt install python3-pip`
  - `pip3 install -r requirements.txt`
+
 And you should be ready to go!
 
 If the python3 is older (or not installed), follow these additional commands
+
  - `sudo apt install software-properties-common`
    - This will install requirements for python3.9
  - `sudo add-apt-repository ppa:deadsnakes/ppa`
