@@ -9,6 +9,7 @@
     + [Mac OSX](#mac-osx)
     + [Windows](#windows)
   * [Usage](#usage)
+    + [Special note for Windows](#special-note-for-windows)
     + [User Data](#user-data)
     + [Logging](#logging)
     + [Reprice SKUs](#reprice-skus)
@@ -37,7 +38,7 @@ This tool has been developed on OSX and should therefore not require much work f
    - Install using [homebrew](https://brew.sh/)
    - `brew install python3` and follow the finalisation instructions `eval "$(/opt/homebrew/bin/brew shellenv)"`
      - You may need to check you have the terminal profile. If you do not, do `touch ~/.bash_profile` or equivalent for zsh and copy the command again.
-   - Install requirements using `pip3 -r requirements`
+   - Install requirements using `pip3 install -r requirements.txt`
      - If you get a message to update pip3, please follow the instructions.
 
 ### Windows
@@ -49,6 +50,17 @@ Moving forwards, the most sensible Linux OS to choose is `Ubuntu 22` which is th
 A brief summary is:
  - `sudo apt-get update`
    - This will update the package manager.
+ - `sudo apt-get upgrade`
+   - This will update the package manager.
+
+Check if your Ubuntu installation contains a recent python3 version 
+ - `python3 --version`
+If this says `Python 3.9.X` or greater, then you just need to ensure the python package manager is available:
+ - `sudo apt install python3-pip`
+ - `pip3 install -r requirements.txt`
+And you should be ready to go!
+
+If the python3 is older (or not installed), follow these additional commands
  - `sudo apt install software-properties-common`
    - This will install requirements for python3.9
  - `sudo add-apt-repository ppa:deadsnakes/ppa`
@@ -57,20 +69,21 @@ A brief summary is:
    - This will ask the package manager to install python3.9.
  - `sudo apt install python3-pip`
    - This will install `pip3` for python package management
- - `pip3 -r requirements`
+ - `pip3 install -r requirements.txt`
    - This should be the same as the OSX instructions to install the required modules.
    - If you get a message to update pip3, please follow the instructions.
+
+
 
 ## Usage
 
 This tool is written for `python3` and makes use of standard data manipulation libraries (such as `pandas`).
-The tool has the ability to access the data stored in Google Sheets and Google Drive which are shared with `Grover` or the `pricing_analytics` user.
+The tool has the ability to access the data stored in Google Sheets and Google Drive which are shared with `Grover`.
 The tool expects active user input to direct the workflow and verify any warnings. In some cases, there will be errors which have been identified which will require pricing analyst intervention but the aim is to limit these to the cases where there are issues with the chosen price points.
 
 ```
-./pricing_wizard.py
+python3 pricing_wizard.py
 ```
-
 This will start the tool and provide a list of options:
 
 1) Reprice SKUs
@@ -79,6 +92,16 @@ This will start the tool and provide a list of options:
 4) Suggest price review SKUs
 5) Review Pricing Wizard data
 6) Exit
+
+### Special note for Windows
+
+When you run the WSL terminal shell, you may find that it places you in an unknown folder. In this case you need to navigate to the area where you have pricing_wizard.
+This will look something like this:
+```
+cd /mnt/Users/<username>/<path_to_pricing_wizard>
+```
+If you are lost, navigate to the mount folder `cd /mnt/` and then list the folder `ls -l` this should show you the `Users` folder. You can then `cd Users` and use the list command to identify the folder which corresponds to your user area on your C drive. 
+
 
 ### User Data
 
