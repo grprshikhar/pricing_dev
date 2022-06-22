@@ -36,7 +36,7 @@ def gsheet_api_check(SCOPES):
     return creds
 
 # This function will return the data from the spreadsheet range
-def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
+def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL,info):
     # Check API functioning
     creds = gsheet_api_check(SCOPES)
     # Create google service
@@ -49,15 +49,15 @@ def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
     
     # Check output
     if not values:
-        raise ValueError(f"No data found in spreadsheet : [{SPREADSHEET_ID}].")
+        raise ValueError(f"No data found in spreadsheet [{info}] : [{SPREADSHEET_ID}].")
     else:
-        print_check (f"Data pulled from spreadsheet : [{SPREADSHEET_ID}].")
+        print_check (f"Data pulled from spreadsheet [{info}] : [{SPREADSHEET_ID}].")
         return values
 
 # This is the function the user will need to call
-def get_dataframe(sheet_id, data_range):
+def get_dataframe(sheet_id, data_range, info):
     # Get data from gsheet
-    data = pull_sheet_data(SCOPES, sheet_id, data_range)
+    data = pull_sheet_data(SCOPES, sheet_id, data_range, info)
     # Convert data (arrays) into dataframe
     df = pandas.DataFrame(data)
     # Extract first row as header

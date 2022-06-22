@@ -8,7 +8,7 @@ class catman_utils(object):
 		# Rental plan sheet
 		self.sheet_id = '1VhyEO0BRVXp3mJ9abXJ0EYiF34Fhu50qv6m9nuldIPI'
 		self.data_range = 'CSV Export!A:K'
-		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Market rental plans")
 		self.sanitise()
 
 	def sanitise(self):
@@ -68,7 +68,7 @@ class catman_utils(object):
 
 	def price_loc(self, df):
 		df_copy  = df.copy()
-		df_plans = df.filter(regex=r'plan\d+')
+		df_plans = df.filter(regex=r'^plan\d+')
 		df_plans_out = pd.concat([df_plans.reset_index(drop=True), df_plans.add_prefix("active_")], axis=1)
 		df_plans_out = pd.concat([df_plans_out.reset_index(drop=True), df_plans.add_prefix("high_")], axis=1)
 		rrp = df_copy.rrp
@@ -89,12 +89,17 @@ class catman_utils(object):
 			else:	
 				df_out = pd.concat([df_out.reset_index(drop=True), df_subplanwise.reset_index(drop=True)], axis=1)
 
-		df_copy['check'] = pd.Series(df_copy[[col for col in df_copy.columns if re.search(r'plan\d+', col)]].fillna('').values.tolist()).str.join('')
+		df_copy['check'] = pd.Series(df_copy[[col for col in df_copy.columns if re.search(r'^plan\d+', col)]].fillna('').values.tolist()).str.join('')
 		df_copy['check'] = df_copy['check'].fillna('')
 		df_copy['comma_count'] = df_copy.check.str.count(',')
 		df_copy['comma_count_plan'] = df_copy.duration_plan.str.count(',')
-		df_copy = df_copy.drop(columns=[col for col in df_copy.columns if re.search(r'plan\d+', col)]).copy()
+		df_copy = df_copy.drop(columns=[col for col in df_copy.columns if re.search(r'^plan\d+', col)]).copy()
 		df_out = pd.concat([df_copy.reset_index(drop=True), df_out.reset_index(drop=True)], axis=1)
+
+		# Convert type for the old price columns for use later in EU checks
+		for rp in [1,3,6,12,18,24]:
+			df_out[f"old_low_plan{rp}"] = pd.to_numeric(df_out[f"old_low_plan{rp}"], errors='coerce')
+			df_out[f"old_high_plan{rp}"] = pd.to_numeric(df_out[f"old_high_plan{rp}"], errors='coerce')
 
 		return df_out
 

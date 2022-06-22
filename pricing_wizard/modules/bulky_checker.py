@@ -11,7 +11,7 @@ class bulky_checker(object):
 
 	def get_dataframe(self):
 		# Pull sheet for a larger range than needed
-		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Bulky products")
 		# Drop other columns
 		self.df = self.df.filter(["product_sku","size"])
 		# Keep only the skus marked as bulky

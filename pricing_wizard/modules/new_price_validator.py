@@ -16,7 +16,7 @@ class new_price_validator(object):
 	# Pull data and get dataframe
 	def get_data(self):	
 		# Pull the data from google sheets
-		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range,"Gross margin sheet")
 		print_check(f"Pulled data for {self.market}")
 		# Format the column names for consistency
 		self.rename_columns()

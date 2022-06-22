@@ -9,7 +9,7 @@ import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
 import modules.admin_panel as admin_panel
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
-from modules.eprice_update_utils import check_discount_anchor
+from modules.eprice_update_utils import check_discount_anchor, check_EU_rules
 
 
 class eprice_validator(object):
@@ -28,7 +28,10 @@ class eprice_validator(object):
 			6 :  [0.055, 0.16],
 			12 : [0.034, 0.078],
 			18 : [0.03,  0.054],
-			24 : [0.025, 0.041]}	
+			24 : [0.025, 0.041]}
+		# EU data
+		self.get_EU_legislation_data()
+
 		# Input for data
 		if sheet_id and data_range:
 			self.sheet_id   = sheet_id
@@ -39,6 +42,10 @@ class eprice_validator(object):
 			self.data_range = None
 			self.set_data(dataframe)
 			
+	# Get days since discount data
+	def get_EU_legislation_data(self):
+		self.df_dsd   = gsheet.get_dataframe("1C6GKgcEO7HKn_Zfv3XmMd1tMoC_RGJQFfgkFQOoWVSA","A:C","Days since discount")
+		self.df_30day = gsheet.get_dataframe("1XLpVyvbidRFt_Y0wm1gqL-DGqZBTObRdv84eDFhGEzw","A:N","30 day low price")
 
 	# Assign dataframe
 	def set_data(self, df):
@@ -49,7 +56,7 @@ class eprice_validator(object):
 	# Pull dataframe
 	def get_data(self):
 		# Pull data and get dataframe
-		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range)
+		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Repricing sheet")
 		self.checks()
 		
 	# Run consistent checks regardless of how dataframe is created
@@ -98,27 +105,33 @@ class eprice_validator(object):
 		print_check("Checked price % guidelines")
 		# Clean NaN in new columns and set to empty strings
 		self.df_td['new']= self.df_td['new'].fillna('')
-		print_exclaim("Passed all checks\n")
+		print_exclaim("Passed sanity checks")
 
 
 	def post_sanity_checks(self):
+		print_exclaim("Checking against current EU rule interpretation")
+		any_warnings = check_EU_rules(self.df_td, self.df_dsd, self.df_30day)
+		if any_warnings:
+			print_warning("\n".join(any_warnings))
+		else:
+			print_check("EU rule interpretation passed")
 		# Check against RedShift pricing history
-		answer_yes = self.run_opts.yn_question("Check historical price points :")
-		if answer_yes:
-			# Create RedShift database manager (if not created)
-			if not self.redshift:
-				self.redshift = redshift_manager.redshift_manager(self.run_opts)
-			# Connect the database
-			self.redshift.connect()
-			# Get the list of SKU for quicker request
-			skus = self.df_td["sku"].unique().tolist()
-			# Retrieve a dataframe consisting of min_high and max_high prices
-			historical_sku_df = self.redshift.get_price_history(skus)
-			# Now we need to process this data and check the recent high prices
-			# TO-DO
-			# If discount being applied, high price needs to be min_high
-			check_discount_anchor(self.df_td, historical_sku_df)
-			# If repricing being applied, high price _can_ be max_high
+		#answer_yes = self.run_opts.yn_question("Check historical price points :")
+		#if answer_yes:
+		#	# Create RedShift database manager (if not created)
+		#	if not self.redshift:
+		#		self.redshift = redshift_manager.redshift_manager(self.run_opts)
+		#	# Connect the database
+		#	self.redshift.connect()
+		#	# Get the list of SKU for quicker request
+		#	skus = self.df_td["sku"].unique().tolist()
+		#	# Retrieve a dataframe consisting of min_high and max_high prices
+		#	historical_sku_df = self.redshift.get_price_history(skus)
+		#	# Now we need to process this data and check the recent high prices
+		#	# TO-DO
+		#	# If discount being applied, high price needs to be min_high
+		#	check_discount_anchor(self.df_td, historical_sku_df)
+		#	# If repricing being applied, high price _can_ be max_high
 			
 
 	def summarise(self):
