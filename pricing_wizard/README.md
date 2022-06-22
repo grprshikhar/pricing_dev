@@ -18,6 +18,9 @@
     + [Suggest price review SKUs](#suggest-price-review-skus)
     + [Review Pricing Wizard data](#review-pricing-wizard-data)
   * [Unit Tests](#unit-tests)
+  * [Tutorial For Setup](#tutorial-for-setup)
+    + [First Time Usage](#first-time-usage)
+    + [Updating Repository](#updating-repository)
 
 
 ## Introduction
@@ -159,5 +162,51 @@ for ut in `ls ut*.py`; do
 done
 ```
 
+## Tutorial For Setup
 
+We are using git to manage version control for this tool.
+
+### First Time Usage
+
+You will need to ensure you have git credentials setup. You can either use a username/password login or you can use an SSH key.
+
+Details can be found [here](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories) but basically:
+
+  - If you are using a username/password - *Use HTTPS clone*
+  - If you are using an SSH key - *Use SSH clone*
+
+In the terminal window
+
+*HTTPS clone*
+```
+git clone https://github.com/grprshikhar/pricing_dev.git
+```
+
+*SSH clone*
+```
+git@github.com:grprshikhar/pricing_dev.git
+```
+
+### Updating Repository
+
+When the tool is developed, updates will be pushed to the main repository. In order to benefit from these changes, you need to _pull_ the updated repository locally. If you have made changes to any files, you may be asked to stash or revert them.
+
+*Pulling updated repository*
+
+Run the following command in your repository:
+
+```
+git pull
+```
+
+You should see information about what was updated.
+
+*Changes to user_data.json*
+
+If you have editted the `user_data.json` file, you may see a warning which prevents your repository from being updated. In this case, you should do the following:
+
+  - Copy the current file and revert the original
+    - `cp user_data.json user_data_bkup.json`
+    - `git checkout user_data.json`
+  - After you update the repository (with `git pull`), you should compare the two files and update as appropriate. Most likely, the change will be minimal and specific to your user.
 
