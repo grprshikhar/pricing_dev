@@ -184,7 +184,7 @@ git clone https://github.com/grprshikhar/pricing_dev.git
 
 *SSH clone*
 ```
-git@github.com:grprshikhar/pricing_dev.git
+git clone git@github.com:grprshikhar/pricing_dev.git
 ```
 
 ### Updating Repository
