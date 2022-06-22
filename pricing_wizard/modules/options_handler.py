@@ -94,8 +94,15 @@ class options_handler(object):
 	# Setup the e-price URL
 	# -------------------------------
 	def select_eprice_sheet(self):
+		# Determine if we want the EU or US sheet
+		question = [inquirer.List("type", message="Select the market for repricing SKUs :", choices=["EU","US"])]
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
+		# Assign sheets
+		if answer["type"] == "EU":
+			self.current_sheet_type = "E-Price EU"
+		if answer["type"] == "US":
+			self.current_sheet_type = "E-Price US"
 		# E-Price sheet option
-		self.current_sheet_type = "E-Price"
 		question = [inquirer.List("yn", message="Use default or update e-sheet URL :", choices=["Use default","Update"])]
 		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		if answer["yn"] == "Use default":

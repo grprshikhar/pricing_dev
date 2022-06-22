@@ -26,6 +26,8 @@ This tool is attempting to standardise the checks we need to apply before prices
 It is important that as we scale up, we have tools which can manage increasing the numbers of SKU in a consistent manner.
 We currently will still make use of Google Sheets but will start to implement checks and streamline the upload processes.
 
+[Miro board](https://miro.com/app/board/uXjVOyEXe5Y=/?share_link_id=557505320610)
+
 ## Systems
 
 The hope is that with the aid of Google Drive, we will not need to have a central location (ie AWS) to use this tool, but instead it can be used locally by any pricing analyst using a device which complies with Grover security requirements (eg encrypted, VPN access, centrally managed).
