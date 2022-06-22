@@ -1,3 +1,4 @@
+
 #! /usr/bin/env python3
 # Regular modules
 import sys
@@ -79,6 +80,8 @@ def reassign_keystrokes():
 	# inquirer uses readchar to catch inputs
 	# OSX - uses \x7F not \x08
 	if sys.platform == "darwin":
+		readchar.key.BACKSPACE = '\x7F'
+	if sys.platform == "linux":
 		readchar.key.BACKSPACE = '\x7F'
 
 def suppress_pandas_xlwt_warning():
