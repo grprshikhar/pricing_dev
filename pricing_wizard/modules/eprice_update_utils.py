@@ -109,8 +109,10 @@ def check_EU_rules(df, df_dsd, df_30day):
 					continue
 				else:
 					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
-		# Done with checks
-		return any_warnings
+	
+	# Done with checks - report back
+	if any_warnings:
+		print_warning("\n".join(any_warnings))
 
 
 

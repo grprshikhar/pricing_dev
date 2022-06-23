@@ -110,29 +110,8 @@ class eprice_validator(object):
 
 	def post_sanity_checks(self):
 		print_exclaim("Checking against current EU rule interpretation")
-		any_warnings = check_EU_rules(self.df_td, self.df_dsd, self.df_30day)
-		if any_warnings:
-			print_warning("\n".join(any_warnings))
-		else:
-			print_check("EU rule interpretation passed")
-		# Check against RedShift pricing history
-		#answer_yes = self.run_opts.yn_question("Check historical price points :")
-		#if answer_yes:
-		#	# Create RedShift database manager (if not created)
-		#	if not self.redshift:
-		#		self.redshift = redshift_manager.redshift_manager(self.run_opts)
-		#	# Connect the database
-		#	self.redshift.connect()
-		#	# Get the list of SKU for quicker request
-		#	skus = self.df_td["sku"].unique().tolist()
-		#	# Retrieve a dataframe consisting of min_high and max_high prices
-		#	historical_sku_df = self.redshift.get_price_history(skus)
-		#	# Now we need to process this data and check the recent high prices
-		#	# TO-DO
-		#	# If discount being applied, high price needs to be min_high
-		#	check_discount_anchor(self.df_td, historical_sku_df)
-		#	# If repricing being applied, high price _can_ be max_high
-			
+		check_EU_rules(self.df_td, self.df_dsd, self.df_30day)
+		print_check("EU rule interpretation passed")			
 
 	def summarise(self):
 		# Breakdown the output for review
