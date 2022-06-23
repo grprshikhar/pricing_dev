@@ -94,27 +94,21 @@ def check_EU_rules(df, df_dsd, df_30day):
 				else:
 					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : new low price greater than previous low price : [{active_low_price} vs {old_low_price}]")
 
-			# If SKU is not currently discounted - check if last discount was more than 30 days ago
+			# If SKU is not currently discounted - check the 30 day low price
 			else:
-				# If yes - Set whatever we want
-				if discount_allowed:
+				# We check this even if the discount is allowed because we still need to use the low 30 day price regardless
+				col_low_30day = f"min_low_{rp}m"
+				# Just incase, not forced to numeric before now...
+				try:
+					low_30day = float(lowest_prices[col_low_30day].values[0])
+				except:
+					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Problem with lowest 30 day value. Please report!")
+				# Check the high price against lowest price
+				is_high_price_lower_than_30day_low = (active_high_price <= low_30day)
+				if is_high_price_lower_than_30day_low:
 					continue
-
-				# If no - Check high price is lowest price of past 30 days
 				else:
-					col_low_30day = f"min_low_{rp}m"
-					# Just incase, not forced to numeric before now...
-					try:
-						low_30day = float(lowest_prices[col_low_30day].values[0])
-					except:
-						any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Problem with lowest 30 day value. Please report!")
-
-					# Check the high price against lowest price
-					is_high_price_lower_than_30day_low = (active_high_price <= low_30day)
-					if is_high_price_lower_than_30day_low:
-						continue
-					else:
-						any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
+					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
 		# Done with checks
 		return any_warnings
 
