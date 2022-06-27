@@ -213,9 +213,9 @@ If you have editted the `user_data.json` file, you may see a warning which preve
 
 ### Alias
 
-An alias is the equivalent of a shortcut within the terminal infrastructure. Depending on your shell, you should have a .bashrc or a .zshrc in your home area. Run `echo $SHELL` to see whether you are using `/bin/bash` or `/bin/zsh`. For either of these, you should have a file which can handle aliases and paths in `~/.bashrc` or `~/.zshrc`
+An alias is the equivalent of a shortcut within the terminal infrastructure. Depending on your shell, you should have a .bashrc or a .zshrc in your home area. Run `echo $SHELL` to see whether you are using `/bin/bash` or `/bin/zsh`. For either of these, you should have a file which can handle aliases and paths in `~/.bashrc` and `~/.bash_profile` or `~/.zshrc` and `~/.zprofile`. These are files which are automatically sourced when your terminal starts (rc or profile depends on the connection you are using).
 
-Inside this folder after you have cloned it, you can run the following command to make a permanent command `pricing_wizard` which you can run from location in your terminal. You only need to set this up once.
+Inside *this* folder (eg `pricing_wizard/`) after you have cloned it, you can run the following command to make a permanent command `pricing_wizard` which you can run from any location in your terminal. You only need to set this up once.
 
 For /bin/bash:
 ```
