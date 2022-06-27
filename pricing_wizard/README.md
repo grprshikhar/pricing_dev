@@ -21,6 +21,7 @@
   * [Tutorial For Setup](#tutorial-for-setup)
     + [First Time Usage](#first-time-usage)
     + [Updating Repository](#updating-repository)
+    + [Setting Up An Alias/Shortcut](#alias)
 
 
 ## Introduction
@@ -209,4 +210,64 @@ If you have editted the `user_data.json` file, you may see a warning which preve
     - `cp user_data.json user_data_bkup.json`
     - `git checkout user_data.json`
   - After you update the repository (with `git pull`), you should compare the two files and update as appropriate. Most likely, the change will be minimal and specific to your user.
+
+### Alias
+
+An alias is the equivalent of a shortcut within the terminal infrastructure. Depending on your shell, you should have a .bashrc or a .zshrc in your home area. Run `echo $SHELL` to see whether you are using `/bin/bash` or `/bin/zsh`. For either of these, you should have a file which can handle aliases and paths in `~/.bashrc` or `~/.zshrc`
+
+Inside this folder after you have cloned it, you can run the following command to make a permanent command `pricing_wizard` which you can run from location in your terminal. You only need to set this up once.
+
+For /bin/bash:
+```
+touch ~/.bashrc
+touch ~/.bash_profile
+export PWPATH=$PWD
+echo "alias pricing_wizard='cd $PWPATH; python3 pricing_wizard.py'" >> ~/.bashrc
+echo "alias pricing_wizard='cd $PWPATH; python3 pricing_wizard.py'" >> ~/.bash_profile
+```
+
+For /bin/zsh
+```
+touch ~/.zshrc
+touch ~/.zprofile
+export PWPATH=$PWD
+echo "alias pricing_wizard='cd $PWPATH; python3 pricing_wizard.py'" >> ~/.zshrc
+echo "alias pricing_wizard='cd $PWPATH; python3 pricing_wizard.py'" >> ~/.zprofile
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
