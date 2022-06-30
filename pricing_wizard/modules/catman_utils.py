@@ -52,13 +52,17 @@ class catman_utils(object):
 	def store_loc(self, df):
 		# Clean column
 		df['store code'] = df['store code'].str.lower()
-
-		for store_id in ['de','at','nl','es','^us','business','b2b']:
+		# We need to explicitly catch b2b business codes now
+		for store_id in ['de','at','nl','es','^us','b2b_de','b2b_at','b2b_nl','b2b_es']:
 			count_store = df['store code'].str.count(store_id)
 			df_new = df.iloc[count_store[count_store>0].index].copy()
-			df_new['store code']=store_id
-			if store_id  in ['business','b2b'] :
+			df_new['store code'] = store_id
+			if store_id == 'b2b_de':
 				df_new['store code']='business'
+			elif 'b2b' in store_id:
+				df_new['store code']=store_id.replace("b2b","business")
+			else:
+				pass
 			if store_id!='de':
 				df_new2 = pd.concat([df_new2,pd.DataFrame(data = df_new)], ignore_index=True)
 			else:

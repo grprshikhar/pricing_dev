@@ -82,6 +82,10 @@ def check_EU_rules(df, df_dsd, df_30day):
 			if np.isnan(active_low_price) or np.isnan(active_high_price):
 				continue
 
+			# Additional check for identical low and high, indicating single price only
+			if active_low_price == active_low_price:
+				continue
+
 			# Was there a discount running previously - was the old high price larger than the old low price
 			prev_discount = (old_high_price > old_low_price)
 
@@ -108,7 +112,7 @@ def check_EU_rules(df, df_dsd, df_30day):
 					else:
 						any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
 				except:
-					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Problem with lowest 30 day value. Please report!")
+					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Lowest 30 day value is missing. Please report if this is not a new SKU!")
 	
 	# Done with checks - report back
 	if any_warnings:

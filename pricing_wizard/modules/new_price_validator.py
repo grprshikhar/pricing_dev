@@ -194,6 +194,29 @@ class new_price_validator(object):
 			sku_rp = self.df_skus.set_index('sku')[[f"new prices {rp}", f"new prices pp pct {rp}", f"gross margin pct {rp}"]]
 			tabulate_dataframe(sku_rp)
 
+	# --------------------------------------------
+	# Functions to set correct store codes + business
+	# --------------------------------------------
+	def get_store_codes(self, x):
+		internationals = x["internationals"].split("+")
+		sku            = x["sku"]
+		also_business  = ("GRB" in sku)
+		store_codes    = []
+		total_markets  = len(internationals)
+		for i in internationals:
+			# Skip if b2b is added along with countries
+			if i == "B2B" and total_markets > 1:
+				continue
+			# If only b2b, then make sure we catch it downstream for DE
+			if i == "B2B" and total_markets == 1:
+				store_codes.append("b2b_de")
+				continue
+			# Otherwise, we add the market and also b2b_ if needed
+			store_codes.append(i)
+			if also_business:
+				store_codes.append(f"b2b_{i}")
+		print (store_codes)
+		return "+".join(store_codes)
 
 	# --------------------------------------------
 	# Functions to clean the dataframe
@@ -223,6 +246,11 @@ class new_price_validator(object):
 		self.df_skus["bulky?"] 			 = pandas.to_numeric(self.df_skus["bulky?"], errors="coerce")
 		self.df_skus["avg pp"] 			 = pandas.to_numeric(self.df_skus["avg pp"], errors="coerce")
 		self.df_skus["rrp"] 			 = pandas.to_numeric(self.df_skus["rrp"],    errors="coerce")
+		# Add business information
+		self.df_skus["store codes"]      = self.df_skus.apply(lambda x: self.get_store_codes(x), axis=1)
+
+
+
 
 	# --------------------------------------------
 	# Functions to handle creation of e-price data
@@ -233,7 +261,7 @@ class new_price_validator(object):
 				   "category"        : "category level 1", 
 				   "subcategory"     : "category level 2", 
 				   "bulky"           : "bulky?", 
-				   "store code"      : "internationals", 
+				   "store code"      : "store codes", 
 				   "new"             : "",
 				   "months_old"      : "", 
 				   "rrp"             : "rrp", 

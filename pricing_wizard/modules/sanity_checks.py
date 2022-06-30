@@ -123,7 +123,7 @@ def check_rrp_perc(df_td,plan_limit_dict):
             any_warnings.append( str(k)+"M Plan Price is too cheap for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
-            sku = f_td.loc[(df_td[act_pp]>=high_limit),['store code','sku',act_pp]]
+            sku = df_td.loc[(df_td[act_pp]>=high_limit),['store code','sku',act_pp]]
             any_warnings.append( str(k)+"M Plan Price is too expensive for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
 
     # Track all cases of RRP issues to better inform the user
