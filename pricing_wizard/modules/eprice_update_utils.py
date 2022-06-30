@@ -101,14 +101,14 @@ def check_EU_rules(df, df_dsd, df_30day):
 				# Just incase, not forced to numeric before now...
 				try:
 					low_30day = float(lowest_prices[col_low_30day].values[0])
+					# Check the high price against lowest price
+					is_high_price_lower_than_30day_low = (active_high_price <= low_30day)
+					if is_high_price_lower_than_30day_low:
+						continue
+					else:
+						any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
 				except:
 					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Problem with lowest 30 day value. Please report!")
-				# Check the high price against lowest price
-				is_high_price_lower_than_30day_low = (active_high_price <= low_30day)
-				if is_high_price_lower_than_30day_low:
-					continue
-				else:
-					any_warnings.append(f"{market} {sku} {rp:2}M rental plan : High price for discount not using lowest 30 day price : [{active_high_price} vs {low_30day}]")
 	
 	# Done with checks - report back
 	if any_warnings:
