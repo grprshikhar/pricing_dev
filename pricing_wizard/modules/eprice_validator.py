@@ -199,7 +199,7 @@ class eprice_validator(object):
 			except:
 				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
 		else:
-			time_now      = datetime.datetime.today()
+			time_now      = datetime.datetime.utcnow()
 			scheduledTime = (time_now + datetime.timedelta(minutes=1)).isoformat(timespec='milliseconds')+"Z"
 
 		# All information available so now we can proceed with passing to admin panel
