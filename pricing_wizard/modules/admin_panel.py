@@ -59,7 +59,7 @@ class admin_panel(object):
 		auth_header = {'Content-Type': 'application/json', 'Authorization': f'Bearer {self.auth_token}'}
 		transport   = AIOHTTPTransport(self.graphql_url, headers=auth_header)
 		# Create client
-		self.graphql_client = gql.Client(transport=transport, fetch_schema_from_transport=True)
+		self.graphql_client = gql.Client(transport=transport, fetch_schema_from_transport=False)
 
 	def put_to_S3(self, pricingFileName, pricingFileUri):
 		# This manages the upload to S3
