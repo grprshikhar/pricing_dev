@@ -136,7 +136,7 @@ def last_digit_9 (df_td):
     for plan in [1,3,6,12,18,24]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9)].empty!=True:
-            sku = df_td.loc[(df_td[pc]*10%10<9) & (df_td[pc]*10%10>9),'sku']
+            sku = df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9),'sku']
             any_errors.append( str(plan)+"M Plan has non Charm prices for SKUs : "+str(sku.values) )
 
     # Track all cases of charm pricing not used to better inform the user
