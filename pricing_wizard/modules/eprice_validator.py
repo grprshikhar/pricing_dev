@@ -1,5 +1,6 @@
 # System imports
 import datetime
+import pytz
 import pandas
 # Module imports
 import modules.gsheet as gsheet
@@ -200,7 +201,9 @@ class eprice_validator(object):
 				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
 		else:
 			time_now      = datetime.datetime.utcnow()
-			scheduledTime = (time_now + datetime.timedelta(minutes=1)).isoformat(timespec='milliseconds')+"Z"
+			#time_now      = pytz.datetime.datetime.now(tz=pytz.timezone('Europe/Berlin')).replace(tzinfo=None)
+			scheduledTime = (time_now + datetime.timedelta(minutes=2)).isoformat(timespec='milliseconds')+"Z"
+			print(scheduledTime)
 
 		# All information available so now we can proceed with passing to admin panel
 		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
