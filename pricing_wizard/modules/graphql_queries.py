@@ -40,23 +40,41 @@ def upload_to_admin_panel(fileUri, adminPanelName, scheduledTime):
 	date_regex_pattern = re.compile(date_regex_str)
 	check_datetime     = date_regex_pattern.match(scheduledTime)
 
-	if not check_datetime:
+	if not check_datetime and scheduledTime != "null":
 		raise ValueError(f"Incorrect scheduled date-time format for AdminPanel upload {scheduledTime}")
 
-	query_string = f"""
-		mutation {{
-			taskCreateRentalPlanUpload(input : {{
-				fileUri: "{fileUri}",
-				fileName: "{adminPanelName}",
-				scheduledFor: "{scheduledTime}"
-			}}) {{
-				... on RentalPlanUploadTask {{
-					id
-				}}
-				... on TaskError {{
-					message
+	if scheduledTime != "null":
+		query_string = f"""
+			mutation {{
+				taskCreateRentalPlanUpload(input : {{
+					fileUri: "{fileUri}",
+					fileName: "{adminPanelName}",
+					scheduledFor: "{scheduledTime}"
+				}}) {{
+					... on RentalPlanUploadTask {{
+						id
+					}}
+					... on TaskError {{
+						message
+					}}
 				}}
 			}}
-		}}
-	"""
+		"""
+	else:
+		query_string = f"""
+			mutation {{
+				taskCreateRentalPlanUpload(input : {{
+					fileUri: "{fileUri}",
+					fileName: "{adminPanelName}",
+					scheduledFor: {scheduledTime}
+				}}) {{
+					... on RentalPlanUploadTask {{
+						id
+					}}
+					... on TaskError {{
+						message
+					}}
+				}}
+			}}
+		"""
 	return query_string

@@ -194,16 +194,19 @@ class eprice_validator(object):
 		# Ask if we want a specific time
 		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time instead :")
 		if answer_yes:
-			time_string = self.run_opts.text_question("Provide the specificed date/time with format [YY-MM-dd:hh.mm] :")
+			print_info(f"Current UTC time is {datetime.datetime.utcnow()}")
+			time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
 			try:
 				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
 			except:
 				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
 		else:
-			time_now      = datetime.datetime.utcnow()
+			#time_now      = datetime.datetime.utcnow()
 			#time_now      = pytz.datetime.datetime.now(tz=pytz.timezone('Europe/Berlin')).replace(tzinfo=None)
-			scheduledTime = (time_now + datetime.timedelta(minutes=2)).isoformat(timespec='milliseconds')+"Z"
-			print(scheduledTime)
+			#scheduledTime = (time_now + datetime.timedelta(minutes=2)).isoformat(timespec='milliseconds')+"Z"
+			#print(scheduledTime)
+			# Setting null means we tell AdminPanel to upload 'Now'
+			scheduledTime = "null"
 
 		# All information available so now we can proceed with passing to admin panel
 		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
