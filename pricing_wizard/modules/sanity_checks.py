@@ -152,6 +152,16 @@ def check_minimum(df_td, minval):
            any_errors.append( str(plan) + f"M Plan has low price (below {minval}€ or {minval}$) : " + str(sku.values) )
     if any_errors:
         raise ValueError("\n".join(any_errors))
+
+# Check the price change tag is provided
+def check_price_change_tag(df):
+    any_warnings = []
+    if df.loc[(df['price change tag'] == "")].empty != True:
+        sku = df.loc[(df['price change tag'] == ""), 'sku'].drop_duplicates()
+        for s in sku:
+            any_warnings.append(f"{s} : No price change tag provided")
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
             
 
 #### Summarize data

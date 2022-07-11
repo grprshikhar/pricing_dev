@@ -106,6 +106,9 @@ class eprice_validator(object):
 		print_check("Checked price % guidelines")
 		# Clean NaN in new columns and set to empty strings
 		self.df_td['new']= self.df_td['new'].fillna('')
+		# Check the price change tag is filled
+		sanity_checks.check_price_change_tag(self.df_td)
+		print_check("Price change tag checked")
 		print_exclaim("Passed sanity checks")
 
 
@@ -147,7 +150,7 @@ class eprice_validator(object):
 		# Get the rental plan sheet
 		rental_plans  = template_df["rental_plans"]
 		# Fill data from our dataframe
-		rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+		rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
 		# Clean any NaN again
 		rental_plans  = rental_plans.fillna('')
 		# Configure output file name
