@@ -5,8 +5,9 @@ import sqlite3
 import datetime
 
 class sqlite_logger(object):
-	def __init__(self):
+	def __init__(self, location):
 		self.database = None
+		self.location = ""
 		self.path     = "database.sqlite"
 		self.timeout  = 60
 		self.initialise_tables()
