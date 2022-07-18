@@ -5,6 +5,7 @@ from tabulate import tabulate
 from googleapiclient.errors import HttpError
 from redshift_connector.error import InterfaceError, ProgrammingError
 import modules.logger as logger
+from modules.sqlite_logging import sqlite_logger
 
 # Print utility
 def print_check(msg):
@@ -56,6 +57,8 @@ def print_warning(msg):
     print_yellow_bold("-----------------------")
     __run_opts = options_handler()
     answer = __run_opts.yn_question("Acknowledge this warning and continue :")
+    s = sqlite_logger()
+    s.add_warnings("test",answer,msg)
     if not answer:
         print_green_bold("Please investigate this warning.")
         raise KeyboardInterrupt
