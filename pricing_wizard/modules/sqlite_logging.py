@@ -32,8 +32,10 @@ class sqlite_logger(object):
 						   			User TEXT,
 						   			Module TEXT,
 						   			Bypassed TEXT,
+						   			product_sku TEXT,
+						   			store_code TEXT,
 						   			Warning TEXT
-						   			)"""
+						   			)""" 
 		# Generate database
 		self.database = sqlite3.connect(self.path,timeout=self.timeout)
 		# Generate write lock
@@ -89,17 +91,38 @@ class sqlite_logger(object):
 
 	def add_warnings(self, user, bypassed, warning_str):
 		import inspect
-		stack = inspect.stack()
-		oringinator = stack[2]
+		import re
+		sku_finder = re.compile(r"GRB\S+")
+		market_finder = re.compile(r"\b(de|at|us|nl|es|business|business_at|business_us|business_nl|business_es)\b")
+		# Get the function which called the print_warning (2 steps back)
+		oringinator = inspect.stack()[2]
 		func = oringinator.function
 		self.database = sqlite3.connect(self.path,timeout=self.timeout)
 		self.database.execute("BEGIN IMMEDIATE")
+		prefix = ""
 		for w in warning_str.split("\n"):
-			timestamp = str(datetime.datetime.utcnow())
 			# Remove single quotes as breaks SQL
 			w = w.replace("'","")
-			insertion = f"""INSERT INTO warnings(TimeStamp,User,Module,Bypassed,Warning)
-							VALUES('{timestamp}','{user}','{func}','{bypassed}','{w}')"""
+			# See if we can identify any SKU
+			any_sku = sku_finder.findall(w)
+			if any_sku:
+				any_sku = " ".join(any_sku)
+			else:
+				any_sku = ""
+			# See if we can identify any market
+			any_market = market_finder.findall(w)
+			if any_market:
+				any_market = " ".join(any_market)
+			else:
+				any_market = ""
+			if any_sku == "" and any_market == "":
+				prefix = w
+			# Timestamp (updates with milliseconds)
+			timestamp = str(datetime.datetime.utcnow())
+			w = prefix+w
+			
+			insertion = f"""INSERT INTO warnings(TimeStamp,User,Module,Bypassed,product_sku,store_code,Warning)
+							VALUES('{timestamp}','{user}','{func}','{bypassed}','{any_sku}','{any_market}','{w}')"""
 			self.database.execute(insertion)
 		self.database.commit()
 		self.database.close()
