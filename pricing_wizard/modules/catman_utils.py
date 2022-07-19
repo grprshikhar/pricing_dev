@@ -25,7 +25,7 @@ class catman_utils(object):
 		# Manage store name/types
 		self.store_dict   = {'de' : ['de','at','nl','es'],
 							 'us' : ['us'],
-							 'business' : ['business','business_at','business_nl','business_es']}
+							 'business' : ['business','business_at','business_nl','business_es','business_us']}
 		duration_plan_leader_list = list(self.store_dict.keys())
 		store_code_list = [self.store_dict[x] for x in duration_plan_leader_list]
 		self.store_code_list = [item for sublist in store_code_list for item in sublist]
@@ -53,7 +53,7 @@ class catman_utils(object):
 		# Clean column
 		df['store code'] = df['store code'].str.lower()
 		# We need to explicitly catch b2b business codes now
-		for store_id in ['de','at','nl','es','^us','b2b_de','b2b_at','b2b_nl','b2b_es']:
+		for store_id in ['de','at','nl','es','us','b2b_us','b2b_de','b2b_at','b2b_nl','b2b_es']:
 			count_store = df['store code'].str.count(store_id)
 			df_new = df.iloc[count_store[count_store>0].index].copy()
 			df_new['store code'] = store_id
