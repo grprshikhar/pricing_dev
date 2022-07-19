@@ -5,7 +5,7 @@ from tabulate import tabulate
 from googleapiclient.errors import HttpError
 from redshift_connector.error import InterfaceError, ProgrammingError
 import modules.logger as logger
-from modules.sqlite_logging import sqlite_logger
+from modules.sqlite_logger import sqlite_logger
 
 # Print utility
 def print_check(msg):
