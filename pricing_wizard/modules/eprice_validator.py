@@ -11,6 +11,7 @@ import modules.redshift_manager as redshift_manager
 import modules.admin_panel as admin_panel
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 from modules.eprice_update_utils import check_discount_anchor, check_EU_rules
+from modules.sqlite_logger import sqlite_logger
 
 
 class eprice_validator(object):
@@ -218,6 +219,12 @@ class eprice_validator(object):
 		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
 								        adminPanelName  = adminPanelName,
 								        scheduledTime   = scheduledTime)
+
+		# sqlite logging for price uploads
+		s = sqlite_logger()
+		s.add_price_upload((datetime.datetime.utcnow() if scheduledTime == "null" else scheduledTime),
+						   self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
+		print_check("Upload complete!")
 
 
 

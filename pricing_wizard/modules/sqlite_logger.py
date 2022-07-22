@@ -4,15 +4,23 @@
 import sqlite3
 import datetime
 
+
 class sqlite_logger(object):
-	def __init__(self, location):
+	def __init__(self):
 		self.database = None
-		self.location = ""
-		self.path     = "database.sqlite"
+		self.location = None
+		self.path     = None
+		self.dbname   = "database.sqlite"
 		self.timeout  = 5
+		self.user     = None
 		self.initialise_tables()
 
+
 	def make_connection(self, nretries):
+		# Firstly set the user
+		self.user     = open(".active_user.dat","r").readlines()[0].strip()
+		self.location = open(".active_path.dat","r").readlines()[0].strip()
+		self.path     = self.location + self.dbname
 		# Helper function to manage retries
 		iattempt = 1
 		while iattempt <= nretries:
@@ -32,6 +40,7 @@ class sqlite_logger(object):
 	def initialise_tables(self):
 		init_price_change = """CREATE TABLE IF NOT EXISTS 
 							   price_changes(TimeStamp DateTime,
+							   				 ScheduledFor DateTime,
 											 User TEXT,
 											 product_sku TEXT,
 											 store_code TEXT,
@@ -63,16 +72,18 @@ class sqlite_logger(object):
 		# End write lock
 		self.database.close()
 
-	def add_price_upload(self, user, df):
+	def add_price_upload(self, scheduledFor, df):
 		# Generate write lock
 		self.make_connection(5)
 		timestamp = str(datetime.datetime.utcnow())
 		# 'SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag'
+		# 'sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag'
+		# Not currently using
+		price_change_reason = ""
 		for idx,row in df.iterrows():
-			print (row)
-			print (row['SKU'])
 			insertion = f"""INSERT INTO price_changes(TimeStamp,
 													  User,
+													  ScheduledFor,
 													  product_sku,
 													  store_code,
 													  newness,
@@ -86,18 +97,19 @@ class sqlite_logger(object):
 													  price_change_reason
 													  )
 													  VALUES('{timestamp}',
-													  		 '{user}',
-													  		 '{row['SKU']}',
-													  		 '{row['Store code']}',
-													  		 '{row['Newness']}',
-													  		 '{row['1']}',
-													  		 '{row['3']}',
-													  		 '{row['6']}',
-													  		 '{row['12']}',
-													  		 '{row['18']}',
-													  		 '{row['24']}',
-													  		 '{row['Price Change Tag']}',
-													  		 '{row['Price Change Reason']}'
+													  		 '{self.user}',
+													  		 '{scheduledFor}',
+													  		 '{row['sku']}',
+													  		 '{row['store code']}',
+													  		 '{row['new']}',
+													  		 '{row['plan1']}',
+													  		 '{row['plan3']}',
+													  		 '{row['plan6']}',
+													  		 '{row['plan12']}',
+													  		 '{row['plan18']}',
+													  		 '{row['plan24']}',
+													  		 '{row['price change tag']}',
+													  		 '{price_change_reason}'
 													  		 )"""
 			# Now insert
 			self.database.execute(insertion)
@@ -108,37 +120,45 @@ class sqlite_logger(object):
 	def add_warnings(self, user, bypassed, warning_str):
 		import inspect
 		import re
-		sku_finder = re.compile(r"GRB\S+")
+		sku_finder = re.compile(r"\bGRB\S+\b")
 		market_finder = re.compile(r"\b(de|at|us|nl|es|business|business_at|business_us|business_nl|business_es)\b")
 		# Get the function which called the print_warning (2 steps back)
 		oringinator = inspect.stack()[2]
 		func = oringinator.function
-		self.database = sqlite3.connect(self.path,timeout=self.timeout)
-		self.database.execute("BEGIN IMMEDIATE")
+
+		# Get database handle
+		self.make_connection(5)
+
 		prefix = ""
 		for w in warning_str.split("\n"):
 			# Remove single quotes as breaks SQL
 			w = w.replace("'","")
+
 			# See if we can identify any SKU
 			any_sku = sku_finder.findall(w)
 			if any_sku:
 				any_sku = " ".join(any_sku)
 			else:
 				any_sku = ""
+
 			# See if we can identify any market
 			any_market = market_finder.findall(w)
 			if any_market:
 				any_market = " ".join(any_market)
 			else:
 				any_market = ""
+
+			# If nothing was found, treat this warning as prefix for future sku/markets 
 			if any_sku == "" and any_market == "":
 				prefix = w
+			else:
+				w = prefix + w
+
 			# Timestamp (updates with milliseconds)
 			timestamp = str(datetime.datetime.utcnow())
-			w = prefix+w
 			
 			insertion = f"""INSERT INTO warnings(TimeStamp,User,Module,Bypassed,product_sku,store_code,Warning)
-							VALUES('{timestamp}','{user}','{func}','{bypassed}','{any_sku}','{any_market}','{w}')"""
+							VALUES('{timestamp}','{self.user}','{func}','{bypassed}','{any_sku}','{any_market}','{w}')"""
 			self.database.execute(insertion)
 		self.database.commit()
 		self.database.close()
