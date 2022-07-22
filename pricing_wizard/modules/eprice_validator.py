@@ -104,6 +104,9 @@ class eprice_validator(object):
 		# Check against plan limit dict
 		sanity_checks.check_rrp_perc(self.df_td, self.plan_limit_dict)
 		print_check("Checked price % guidelines")
+		# Check if bulky 1M plan is high enough
+		sanity_checks.bulky_plan_check(self.df_td)
+		print_check("Checked bulky 1M price point (if applicable)")
 		# Clean NaN in new columns and set to empty strings
 		self.df_td['new']= self.df_td['new'].fillna('')
 		# Check the price change tag is filled
@@ -181,7 +184,7 @@ class eprice_validator(object):
 
 	def upload_template_to_adminpanel(self):
 		# Need the user to select Staging or Production version of site
-		answer = self.run_opts.choice_question("Please select Admin Panel version for upload",["Staging", "Production"])
+		answer = self.run_opts.choice_question("Please select Admin Panel version for upload",["Production","Staging"])
 		to_production = (answer == "Production")
 
 		# Create the admin panel tool (if not created)

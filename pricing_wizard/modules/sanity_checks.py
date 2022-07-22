@@ -49,9 +49,15 @@ def check_discounts(df_td):
     for plan in [1,3,6,12,18,24]:
         active_plan_name = f"active_plan{plan}"
         high_plan_name   = f"high_plan{plan}"
-        if df_td[ (df_td[active_plan_name] >= df_td[high_plan_name]) ].values.any():
-            SKU = df_td.loc[(df_td[active_plan_name] >= df_td[high_plan_name]), 'sku']
-            any_errors.append(f"{plan}M plan has active price >= high price for {SKU.values}")
+        # Report if active price is greater than high price for discount
+        if df_td[ (df_td[active_plan_name] > df_td[high_plan_name]) ].values.any():
+            SKU = df_td.loc[(df_td[active_plan_name] > df_td[high_plan_name]), 'sku'].drop_duplicates()
+            any_errors.append(f"{plan}M plan has active price > high price for {SKU.values}")
+
+        # Check if active price equals high price and we have discounts present (check active and high and check if comma in plan)
+        if df_td[ (df_td[active_plan_name] == df_td[high_plan_name]) & (df_td[f"plan{plan}"].str.contains(",")) ].values.any():
+            SKU = df_td.loc[(df_td[active_plan_name] == df_td[high_plan_name]) & (df_td[f"plan{plan}"].str.contains(",")), 'sku'].drop_duplicates()
+            any_errors.append(f"{plan}M plan has active price = high price with a discount format for {SKU.values}")
 
     if any_errors:
         raise ValueError("\n".join(any_errors))
@@ -162,6 +168,23 @@ def check_price_change_tag(df):
             any_warnings.append(f"{s} : No price change tag provided")
     if any_warnings:
         print_warning("\n".join(any_warnings))
+
+# For now, if we have a bulky item, our 1M rental should generate same profit as 3M
+def bulky_plan_check(df):
+    any_warnings = []
+    # Comparing active price because high price not defined when repricing (but does mean discounts might flag this)
+    bulky   = "bulky"
+    high_1M = "active_plan1"
+    high_3M = "active_plan3"
+    if df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1)].empty != True:
+        sku = df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1), "sku"].drop_duplicates()
+        for s in sku:
+            any_warnings.append(f"Bulky sku [{s}] : 1M  < (3 * 3M) high price, required due to increased shipping costs")
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
+
+
+
             
 
 #### Summarize data
