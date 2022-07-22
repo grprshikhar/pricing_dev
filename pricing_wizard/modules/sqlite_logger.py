@@ -9,8 +9,25 @@ class sqlite_logger(object):
 		self.database = None
 		self.location = ""
 		self.path     = "database.sqlite"
-		self.timeout  = 60
+		self.timeout  = 5
 		self.initialise_tables()
+
+	def make_connection(self, nretries):
+		# Helper function to manage retries
+		iattempt = 1
+		while iattempt <= nretries:
+			try:
+				# Make connection
+				self.database = sqlite3.connect(self.path,timeout=self.timeout)
+				# Attempt to access for writing
+				self.database.execute("BEGIN IMMEDIATE")
+				return
+			except:
+				# If we error on execute, it means the database is in use and we need to retry
+				print(f"Logging database currently in use. Retry attempt {iattempt}/{nretries}")
+				iattempt += 1
+		# If we still fail, we need to error
+		raise ValueError("Error connecting to SQLITE logging database. Please investigate.")
 
 	def initialise_tables(self):
 		init_price_change = """CREATE TABLE IF NOT EXISTS 
@@ -38,9 +55,8 @@ class sqlite_logger(object):
 						   			Warning TEXT
 						   			)""" 
 		# Generate database
-		self.database = sqlite3.connect(self.path,timeout=self.timeout)
+		self.make_connection(5)
 		# Generate write lock
-		self.database.execute("BEGIN IMMEDIATE")
 		self.database.execute(init_price_change)
 		self.database.execute(init_warnings)
 		self.database.commit()
@@ -49,8 +65,7 @@ class sqlite_logger(object):
 
 	def add_price_upload(self, user, df):
 		# Generate write lock
-		self.database = sqlite3.connect(self.path,timeout=self.timeout)
-		self.database.execute("BEGIN IMMEDIATE")
+		self.make_connection(5)
 		timestamp = str(datetime.datetime.utcnow())
 		# 'SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag'
 		for idx,row in df.iterrows():
