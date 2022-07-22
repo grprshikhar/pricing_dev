@@ -49,9 +49,15 @@ def check_discounts(df_td):
     for plan in [1,3,6,12,18,24]:
         active_plan_name = f"active_plan{plan}"
         high_plan_name   = f"high_plan{plan}"
+        # Report if active price is greater than high price for discount
         if df_td[ (df_td[active_plan_name] > df_td[high_plan_name]) ].values.any():
-            SKU = df_td.loc[(df_td[active_plan_name] > df_td[high_plan_name]), 'sku']
+            SKU = df_td.loc[(df_td[active_plan_name] > df_td[high_plan_name]), 'sku'].drop_duplicates()
             any_errors.append(f"{plan}M plan has active price > high price for {SKU.values}")
+
+        # Check if active price equals high price and we have discounts present (check active and high and check if comma in plan)
+        if df_td[ (df_td[active_plan_name] == df_td[high_plan_name]) & (df_td[f"plan{plan}"].str.contains(",")) ].values.any():
+            SKU = df_td.loc[(df_td[active_plan_name] == df_td[high_plan_name]) & (df_td[f"plan{plan}"].str.contains(",")), 'sku'].drop_duplicates()
+            any_errors.append(f"{plan}M plan has active price = high price with a discount format for {SKU.values}")
 
     if any_errors:
         raise ValueError("\n".join(any_errors))
