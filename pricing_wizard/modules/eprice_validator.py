@@ -99,7 +99,7 @@ class eprice_validator(object):
 		sanity_checks.last_digit_9(self.df_td)
 		print_check("Decimal digit ends with 9")
 		# Check price plans are not below a threshold
-		sanity_checks.check_minimum(self.df_td, 5)
+		sanity_checks.check_minimum(self.df_td, 4)
 		print_check("Rental plans larger than minimum requirement")
 		# Check against plan limit dict
 		sanity_checks.check_rrp_perc(self.df_td, self.plan_limit_dict)
