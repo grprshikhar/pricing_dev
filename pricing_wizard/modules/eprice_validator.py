@@ -196,10 +196,10 @@ class eprice_validator(object):
 		adminPanelName  = self.template_filename
 
 		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
-		print_exclaim(f"Scheduling upload for 1 minutes time")
+		# print_exclaim(f"Scheduling upload for 1 minutes time")
 		# Ask if we want a specific time
-		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time instead :")
-		if answer_yes:
+		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
+		if not answer_yes:
 			print_info(f"Current UTC time is {datetime.datetime.utcnow()}")
 			time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
 			try:
