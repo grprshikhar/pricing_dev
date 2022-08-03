@@ -62,6 +62,7 @@ class new_price_validator(object):
 		# Or set to None which will generate a check
 		if self.market == "US":
 			self.df["bulky?"] = None
+			self.df["internationals"] = "US+B2B_US"
 
 	# User provides SKUs which defines a subset of main dataframe
 	def select_SKUs(self, SKUs):
