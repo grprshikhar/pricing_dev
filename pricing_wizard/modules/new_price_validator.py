@@ -174,7 +174,7 @@ class new_price_validator(object):
 	def check_pp_perc(self):
 		any_errors   = []
 		# rp - rental plan; ppp - purchase price percentage
-		for rp,ppp in [(1, 11),(3, 8),(6, 6),(12, 5),(18, 4.5),(24, 4)]:
+		for rp,ppp in [(1, 11),(3, 8),(6, 6),(12, 4.8),(18, 4.5),(24, 4)]:
 			# Check if the purchase price % is lower than threshold reserved used for RRP (usually PP < RRP)
 			col_name = f"new prices pp pct {rp}"
 			if self.df_skus.loc[(self.df_skus[col_name] < ppp)].empty != True:
