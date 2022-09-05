@@ -1,7 +1,7 @@
 import requests
 import json
 import gql
-from getpass import getpass
+from modules.get_password import getpass
 from gql.transport.aiohttp import AIOHTTPTransport
 from modules.graphql_queries import upload_to_S3_staging, upload_to_S3_production, upload_to_admin_panel
 from modules.print_utils import print_exclaim, print_check
@@ -13,6 +13,7 @@ class admin_panel(object):
 		self.auth_token     = None
 		self.run_opts       = run_opts
 		self.to_production  = to_production
+		self.retries        = 5
 		self.define_urls()
 
 	def define_urls(self):
@@ -45,7 +46,12 @@ class admin_panel(object):
 		try:
 			self.auth_token = json.loads(auth_request.text)["access_token"]
 		except:
-			raise ValueError(f"Admin Panel authorisation failed [{user}]")
+			print(f"Admin Panel authorisation failed [{user}]")
+			# Reset token
+			self.auth_token = None
+			# Rerun
+			self.authorise()
+			
 		print_check(f"Admin Panel authorisation complete [{user}]")
 
 	def configure(self):

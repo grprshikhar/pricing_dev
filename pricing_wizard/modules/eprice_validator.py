@@ -28,7 +28,7 @@ class eprice_validator(object):
 			1 :  [0.085, 0.5],
 			3 :  [0.068, 0.3],
 			6 :  [0.055, 0.16],
-			12 : [0.034, 0.078],
+			12 : [0.02, 0.078],
 			18 : [0.03,  0.054],
 			24 : [0.025, 0.041]}
 		# EU data
@@ -100,7 +100,7 @@ class eprice_validator(object):
 		sanity_checks.last_digit_9(self.df_td)
 		print_check("Decimal digit ends with 9")
 		# Check price plans are not below a threshold
-		sanity_checks.check_minimum(self.df_td, 5)
+		sanity_checks.check_minimum(self.df_td, 4)
 		print_check("Rental plans larger than minimum requirement")
 		# Check against plan limit dict
 		sanity_checks.check_rrp_perc(self.df_td, self.plan_limit_dict)
@@ -197,10 +197,10 @@ class eprice_validator(object):
 		adminPanelName  = self.template_filename
 
 		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
-		print_exclaim(f"Scheduling upload for 1 minutes time")
+		# print_exclaim(f"Scheduling upload for 1 minutes time")
 		# Ask if we want a specific time
-		answer_yes = self.run_opts.yn_question("Schedule upload for a specific time instead :")
-		if answer_yes:
+		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
+		if not answer_yes:
 			print_info(f"Current UTC time is {datetime.datetime.utcnow()}")
 			time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
 			try:

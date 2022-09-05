@@ -62,6 +62,7 @@ class new_price_validator(object):
 		# Or set to None which will generate a check
 		if self.market == "US":
 			self.df["bulky?"] = None
+			self.df["internationals"] = "US+B2B_US"
 
 	# User provides SKUs which defines a subset of main dataframe
 	def select_SKUs(self, SKUs):
@@ -173,7 +174,7 @@ class new_price_validator(object):
 	def check_pp_perc(self):
 		any_errors   = []
 		# rp - rental plan; ppp - purchase price percentage
-		for rp,ppp in [(1, 11),(3, 8),(6, 6),(12, 5),(18, 4.5),(24, 4)]:
+		for rp,ppp in [(1, 11),(3, 8),(6, 6),(12, 4.8),(18, 4.5),(24, 4)]:
 			# Check if the purchase price % is lower than threshold reserved used for RRP (usually PP < RRP)
 			col_name = f"new prices pp pct {rp}"
 			if self.df_skus.loc[(self.df_skus[col_name] < ppp)].empty != True:
@@ -224,7 +225,7 @@ class new_price_validator(object):
 	def sanitise_SKUs(self):
 		# We should place here any preprocessing/sanitisation required on the new dataframe
 		# Remove sheets NaN error
-		self.df_skus = self.df_skus.replace('#N/A',numpy.nan)
+		self.df_skus = self.df_skus.replace('#N/A',"#N/A%")
 		# Clean string and convert types
 		for rp in [1,3,6,12,18,24]:
 			col_name = f"gross margin pct {rp}"
@@ -237,6 +238,7 @@ class new_price_validator(object):
 			self.df_skus[col_name] = self.df_skus[col_name].str.replace("€","",regex=False)
 			self.df_skus[col_name] = self.df_skus[col_name].str.replace("$","",regex=False)
 			self.df_skus[col_name] = pandas.to_numeric(self.df_skus[col_name],errors="coerce")
+
 		# Other types
 		self.df_skus["sku"]  			 = self.df_skus["sku"].astype(str)
 		self.df_skus["name"] 			 = self.df_skus["name"].astype(str)
@@ -282,7 +284,8 @@ class new_price_validator(object):
 				   "old_high_plan6"  : "", 
 				   "old_high_plan12" : "", 
 				   "old_high_plan18" : "", 
-				   "old_high_plan24" : ""}
+				   "old_high_plan24" : "",
+				   "price change tag": ""}
 		# Create dataframe with columns
 		df_eprice = pandas.DataFrame(columns=columns.keys())
 		# Process our selected data
@@ -293,6 +296,7 @@ class new_price_validator(object):
 
 		# Now set "newness"
 		df_eprice["new"] = "new"
+		df_eprice = df_eprice.fillna('')
 		return df_eprice
 
 
