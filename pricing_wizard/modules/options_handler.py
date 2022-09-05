@@ -99,7 +99,7 @@ class options_handler(object):
 		active_user = open(".active_user.dat","w")
 		active_user.write(self.current_user)
 		active_user.close()
-		# Local lock
+		# Local lock - If False, we will download a new sqlite copy
 		active_file = open(".active_file.dat","w")
 		active_file.write("False")
 		active_file.close()

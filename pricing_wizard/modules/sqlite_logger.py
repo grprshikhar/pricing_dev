@@ -28,6 +28,7 @@ class sqlite_logger(object):
 		active        = open(".active_file.dat","r").readlines()[0].strip()
 		if active == "False":
 			self.download()
+			# Set to True to avoid downloading again
 			active_file = open(".active_file.dat","w")
 			active_file.write("True")
 			active_file.close()

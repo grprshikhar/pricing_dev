@@ -222,9 +222,9 @@ class eprice_validator(object):
 			scheduledTime = "null"
 
 		# All information available so now we can proceed with passing to admin panel
-		#self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
-		#						        adminPanelName  = adminPanelName,
-		#						        scheduledTime   = scheduledTime)
+		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
+								        adminPanelName  = adminPanelName,
+								        scheduledTime   = scheduledTime)
 
 		# sqlite logging for price uploads
 		s = sqlite_logger()
