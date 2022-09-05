@@ -145,6 +145,12 @@ class eprice_validator(object):
 		print_exclaim("Preparing to upload prices (use [CTRL+C] to cancel)")
 		self.upload_template_to_gdrive()
 		self.upload_template_to_adminpanel()
+		self.upload_log()
+
+	def upload_log(self):
+		from modules.sqlite_logger import sqlite_logger
+		s = sqlite_logger()
+		s.upload()
 
 	def upload_template_to_gdrive(self):
 		# Download the template file
@@ -216,9 +222,9 @@ class eprice_validator(object):
 			scheduledTime = "null"
 
 		# All information available so now we can proceed with passing to admin panel
-		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
-								        adminPanelName  = adminPanelName,
-								        scheduledTime   = scheduledTime)
+		#self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
+		#						        adminPanelName  = adminPanelName,
+		#						        scheduledTime   = scheduledTime)
 
 		# sqlite logging for price uploads
 		s = sqlite_logger()

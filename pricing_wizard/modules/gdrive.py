@@ -113,6 +113,56 @@ def download_store_template():
     print_check(f"Template file saved as [{file_name}].")
     # Return the file name for use elsewhere
     return file_name
+
+def download_log(username):
+    log_name = f"{username}_log.sqlite"
+    log_id   = ""
+    # Get all files in our folder
+    files = list_folder()
+    for f in files:
+        # If we find the log, store the id
+        if f['name'] == log_name:
+            log_id = f['id']
+            break
+    # If id is not "", we can download
+    if log_id != "":
+        file_bytes = download(log_id)
+        with open(log_name,'wb') as f:
+            f.write(file_bytes.getbuffer())
+            f.close()
+        print_check(f"Downloaded log file [{log_name}] from gdrive.")
+    else:
+        print_check(f"Log file [{log_name}] does not currently exist.")
+
+def upload_log(username):
+    out_filename = f"{username}_log.sqlite"
+    # Credentials
+    creds     = gdrive_api_check(SCOPES)
+    service   = build('drive', 'v3', credentials=creds)
+    # 'Price Upload - Sanity Checked' folder ID
+    folder_id = '1oN1oPK91McwGKmLltI2667x7tq6HWg78'
+    mime_type = 'application/x-sqlite3'
+
+    # Check if it exists
+    log_id   = ""
+    # Get all files in our folder
+    files = list_folder()
+    for f in files:
+        # If we find the log, store the id
+        if f['name'] == out_filename:
+            log_id = f['id']
+            break
+    # If id is not "", we can update existing file
+    if log_id != "":
+        body  = {'name': out_filename, 'mimeType': mime_type}
+        media = MediaFileUpload(out_filename, mimetype = mime_type)
+        file = service.files().update(fileId=log_id, body=body, media_body=media).execute() 
+    else:
+        body  = {'name': out_filename, 'parents':[folder_id],'mimeType': mime_type}
+        media = MediaFileUpload(out_filename, mimetype = mime_type)
+        file  = service.files().create(body=body, media_body=media).execute()
+
+
     
 
 

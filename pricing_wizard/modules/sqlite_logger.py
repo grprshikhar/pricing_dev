@@ -3,24 +3,34 @@
 
 import sqlite3
 import datetime
-
+from modules import gdrive
 
 class sqlite_logger(object):
 	def __init__(self):
 		self.database = None
 		self.location = None
 		self.path     = None
-		self.dbname   = "database.sqlite"
 		self.timeout  = 5
 		self.user     = None
 		self.initialise_tables()
 
+	def download(self):
+		gdrive.download_log(self.user)
+
+	def upload(self):
+		gdrive.upload_log(self.user)
 
 	def make_connection(self, nretries):
 		# Firstly set the user
 		self.user     = open(".active_user.dat","r").readlines()[0].strip()
-		self.location = open(".active_path.dat","r").readlines()[0].strip()
-		self.path     = self.location + self.dbname
+		self.path     = f"{self.user}_log.sqlite"
+		# Download from gdrive ONCE (per pricing_wizard run)
+		active        = open(".active_file.dat","r").readlines()[0].strip()
+		if active == "False":
+			self.download()
+			active_file = open(".active_file.dat","w")
+			active_file.write("True")
+			active_file.close()
 		# Helper function to manage retries
 		iattempt = 1
 		while iattempt <= nretries:

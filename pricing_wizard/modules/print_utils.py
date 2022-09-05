@@ -5,7 +5,6 @@ from tabulate import tabulate
 from googleapiclient.errors import HttpError
 from redshift_connector.error import InterfaceError, ProgrammingError
 import modules.logger as logger
-from modules.sqlite_logger import sqlite_logger
 
 # Print utility
 def print_check(msg):
@@ -51,6 +50,8 @@ def print_yellow_bold(msg):
 def print_warning(msg):
     # Import the option handler in a limited use case to avoid circular reference
     from modules.options_handler import options_handler
+    # Import the sqlite_logger in a limited use case to avoid circular reference
+    from modules.sqlite_logger import sqlite_logger
     print_yellow_bold("PricingWizard : Warning")
     print_yellow_bold("-----------------------")
     print_yellow(msg)

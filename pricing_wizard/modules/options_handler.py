@@ -99,22 +99,10 @@ class options_handler(object):
 		active_user = open(".active_user.dat","w")
 		active_user.write(self.current_user)
 		active_user.close()
-		# Find local gdrive hopefully
-		possible_options = ["/Volumes/GoogleDrive/My Drive/Pricing/Price Uploads/Price Upload - Sanity Checked/",
-							"C:\\Users\\*\\Google Drive\\My Drive\\Pricing\\*\\Price Upload - Sanity Checked/"]
-		gdrive_path = ""
-		for o in possible_options:
-			res = glob.glob(o)
-			if res:
-				gdrive_path = res[0]
-				break
-
-		if gdrive_path == "":
-			raise ValueError("Cannot find local google drive desktop path. Please contact Ian to help resolve this.")
-			
-		local_gdrive_path = open(".active_path.dat","w")
-		local_gdrive_path.write(gdrive_path)
-		local_gdrive_path.close()
+		# Local lock
+		active_file = open(".active_file.dat","w")
+		active_file.write("False")
+		active_file.close()
 
 	# -------------------------------
 	# Setup the e-price URL
