@@ -63,7 +63,8 @@ class sqlite_logger(object):
 											 rental_plan_18_month TEXT,
 											 rental_plan_24_month TEXT,
 											 price_change_tag TEXT,
-											 price_change_reason TEXT
+											 price_change_reason TEXT,
+											 id TEXT
 											 )"""
 		init_warnings = """CREATE TABLE IF NOT EXISTS 
 						   warnings(TimeStamp DateTime,
@@ -72,7 +73,8 @@ class sqlite_logger(object):
 						   			Bypassed TEXT,
 						   			product_sku TEXT,
 						   			store_code TEXT,
-						   			Warning TEXT
+						   			Warning TEXT,
+						   			id TEXT
 						   			)""" 
 		# Generate database
 		self.make_connection(5)
@@ -87,6 +89,7 @@ class sqlite_logger(object):
 		# Generate write lock
 		self.make_connection(5)
 		timestamp = str(datetime.datetime.utcnow())
+		ID        = open(".active_session.dat","r").readlines()[0].strip()
 		# 'SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag'
 		# 'sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag'
 		# Not currently using
@@ -105,7 +108,8 @@ class sqlite_logger(object):
 													  rental_plan_18_month,
 													  rental_plan_24_month,
 													  price_change_tag,
-													  price_change_reason
+													  price_change_reason,
+													  id
 													  )
 													  VALUES('{timestamp}',
 													  		 '{self.user}',
@@ -120,7 +124,8 @@ class sqlite_logger(object):
 													  		 '{row['plan18']}',
 													  		 '{row['plan24']}',
 													  		 '{row['price change tag']}',
-													  		 '{price_change_reason}'
+													  		 '{price_change_reason}',
+													  		 '{ID}'
 													  		 )"""
 			# Now insert
 			self.database.execute(insertion)
@@ -136,7 +141,7 @@ class sqlite_logger(object):
 		# Get the function which called the print_warning (2 steps back)
 		oringinator = inspect.stack()[2]
 		func = oringinator.function
-
+		ID   = open(".active_session.dat","r").readlines()[0].strip()
 		# Get database handle
 		self.make_connection(5)
 
@@ -168,8 +173,8 @@ class sqlite_logger(object):
 			# Timestamp (updates with milliseconds)
 			timestamp = str(datetime.datetime.utcnow())
 			
-			insertion = f"""INSERT INTO warnings(TimeStamp,User,Module,Bypassed,product_sku,store_code,Warning)
-							VALUES('{timestamp}','{self.user}','{func}','{bypassed}','{any_sku}','{any_market}','{w}')"""
+			insertion = f"""INSERT INTO warnings(TimeStamp,User,Module,Bypassed,product_sku,store_code,Warning,id)
+							VALUES('{timestamp}','{self.user}','{func}','{bypassed}','{any_sku}','{any_market}','{w}','{ID}')"""
 			self.database.execute(insertion)
 		self.database.commit()
 		self.database.close()

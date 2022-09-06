@@ -3,6 +3,7 @@ from inquirer.themes import load_theme_from_dict
 import json
 import getpass
 import sys
+import datetime
 from modules.print_utils import print_check, print_exclaim
 
 # This class will handle user input and direct and track program flow
@@ -103,6 +104,10 @@ class options_handler(object):
 		active_file = open(".active_file.dat","w")
 		active_file.write("False")
 		active_file.close()
+		# Write an ID for this session
+		active_session = open(".active_session.dat","w")
+		active_session.write(f"{self.current_user} {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
+		active_session.close()
 
 	# -------------------------------
 	# Setup the e-price URL
