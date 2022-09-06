@@ -50,12 +50,19 @@ def print_yellow_bold(msg):
 def print_warning(msg):
     # Import the option handler in a limited use case to avoid circular reference
     from modules.options_handler import options_handler
+    # Import the sqlite_logger in a limited use case to avoid circular reference
+    from modules.sqlite_logger import sqlite_logger
     print_yellow_bold("PricingWizard : Warning")
     print_yellow_bold("-----------------------")
     print_yellow(msg)
     print_yellow_bold("-----------------------")
     __run_opts = options_handler()
     answer = __run_opts.yn_question("Acknowledge this warning and continue :")
+
+    # sqlite logging for warnings
+    s = sqlite_logger()
+    s.add_warnings("test",answer,msg)
+
     if not answer:
         print_green_bold("Please investigate this warning.")
         raise KeyboardInterrupt

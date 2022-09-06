@@ -13,6 +13,8 @@ from modules.new_price_validator import new_price_validator
 from modules.print_utils import exception_hook
 # Import module holding reports
 from modules.report_runner import report_runner
+# sqlite logger
+from modules.sqlite_logger import sqlite_logger
 
 # ------------------------------------------------------------------------ #
 # Functions managing calls for each stage of the program flow

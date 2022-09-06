@@ -3,6 +3,7 @@ from inquirer.themes import load_theme_from_dict
 import json
 import getpass
 import sys
+import datetime
 from modules.print_utils import print_check, print_exclaim
 
 # This class will handle user input and direct and track program flow
@@ -17,6 +18,7 @@ class options_handler(object):
 		self.users              = None
 		self.stage              = None
 		self._theme             = None
+		self.sqlite_logger      = None
 		# Call setup
 		self.setup()
 
@@ -89,6 +91,23 @@ class options_handler(object):
 		else:
 			self.add_user_to_json()
 		print_check (f"User [{self.current_user}] selected.")
+		# One-time per run, configure files for sqlite
+		self.configure_for_sqlite()
+
+	def configure_for_sqlite(self):
+		import glob
+		# For use with the sqlite logger in a standalone way
+		active_user = open(".active_user.dat","w")
+		active_user.write(self.current_user)
+		active_user.close()
+		# Local lock - If False, we will download a new sqlite copy
+		active_file = open(".active_file.dat","w")
+		active_file.write("False")
+		active_file.close()
+		# Write an ID for this session
+		active_session = open(".active_session.dat","w")
+		active_session.write(f"{self.current_user} {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
+		active_session.close()
 
 	# -------------------------------
 	# Setup the e-price URL
