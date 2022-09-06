@@ -150,14 +150,14 @@ def last_digit_9 (df_td):
         raise ValueError("\n".join(any_errors))
 
 def check_minimum(df_td, minval):
-    any_errors = []
+    any_warnings = []
     for plan in [1,3,6,12,18,24]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]<minval)].empty != True:
-           sku = df_td.loc[(df_td[pc]<minval), 'sku']
-           any_errors.append( str(plan) + f"M Plan has low price (below {minval}€ or {minval}$) : " + str(sku.values) )
-    if any_errors:
-        raise ValueError("\n".join(any_errors))
+           sku = df_td.loc[(df_td[pc]<minval), 'sku'].drop_duplicates()
+           any_warnings.append( str(plan) + f"M Plan has low price (below {minval}€ or {minval}$) : " + str(sku.values) )
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
 
 # Check the price change tag is provided
 def check_price_change_tag(df):
