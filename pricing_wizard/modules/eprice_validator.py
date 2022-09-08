@@ -207,7 +207,7 @@ class eprice_validator(object):
 		# Ask if we want a specific time
 		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
 		if not answer_yes:
-			print_info(f"Current UTC time is {datetime.datetime.utcnow()}")
+			print_green(f"Current UTC time is {datetime.datetime.utcnow()}")
 			time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
 			try:
 				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
