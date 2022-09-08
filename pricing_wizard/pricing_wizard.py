@@ -15,6 +15,9 @@ from modules.print_utils import exception_hook
 from modules.report_runner import report_runner
 # sqlite logger
 from modules.sqlite_logger import sqlite_logger
+# getting market price code
+from modules.market_price_scraper import market_price_scraper 
+
 
 # ------------------------------------------------------------------------ #
 # Functions managing calls for each stage of the program flow
@@ -135,4 +138,8 @@ if __name__ == "__main__":
 		# 4 : Just print out the data stored in the json file for cross-checks on-the-fly
 		if run_opts.stage == 4:
 			run_opts.info()
+
+		# 5 : Update Competition Pricing Sheet
+		if run_opts.stage == 5:
+			market_price_scraper()
 
