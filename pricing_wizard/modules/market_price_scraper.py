@@ -11,6 +11,7 @@ def market_price_scraper():
     import sqlite3 
     from modules.gdrive import download_pricsync, upload_pricsync
     from modules.print_utils import print_check, print_exclaim, tabulate_dataframe, print_exclaim_sameline
+    from modules.gsheet import upload_df_to_gsheet
 
     # Date
     date_today =datetime.today().strftime('%Y-%m-%d')
@@ -23,13 +24,18 @@ def market_price_scraper():
     # Make a connection
     conn = sqlite3.connect(database_filename)
     last_run = pd.read_sql_query('SELECT crawl_date FROM data_output ORDER BY crawl_date DESC limit 1',conn)
-    conn.close()
     last_run_date = last_run["crawl_date"].loc[0]
     if last_run_date == date_today:
       print_check("Database already contains price data for today")
+      print_exclaim("Updating spreadsheet with latest data")
+      output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
+      response = upload_df_to_gsheet(output)
+      print_check(response)
       return
     else:
       print_check(f"Competition prices last scraped on: {last_run_date}")
+
+    conn.close()
 
     print_exclaim("Downloading data from API Link (Please be patient...)")
     Start_Url = 'https://prisync.com/api/v2/list/product/summary/startFrom/0'
@@ -284,6 +290,7 @@ def market_price_scraper():
     Mediamarkt_prices_df.rename(columns = {'price':'Mediamarkt_prices'}, inplace = True) 
     Last_df = Last_df.merge(Mediamarkt_prices_df, how = 'left' ,left_on = 'sku', right_on = "product_code")
     Last_df.drop(["product_code","price"], inplace = True, axis = 1)
+    Last_df['crawl_date'] = date_today
 
     # Checking data
     tabulate_dataframe(Last_df.tail())
@@ -311,6 +318,12 @@ def market_price_scraper():
     print_exclaim("Updating database in gdrive")
     upload_pricsync(database_filename)
     print_check("Database updated in gdrive")
+
+    # Updating gsheet
+    print_exclaim("Updating spreadsheet with latest data")
+    response = upload_df_to_gsheet(Last_df)
+    print_check(response)
+    print_check("Spreadsheet update complete")
 
 
 

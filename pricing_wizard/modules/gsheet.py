@@ -74,3 +74,27 @@ def get_dataframe(sheet_id, data_range, info):
     df.columns = [x.lower() for x in df.columns]
     # Return the dataframe
     return df
+
+def upload_df_to_gsheet(df, sheet_id='1stmF76Qm4Vr75o08xnd-KMXgwq3w8xSGAeILShJUbUg', sheet_name='Sheet1!A:S'):
+    # Credentials
+    creds = gsheet_api_check(SCOPES)
+    # Create google service
+    service = build('sheets', 'v4', credentials=creds)
+    # Create sheet service
+    sheet = service.spreadsheets()
+    df_data = [df.columns.values.tolist()]
+    df_data.extend(df.values.tolist())
+    data = [{'range' : sheet_name, 'values' : df_data}]
+    batch_update_values_request_body = {'value_input_option': 'RAW', 'data': data }
+
+    request = sheet.values().batchUpdate(spreadsheetId=sheet_id,
+                                         body=batch_update_values_request_body)
+    response = request.execute()
+    return response
+    
+
+
+
+
+
+
