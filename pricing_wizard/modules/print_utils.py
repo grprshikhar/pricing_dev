@@ -67,9 +67,12 @@ def print_warning(msg):
         print_green_bold("Please investigate this warning.")
         raise KeyboardInterrupt
 
-
 def tabulate_dataframe(df):
     print(colored(tabulate(df, headers='keys', tablefmt='psql'),'blue')+"\n\n") 
+
+def print_exclaim_sameline(msg):
+    msg_fmt = " - "+colored('!', 'green', attrs=['bold'])+" - "+colored(msg, 'blue', attrs=['bold'])
+    print( msg_fmt, end='\r')
 
 # Error handling utility
 
