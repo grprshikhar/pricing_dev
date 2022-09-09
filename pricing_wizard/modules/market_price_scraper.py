@@ -29,7 +29,7 @@ def market_price_scraper():
       print_check("Database already contains price data for today")
       print_exclaim("Updating spreadsheet with latest data")
       output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
-      response = upload_df_to_gsheet(output)
+      response = upload_df_to_gsheet(output.drop(columns='index'))
       print_check(response)
       return
     else:
