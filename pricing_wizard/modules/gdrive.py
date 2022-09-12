@@ -1,5 +1,6 @@
 import os, io
 # Google API
+import socket
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -7,6 +8,9 @@ from googleapiclient.discovery import build
 from apiclient.http import MediaFileUpload, MediaIoBaseDownload
 from googleapiclient.errors import HttpError
 from modules.print_utils import print_check, print_exclaim
+
+# Increase default socket timeout (300 seconds)
+socket.setdefaulttimeout(300)
 
 # Scope variable - Can probably be placed into the api check on its own
 SCOPES = ['https://www.googleapis.com/auth/drive']

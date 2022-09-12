@@ -84,6 +84,7 @@ def upload_df_to_gsheet(df, sheet_id='1stmF76Qm4Vr75o08xnd-KMXgwq3w8xSGAeILShJUb
     sheet = service.spreadsheets()
     df_data = [df.columns.values.tolist()]
     df_data.extend(df.values.tolist())
+    print (df[df['sku']  == 'GRB100P893' ].to_string())
     data = [{'range' : sheet_name, 'values' : df_data}]
     batch_update_values_request_body = {'value_input_option': 'RAW', 'data': data }
 

@@ -312,7 +312,7 @@ def market_price_scraper():
     if new_df2[new_df2.duplicated()].empty != True:
       print_exclaim("Duplicate rows identified in dataframe.")
       print_exclaim("Please check")
-      tabulate_dataframe(new_df2[new_df2.duplicated()])
+      #tabulate_dataframe(new_df2[new_df2.duplicated()])
     
     # Update google drive with new database
     print_exclaim("Updating database in gdrive")
@@ -321,7 +321,7 @@ def market_price_scraper():
 
     # Updating gsheet
     print_exclaim("Updating spreadsheet with latest data")
-    response = upload_df_to_gsheet(Last_df)
+    response = upload_df_to_gsheet(output)
     print_check(response)
     print_check("Spreadsheet update complete")
 
