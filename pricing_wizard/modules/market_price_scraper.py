@@ -29,6 +29,7 @@ def market_price_scraper():
       print_check("Database already contains price data for today")
       print_exclaim("Updating spreadsheet with latest data")
       output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
+      print (output.dtypes)
       response = upload_df_to_gsheet(output.drop(columns='index'))
       print_check(response)
       return
@@ -94,7 +95,7 @@ def market_price_scraper():
     x3 = x3.reset_index()  
     # Output should be results for next section
     results = x3.copy(deep = True)
-    results.rename(columns = {'brand.name' : "brand_name", 'cost':'inhouse_RRP'}, inplace = True)
+    results.rename(columns = {'brand.name' : "brand_name"}, inplace = True)
     print_check("Data cleaned")
 
 
