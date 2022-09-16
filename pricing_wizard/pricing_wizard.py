@@ -17,6 +17,8 @@ from modules.report_runner import report_runner
 from modules.sqlite_logger import sqlite_logger
 # getting market price code
 from modules.market_price_scraper import market_price_scraper 
+# running price review clustering
+from modules.price_reviewer import price_reviewer
 
 
 # ------------------------------------------------------------------------ #
@@ -65,6 +67,9 @@ def price_new_skus(run_opts):
 	# Upload output to google drive and admin panel
 	ep_validator.upload()
 
+def price_review_clustering():
+	pr = price_reviewer()
+	pr.summarise()
 
 def redshift_report(run_opts):
 	# Class to manage setting up report options
@@ -133,7 +138,7 @@ if __name__ == "__main__":
 
 		# 3 : Separate option for pricing review
 		if run_opts.stage == 3:
-			pass
+			price_review_clustering()
 
 		# 4 : Just print out the data stored in the json file for cross-checks on-the-fly
 		if run_opts.stage == 4:

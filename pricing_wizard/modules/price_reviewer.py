@@ -6,6 +6,7 @@ from modules.options_handler import options_handler
 from modules.print_utils import tabulate_dataframe, print_check, print_exclaim
 # Clustering
 from sklearn.cluster import Birch
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 class price_reviewer(object):
@@ -28,7 +29,6 @@ class price_reviewer(object):
 		self.df = self.df.merge(dfs[1], right_on='variant_sku', left_on='variant_sku', suffixes=("","_r"), validate='one_to_one')
 		# Drop entries where no category
 		self.df = self.df[self.df['category_name'] != ""]
-		print (self.df.head())
 
 	def create_variables(self):
 		# Months of stock
@@ -70,7 +70,7 @@ class price_reviewer(object):
 		# Reduce dataframe by subcategory (if required)
 		if selected_subcat != 'All':
 			self.df = self.df[self.df['subcategory_name'] == selected_subcat]
-		print (self.df.dtypes.to_string())
+
 
 	def get_features(self):
 		features = ["months_of_stock",
@@ -81,7 +81,7 @@ class price_reviewer(object):
 		return features
 
 	def numerify(self):
-		# Convert types
+		# Convert types - needed for cleaning data
 		for f in self.get_features():
 			self.df[f] = pandas.to_numeric(self.df[f],errors='coerce')
 		# Now set nan to 0
@@ -98,8 +98,9 @@ class price_reviewer(object):
 		df_X = self.df[features].values
 		# We need C-type array, this numpy function does this
 		df_X = np.ascontiguousarray(df_X,dtype=np.float32)
-		# Run the clustering and generate labels
-		df_Y = cl.fit_predict(df_X)
+		# Run the clustering and generate labels (apply scaling to help clustering)
+		ss   = StandardScaler()
+		df_Y = cl.fit_predict(ss.fit_transform(df_X))
 		# Place labels onto the rows (ordering preserved)
 		self.df['cluster_label'] = df_Y
 		# Add back the low month of stock data
@@ -108,17 +109,17 @@ class price_reviewer(object):
 		self.numerify()
 
 	def summarise(self):
-		print_exclaim("Group [-1] are all SKU with less than 1 month of stock")
 		group_summary = self.df.groupby(['cluster_label'])
 		tabulate_dataframe(group_summary[self.get_features()].describe(percentiles=[]).T)
 		# Options handling
 		oh = options_handler()
 		# Display cluster entries
 		cluster_summary = self.df['cluster_label'].value_counts()
-		cluster_ids = []
+		cluster_ids = ['All']
 		for cluster,value in sorted(cluster_summary.items(), key = lambda x: x[0]):
 			cluster_ids.append(f"{cluster} : [{value}]")
 		while True:
+			print_exclaim("Group [-1] are all SKU with less than 1 month of stock")
 			selected_id = oh.choice_question("Select cluster to display", cluster_ids+['Exit'])
 			if selected_id == 'Exit':
 				break
@@ -126,15 +127,22 @@ class price_reviewer(object):
 				self.show_cluster(selected_id)
 
 		# Plot
-		self.plot()
+		do_plot = oh.yn_question("Generate cluster plots?")
+		if do_plot:
+			self.plot()
 
 	def show_cluster(self, cluster_id):
-		cluster_id = int(cluster_id.split(":")[0].strip())
+		cluster_id = cluster_id.split(":")[0].strip()
 		# Output features
-		out_features = ["variant_sku","brand","product_name"]+self.get_features()
-		cluster_df = self.df[self.df['cluster_label'] == cluster_id]
+		out_features = ["variant_sku","brand","product_name","cluster_label"]+self.get_features()
+		if cluster_id != "All":
+			cluster_id = int(cluster_id)
+			cluster_df = self.df[self.df['cluster_label'] == cluster_id]
+		else:
+			cluster_df = self.df.sort_values(by=['cluster_label'])
 		cluster_df_output = cluster_df[out_features]
 		tabulate_dataframe(cluster_df_output)
+
 
 	def plot(self):
 		features = self.get_features()
