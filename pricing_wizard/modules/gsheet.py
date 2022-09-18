@@ -84,7 +84,6 @@ def upload_df_to_gsheet(df, sheet_id='1stmF76Qm4Vr75o08xnd-KMXgwq3w8xSGAeILShJUb
     sheet = service.spreadsheets()
     df_data = [df.columns.values.tolist()]
     df_data.extend(df.values.tolist())
-    print (df[df['sku']  == 'GRB100P893' ].to_string())
     data = [{'range' : sheet_name, 'values' : df_data}]
     batch_update_values_request_body = {'value_input_option': 'USER_ENTERED', 'data': data }
 
@@ -93,6 +92,29 @@ def upload_df_to_gsheet(df, sheet_id='1stmF76Qm4Vr75o08xnd-KMXgwq3w8xSGAeILShJUb
     response = request.execute()
     return response
     
+def create_tab_in_gsheet(sheet_id, sheet_name):
+    body = {
+            'requests': [{
+                'addSheet': {
+                    'properties': {
+                        'title': sheet_name,
+                        'tabColor': {
+                            'red': 0.44,
+                            'green': 0.99,
+                            'blue': 0.50
+                        }
+                    }
+                }
+            }]
+        }
+    creds = gsheet_api_check(SCOPES)
+    # Create google service
+    service = build('sheets', 'v4', credentials=creds)
+    # Will return HttpError error if the tab exists
+    try:
+        result = service.spreadsheets().batchUpdate(spreadsheetId=sheet_id,body=body).execute()
+    except HttpError:
+        pass
 
 
 
