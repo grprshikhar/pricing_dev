@@ -4,6 +4,7 @@ import itertools
 import modules.gsheet as gsheet
 from modules.options_handler import options_handler
 from modules.print_utils import tabulate_dataframe, print_check, print_exclaim
+import modules.gsheet as gsheet
 # Clustering
 from sklearn.cluster import Birch
 from sklearn.preprocessing import StandardScaler
@@ -13,6 +14,10 @@ class price_reviewer(object):
 	def __init__(self):
 		self.sheet_id = "1zB8QTkvXZXQc0ttdAIePuuuUhokhnHxHkrerO4CEeeg"
 		self.ranges   = ["Product Data!A:AI","Marketing&Performance!A:AO"]
+		self.cat      = ""
+		self.sub      = ""
+		self.market   = ""
+		self.upload_id = '1aZ5Js5mFuD1o63kJD8ehS5KK-wk-XlmZuhEoIsEK1LY'
 		self.get_data()
 		self.create_variables()
 		self.apply_selection()
@@ -70,6 +75,10 @@ class price_reviewer(object):
 		# Reduce dataframe by subcategory (if required)
 		if selected_subcat != 'All':
 			self.df = self.df[self.df['subcategory_name'] == selected_subcat]
+		# Store selections
+		self.market = selected_market
+		self.cat    = selected_cat
+		self.sub    = selected_subcat
 
 
 	def get_features(self):
@@ -93,9 +102,11 @@ class price_reviewer(object):
 		# Features for clustering
 		features = self.get_features()
 		# Clustering tool
-		cl = Birch(n_clusters=10, threshold=0.5, branching_factor=10)
+		cl = Birch(n_clusters=None, threshold=2.0, branching_factor=100)
 		# Pandas returns fortran-style array 
+
 		df_X = self.df[features].values
+		print(df_X.shape)
 		# We need C-type array, this numpy function does this
 		df_X = np.ascontiguousarray(df_X,dtype=np.float32)
 		# Run the clustering and generate labels (apply scaling to help clustering)
@@ -107,6 +118,8 @@ class price_reviewer(object):
 		self.df = pandas.concat([self.df, self.df_low_mos], ignore_index=True)
 		# Reclean
 		self.numerify()
+		# Sort
+		self.df = self.df.sort_values(['cluster_label','variant_sku'])
 
 	def summarise(self):
 		group_summary = self.df.groupby(['cluster_label'])
@@ -129,7 +142,11 @@ class price_reviewer(object):
 		# Plot
 		do_plot = oh.yn_question("Generate cluster plots?")
 		if do_plot:
+			print_exclaim("Generating 2D scatter plots of cluster variables")
 			self.plot()
+		print_exclaim(f"Uploading cluster results to [{self.upload_id}]")
+		self.send_data_to_gsheet()
+		print_check("Upload complete")
 
 	def show_cluster(self, cluster_id):
 		cluster_id = cluster_id.split(":")[0].strip()
@@ -153,7 +170,20 @@ class price_reviewer(object):
 			ax = self.df.plot.scatter(x,y,c='cluster_label', colormap='gist_rainbow')
 			ax.get_figure().savefig(f"cluster_{x}_{y}.pdf")
 
-
+	def send_data_to_gsheet(self):
+		# Generate a tab based on cat or subcat name
+		tab_name = f"{self.market} "
+		if self.sub == "All":
+			tab_name += f"{self.cat}"
+		else:
+			tab_name += f"{self.sub}"
+		# Create tab in sheet (if does not exist)
+		gsheet.create_tab_in_gsheet(self.upload_id,tab_name)
+		# Place the cluster earlier in the column list
+		self.df.insert(1, 'cluster_label', self.df.pop('cluster_label'))
+		# Send data to gsheet
+		gsheet.upload_df_to_gsheet(self.df, self.upload_id, tab_name+"!A:BZ")
+		# Done
 
 
 
