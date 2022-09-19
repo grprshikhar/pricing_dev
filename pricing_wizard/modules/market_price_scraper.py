@@ -29,9 +29,9 @@ def market_price_scraper():
       print_check("Database already contains price data for today")
       print_exclaim("Updating spreadsheet with latest data")
       output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
-      print (output.dtypes)
+      #print (output.dtypes)
       response = upload_df_to_gsheet(output.drop(columns='index'))
-      print_check(response)
+      #print_check(response)
       return
     else:
       print_check(f"Competition prices last scraped on: {last_run_date}")
@@ -294,7 +294,7 @@ def market_price_scraper():
     Last_df['crawl_date'] = date_today
 
     # Checking data
-    tabulate_dataframe(Last_df.tail())
+    #tabulate_dataframe(Last_df.tail())
 
     # Working on sqlite database  
     print_exclaim("Updating local database with new data")
@@ -305,7 +305,7 @@ def market_price_scraper():
 
     # Run a check
     new_df2 = pd.read_sql_query('SELECT * FROM data_output',conn)
-    tabulate_dataframe(new_df2.tail())
+    #tabulate_dataframe(new_df2.tail())
     conn.close()
     print_check("Local database updated")
 
@@ -323,7 +323,7 @@ def market_price_scraper():
     # Updating gsheet
     print_exclaim("Updating spreadsheet with latest data")
     response = upload_df_to_gsheet(output)
-    print_check(response)
+    #print_check(response)
     print_check("Spreadsheet update complete")
 
 
