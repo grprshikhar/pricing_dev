@@ -88,9 +88,7 @@ def exception_hook(exctype, value, tb):
         # List of traceback
         if "invalid literal" in value.args[0]:
             err_details = traceback.format_tb(tb)
-            print_red(tb)
-        # err_details = traceback.format_tb(tb)
-        # print_red(" ---> "+err_details[-1].strip())
+            print_red(" ---> "+err_details[-1].strip())
         sys.exit(1)
     elif exctype == TypeError:
         print_red_bold("PricingWizard : TypeError")
