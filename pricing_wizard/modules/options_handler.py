@@ -19,6 +19,7 @@ class options_handler(object):
 		self.stage              = None
 		self._theme             = None
 		self.sqlite_logger      = None
+		self.is_partner_upload  = False
 		# Call setup
 		self.setup()
 
@@ -168,6 +169,32 @@ class options_handler(object):
 			else:
 				print_check (f"Data for [{self.current_user}] stored just for this session.")
 
+	def select_eprice_sheet_partners(self):
+		# Determine if we want the EU or US sheet
+		question = [inquirer.List("type", message="Select the market for repricing SKUs :", choices=["EU","US"])]
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
+		# Assign sheets
+		if answer["type"] == "EU":
+			self.current_sheet_type = "Partners EU"
+		if answer["type"] == "US":
+			self.current_sheet_type = "Partners US"
+		# E-Price sheet option
+		question = [inquirer.List("yn", message="Use default or update e-sheet URL :", choices=["Use default","Update"])]
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
+		if answer["yn"] == "Use default":
+			self.current_sheet = self.user_data[self.current_user][self.current_sheet_type]
+		if answer["yn"] == "Update":
+			new_id = input(f"Provide new id for {self.current_sheet_type} : ")
+			self.user_data[self.current_user][self.current_sheet_type] = new_id
+			self.current_sheet = new_id
+			# Save updated data
+			answer_yes = self.yn_question("Save updated data to disk :")
+			if answer_yes:
+				with open(self.user_data_path, 'w') as fp:
+					json.dump(self.user_data, fp, indent=4)
+			else:
+				print_check (f"Data for [{self.current_user}] stored just for this session.")
+
 	# -------------------------------
 	# Add a new user to the settings
 	# -------------------------------
@@ -225,7 +252,7 @@ class options_handler(object):
 		# This option can control the flow of the program
 		# Just keep the order the same but can rename these without breaking code
 		# Ensure "Exit" is last option as this looks best in terminal option
-		stages = ["Reprice SKUs", "Price new SKUs", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Exit"]
+		stages = ["Reprice SKUs (B2C, B2B)", "Reprice SKUs (Partners)", "Price new SKUs", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Exit"]
 		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
 		answer = inquirer.prompt(question, theme=self._theme2, raise_keyboard_interrupt=True)
 		self.stage = stages.index(answer["stage"])

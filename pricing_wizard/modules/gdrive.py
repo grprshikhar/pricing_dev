@@ -94,14 +94,8 @@ def download_from_list(folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'):
         f.close()
     print_check(f"File downloaded as [{select_file}]")
 
-# Helper function - Fixed procedure to download the template file
-def download_store_template():
-    # Fixed - Pricing/Templates
-    folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'
-    # Fixed - File name
-    file_name = 'template_stores.xlsx'
-    # Fixed - File ID
-    file_id   = '11fb3mtzptYOmGOC-YnUtcK3YX-0BIiWD'
+# Refactor into single function
+def download_template(folder_id, file_name, file_id):
     # Perform a check that this data matches before proceeding
     files = list_folder(folder_id)
     matching_file   = next(filter(lambda x : x['name'] == file_name and x['id'] == file_id, files), None)
@@ -116,6 +110,29 @@ def download_store_template():
         f.close()
     print_check(f"Template file saved as [{file_name}].")
     # Return the file name for use elsewhere
+    return file_name
+
+# Helper function - Fixed procedure to download the template file
+def download_store_template():
+    # Fixed - Pricing/Templates
+    folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'
+    # Fixed - File name
+    file_name = 'template_stores.xlsx'
+    # Fixed - File ID
+    file_id   = '11fb3mtzptYOmGOC-YnUtcK3YX-0BIiWD'
+    # Output
+    file_name = download_template(folder_id,file_name,file_id)
+    return file_name
+
+def download_partner_template():
+    # Fixed - Pricing/Templates
+    folder_id = '1X9hOcO4vCjBJDoxjpVSRdH2m5DgOdyNZ'
+    # Fixed - File name
+    file_name = 'template_partners.xlsx'
+    # Fixed - File ID
+    file_id   = '1WhOaXqlceP0k4HZ62q-Dmm2dnfq6dF3E'
+    # Output
+    file_name = download_template(folder_id,file_name,file_id)
     return file_name
 
 def download_log(username):
