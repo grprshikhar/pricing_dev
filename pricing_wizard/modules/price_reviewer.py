@@ -6,7 +6,7 @@ from modules.options_handler import options_handler
 from modules.print_utils import tabulate_dataframe, print_check, print_exclaim
 import modules.gsheet as gsheet
 # Clustering
-from sklearn.cluster import Birch
+from sklearn.cluster import Birch, KMeans
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
@@ -21,7 +21,7 @@ class price_reviewer(object):
 		self.get_data()
 		self.create_variables()
 		self.apply_selection()
-		self.separate_low_MoS_SKU()
+		#self.separate_low_MoS_SKU()
 		self.apply_clustering()
 
 	def get_data(self):
@@ -41,7 +41,7 @@ class price_reviewer(object):
 		self.df['stock_on_hand']            = pandas.to_numeric(self.df['stock_on_hand'], errors='coerce')
 		self.df['created_subs_last_4weeks'] = self.df['created_subs_last_4weeks'].fillna(0)
 		self.df['stock_on_hand']            = self.df['stock_on_hand'].fillna(0)
-		self.df['months_of_stock']          = self.df['stock_on_hand'].divide(self.df['created_subs_last_4weeks']).replace(np.inf, 0)
+		self.df['months_of_stock']          = self.df['stock_on_hand'].divide(self.df['created_subs_last_4weeks']).replace(np.inf, 100)
 
 	def separate_low_MoS_SKU(self):
 		# We should remove low MoS SKUs before clustering
@@ -103,10 +103,9 @@ class price_reviewer(object):
 		features = self.get_features()
 		# Clustering tool
 		cl = Birch(n_clusters=None, threshold=2.0, branching_factor=100)
-		# Pandas returns fortran-style array 
 
+		# Pandas returns fortran-style array 
 		df_X = self.df[features].values
-		print(df_X.shape)
 		# We need C-type array, this numpy function does this
 		df_X = np.ascontiguousarray(df_X,dtype=np.float32)
 		# Run the clustering and generate labels (apply scaling to help clustering)
@@ -115,7 +114,7 @@ class price_reviewer(object):
 		# Place labels onto the rows (ordering preserved)
 		self.df['cluster_label'] = df_Y
 		# Add back the low month of stock data
-		self.df = pandas.concat([self.df, self.df_low_mos], ignore_index=True)
+		#self.df = pandas.concat([self.df, self.df_low_mos], ignore_index=True)
 		# Reclean
 		self.numerify()
 		# Sort
