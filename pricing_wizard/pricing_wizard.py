@@ -25,12 +25,30 @@ from modules.price_reviewer import price_reviewer
 # Functions managing calls for each stage of the program flow
 # ------------------------------------------------------------------------ #
 def validate_and_upload_eprice(run_opts):
+	# B2C/B2B upload function
+	run_opts.is_partner_upload = False
 	# Validate the user information
 	run_opts.validate_user() 
 	# Verify the URL to be used
 	run_opts.select_eprice_sheet()
 	# Create eprice validator and runs checks
-	data_range = 'Export!A:P'
+	data_range = 'Export!A:AB'
+	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
+	# Run post-sanity checks
+	validator.post_sanity_checks()
+	# Display the output
+	validator.summarise()
+	# Upload output to google drive and admin panel
+	validator.upload()
+
+def validate_and_upload_eprice_partners(run_opts):
+	# Partner upload function
+	run_opts.is_partner_upload = True
+	# Validate the user information
+	run_opts.validate_user() 
+	# Verify the URL to be used
+	run_opts.select_eprice_sheet_partners()
+	# Create eprice validator and runs checks
 	data_range = 'Export!A:AB'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Run post-sanity checks
@@ -41,6 +59,8 @@ def validate_and_upload_eprice(run_opts):
 	validator.upload()
 
 def price_new_skus(run_opts):
+	# Assume B2C/B2B for new prices
+	run_opts.is_partner_upload = False
 	# Validate the user information
 	run_opts.validate_user()
 	# Verify the URL to be used
@@ -128,23 +148,27 @@ if __name__ == "__main__":
 		if run_opts.stage == 0:
 			validate_and_upload_eprice(run_opts)
 
-		# 1 : Handle pricing new SKUs
+		# 1 : Repricing, but for partner stores
 		if run_opts.stage == 1:
+			validate_and_upload_eprice_partners(run_opts)
+
+		# 2 : Handle pricing new SKUs
+		if run_opts.stage == 2:
 			price_new_skus(run_opts)
 
-		# 2 : Run a redshift-based report
-		if run_opts.stage == 2:
+		# 3 : Run a redshift-based report
+		if run_opts.stage == 3:
 			redshift_report(run_opts)
 
-		# 3 : Separate option for pricing review
-		if run_opts.stage == 3:
+		# 4 : Separate option for pricing review
+		if run_opts.stage == 4:
 			price_review_clustering()
 
-		# 4 : Just print out the data stored in the json file for cross-checks on-the-fly
-		if run_opts.stage == 4:
+		# 5 : Just print out the data stored in the json file for cross-checks on-the-fly
+		if run_opts.stage == 5:
 			run_opts.info()
 
-		# 5 : Update Competition Pricing Sheet
-		if run_opts.stage == 5:
+		# 6 : Update Competition Pricing Sheet
+		if run_opts.stage == 6:
 			market_price_scraper()
 

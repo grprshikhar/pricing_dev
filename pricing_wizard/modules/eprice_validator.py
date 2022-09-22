@@ -18,8 +18,9 @@ class eprice_validator(object):
 	# initialise with gsheet read or dataframe assignment (use named arguments!)
 	def __init__(self, run_opts, sheet_id=None, data_range=None, dataframe=None):
 		# Tools
-		self.run_opts = run_opts
-		self.redshift   = None
+		self.run_opts    = run_opts
+		self.is_partner  = self.run_opts.is_partner_upload
+		self.redshift    = None
 		self.admin_panel = None
 		# Template file name when created
 		self.template_filename = ""
@@ -66,7 +67,7 @@ class eprice_validator(object):
 		# Run santisation of data
 		self.sanitise()
 		# Create the catman utils class object and attach
-		self.catman_utils = catman_utils.catman_utils()
+		self.catman_utils = catman_utils.catman_utils(self.is_partner)
 		# Run sanity checks
 		self.sanity_check()
 
@@ -104,7 +105,7 @@ class eprice_validator(object):
 		print_check("Rental plans larger than minimum requirement")
 		# Check against plan limit dict
 		sanity_checks.check_rrp_perc(self.df_td, self.plan_limit_dict)
-		print_check("Checked price % guidelines")
+		print_check(f"Checked price % guidelines")
 		# Check if bulky 1M plan is high enough
 		sanity_checks.bulky_plan_check(self.df_td)
 		print_check("Checked bulky 1M price point (if applicable)")
@@ -136,7 +137,10 @@ class eprice_validator(object):
 		# - Show the sheet for final check
 		answer_yes = self.run_opts.yn_question("View full upload data :")
 		if answer_yes:
-			disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+			if self.is_partner:
+				disc_dt = self.df_td[['sku','partner name','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+			else:
+				disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
 			print_green("Full upload data")
 			tabulate_dataframe(disc_dt)
 
@@ -154,13 +158,19 @@ class eprice_validator(object):
 
 	def upload_template_to_gdrive(self):
 		# Download the template file
-		template_name = gdrive.download_store_template()
+		if self.is_partner:
+			template_name = gdrive.download_partner_template()
+		else:
+			template_name = gdrive.download_store_template()
 		# Read template into dataframe
 		template_df   = pandas.read_excel(template_name, sheet_name=None)
 		# Get the rental plan sheet
 		rental_plans  = template_df["rental_plans"]
 		# Fill data from our dataframe
-		rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+		if self.is_partner:
+			rental_plans[['SKU','Partner Name','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+		else:
+			rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
 		# Clean any NaN again
 		rental_plans  = rental_plans.fillna('')
 		# Configure output file name

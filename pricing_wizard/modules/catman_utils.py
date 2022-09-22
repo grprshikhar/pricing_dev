@@ -4,12 +4,20 @@ import pandas as pd
 import sys
 
 class catman_utils(object):
-	def __init__(self):
+	def __init__(self, is_partner = False):
 		# Rental plan sheet
-		self.sheet_id = '1VhyEO0BRVXp3mJ9abXJ0EYiF34Fhu50qv6m9nuldIPI'
-		self.data_range = 'CSV Export!A:K'
-		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Market rental plans")
+		self.sheet_id      = '1VhyEO0BRVXp3mJ9abXJ0EYiF34Fhu50qv6m9nuldIPI'
+		self.data_range    = 'CSV Export!A:K'
+		self.df            = gsheet.get_dataframe(self.sheet_id, self.data_range, "Market rental plans")
+		self.is_partner    = is_partner
+		self.partner_names = self.get_partner_names()
 		self.sanitise()
+
+	# If we want to run partner name checks, build on this
+	def get_partner_names(self):
+		if not self.is_partner:
+			return None
+		return gsheet.get_dataframe('17IAjCav5H3MkZ0xoag6qL0BPd24ADkKLtsjkhpNBFh4', 'Sheet1!A:F', 'Partner store names')
 
 	def sanitise(self):
 		# Ensure type - int
@@ -48,6 +56,30 @@ class catman_utils(object):
 		print (self.df_store_dict)
 		print (self.df_csp)
 
+	def assign_partner_store_code(self, df):
+		# Move store code column to partner name
+		df.rename(columns={'store code':'partner name'}, inplace=True)
+		# Create an empty store code
+		df['store code'] = ""
+		# We need to parse the parner names and assign a store code for the rental duration
+		def store_assign(x):
+			if '_es' in x['partner name']:
+				return 'business_es'
+			elif '_nl' in x['partner name']:
+				return 'business_nl'
+			elif '_at' in x['partner name']:
+				return 'business_at'
+			elif '_us' in x['partner name']:
+				return 'business_us'
+			else:
+				return 'business'
+		df['store code'] = df.apply(lambda x: store_assign(x), axis=1)
+		# Also perform a quick check that partner names are as expected
+		invalid_partners = df[~df['partner name'].isin(self.partner_names['partner_name'])]
+		if len(invalid_partners) > 0:
+			raise ValueError(f"Invalid partner names provided {invalid_partners['partner name'].drop_duplicates().values}")
+
+		return df
 
 	def store_loc(self, df):
 		# Clean column
@@ -119,7 +151,11 @@ class catman_utils(object):
 
 	# Cleaning the store plan
 	def clean_store_plan(self, df):
-		df_init = self.store_loc(df)
+		# For partner stores, we are not consolidating over store codes
+		if self.is_partner:
+			df_init = self.assign_partner_store_code(df)
+		else:
+			df_init = self.store_loc(df)
 
 		if (~df_init['store code'].isin(self.store_code_list).values).any():
 			out_error = "Incorrect store code values: "+str((df_init[~df_init['store code'].isin(self.store_code_list)]['store code'].values))
