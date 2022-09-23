@@ -2,6 +2,7 @@
 import datetime
 import pytz
 import pandas
+import re
 # Module imports
 import modules.gsheet as gsheet
 import modules.gdrive as gdrive
@@ -218,11 +219,21 @@ class eprice_validator(object):
 		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
 		if not answer_yes:
 			print_green(f"Current UTC time is {datetime.datetime.utcnow()}")
-			time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
+			# Add a regex check for format
+			pattern = re.compile(r'\d\d\-\d\d\-\d\d\:\d\d\.\d\d')
+			# Generate a retry loop until its correct
+			match = False
+			while not match:
+				# Get the user string
+				time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
+				# See if we found a full match (None type if no match found)
+				match = (pattern.fullmatch(time_string) != None)
+
+			# Now use the valid string but still catch error incase of problem
 			try:
 				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
 			except:
-				raise ValueError(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
+				print_exclaim(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
 		else:
 			#time_now      = datetime.datetime.utcnow()
 			#time_now      = pytz.datetime.datetime.now(tz=pytz.timezone('Europe/Berlin')).replace(tzinfo=None)
