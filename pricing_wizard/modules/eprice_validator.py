@@ -218,20 +218,27 @@ class eprice_validator(object):
 		# Ask if we want a specific time
 		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
 		if not answer_yes:
-			print_green(f"Current UTC time is {datetime.datetime.utcnow()}")
+			print_green(f"Provide time for upload in Berlin timezone")
 			# Add a regex check for format
 			pattern = re.compile(r'\d\d\-\d\d\-\d\d\:\d\d\.\d\d')
 			# Generate a retry loop until its correct
 			match = False
 			while not match:
 				# Get the user string
-				time_string = self.run_opts.text_question("Provide the specified UTC date/time with format [YY-MM-dd:hh.mm] :")
+				time_string = self.run_opts.text_question("Provide the specified Berlin date/time with format [YY-MM-dd:hh.mm] :")
 				# See if we found a full match (None type if no match found)
 				match = (pattern.fullmatch(time_string) != None)
 
 			# Now use the valid string but still catch error incase of problem
 			try:
-				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M").isoformat(timespec='milliseconds')+"Z"
+				# Create timezone object
+				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M")
+				# Convert to Berlin locale timezone object
+				scheduledTime = pytz.timezone('Europe/Berlin').localize(scheduledTime,is_dst=None)
+				# Now convert to UTC
+				scheduledTime = scheduledTime.astimezone(pytz.utc)
+				# Now format it for upload (:-6 strips off last 5 characters which are +00.00 for UTC, ie timezone)
+				scheduledTime = scheduledTime.isoformat(timespec='milliseconds')[:-6]+"Z"
 			except:
 				print_exclaim(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
 		else:
