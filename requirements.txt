@@ -1,0 +1,11 @@
+scikit-learn
+inquirer
+termcolor
+tabulate
+google-api-python-client
+redshift-connector
+google-cloud-logging
+google-auth-oauthlib
+gql
+aiohttp
+pyfiglet

@@ -1,0 +1,16 @@
+2022-09-30 01:32:00,527 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mPricingWizard : ValueError[0m
+2022-09-30 01:32:00,646 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31m--------------------------[0m
+2022-09-30 01:32:00,647 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mError reading user data from user_data.json
+[0m
+2022-09-30 01:34:48,274 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mPricingWizard : ValueError[0m
+2022-09-30 01:34:48,376 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31m--------------------------[0m
+2022-09-30 01:34:48,377 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mError reading user data from user_data.json
+[0m
+2022-09-30 01:36:10,967 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mPricingWizard : ValueError[0m
+2022-09-30 01:36:11,071 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31m--------------------------[0m
+2022-09-30 01:36:11,071 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mError reading user data from user_data.json
+[0m
+2022-09-30 01:36:14,847 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mPricingWizard : ValueError[0m
+2022-09-30 01:36:14,949 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31m--------------------------[0m
+2022-09-30 01:36:14,950 > pricing_wizard > ERROR > print_utils::print_red_bold::error > [1m[31mError reading user data from user_data.json
+[0m
