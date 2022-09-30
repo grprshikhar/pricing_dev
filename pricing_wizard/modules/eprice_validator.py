@@ -158,10 +158,19 @@ class eprice_validator(object):
 		s.upload()
 
 	def upload_template_to_gdrive(self):
+		# Partner upload has different handling if we are doing partner store codes or partner names
+		is_partner_names = False
 		# Download the template file
 		if self.is_partner:
-			template_name = gdrive.download_partner_template()
+			is_partner_names = self.run_opts.yn_question("Do you want to upload using Partner Name?")
+			if is_partner_names:
+				# Get Partner template using Partner Name
+				template_name = gdrive.download_partner_template()
+			else:
+				# Get Partner template using Store code
+				template_name = gdrive.download_store_template()	
 		else:
+			# Get B2B/B2C template using Store code
 			template_name = gdrive.download_store_template()
 		# Read template into dataframe
 		template_df   = pandas.read_excel(template_name, sheet_name=None)
@@ -169,8 +178,14 @@ class eprice_validator(object):
 		rental_plans  = template_df["rental_plans"]
 		# Fill data from our dataframe
 		if self.is_partner:
-			rental_plans[['SKU','Partner Name','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+			if is_partner_names:
+				# Partner name into partner name column
+				rental_plans[['SKU','Partner Name','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+			else:
+				# Partner name into store code column
+				rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
 		else:
+			# Store code into store code column
 			rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
 		# Clean any NaN again
 		rental_plans  = rental_plans.fillna('')
