@@ -205,9 +205,15 @@ def upload_pricsync(file_name='competition_pricing.db'):
     print_check(f"Updated pricsync database [{file_name}] in gdrive.")
 
 
+def upload_csv_to_sheet(folder_id, out_filename, upload_filename):
+    # Credentials
+    creds     = gdrive_api_check(SCOPES)
+    service   = build('drive', 'v3', credentials=creds)
+    mime_type = 'application/vnd.google-apps.spreadsheet'
 
-
-
+    body  = {'name': upload_filename, 'parents':[folder_id],'mimeType': mime_type}
+    media = MediaFileUpload(out_filename, mimetype = 'text/csv')
+    file  = service.files().create(body=body, media_body=media).execute()
 
 
 
