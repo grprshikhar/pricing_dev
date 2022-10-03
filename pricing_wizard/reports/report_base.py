@@ -21,6 +21,9 @@ class report_base(ABC):
 	@property # Shared property in derived classes
 	@final    # Cannot be changed in derived classes
 	def conn(self):
+		# Only create once
+		if self._conn:
+			return
 		print_exclaim("Configure RedShift connection.")
 		user = input("Enter username : ")
 		pwd  = getpass.getpass()
@@ -31,7 +34,7 @@ class report_base(ABC):
 			database='dev',
 			user=user,
 			password=pwd,
-			timeout=5
+			timeout=300
 			)
 		# Note - We will timeout with InterfaceError if the vpn is not active
 		print_check("RedShift connection active.")
@@ -43,7 +46,6 @@ class report_base(ABC):
 		if not self._conn:
 			self.conn
 		return self._conn.cursor()
-
 
 	# Required for derived class
 	@abstractmethod
