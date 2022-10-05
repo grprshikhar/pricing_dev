@@ -2,6 +2,7 @@ import re
 import modules.gsheet as gsheet
 import pandas as pd
 import sys
+from modules.print_utils import print_warning
 
 class catman_utils(object):
 	def __init__(self, is_partner = False):
@@ -149,6 +150,19 @@ class catman_utils(object):
 			out_error = "Incorrect Subcategory values: "+str((df[~df['subcategory'].isin(self.sub_cat_list)]['subcategory'].values))
 			raise ValueError(out_error)
 
+	# Function to handle warning for removing prices/skus
+	def price_removal_warning(self, skus):
+		# Empty list - Nothing to worry about
+		if len(skus) == 0:
+			return
+		# Build message
+		message_list = []
+		for sku_store in skus:
+			message_list.append(f"Missing prices/price removal : {sku_store} for rental plan(s) {','.join(skus[sku_store])}")
+		print_warning("\n".join(message_list))
+
+		
+
 	# Cleaning the store plan
 	def clean_store_plan(self, df):
 		# For partner stores, we are not consolidating over store codes
@@ -166,13 +180,22 @@ class catman_utils(object):
 		df_td = self.price_loc(df_init)
 
     	#### Plan curation
-    	## if plan allowed is there but not in plan price > Raise error
+    	## if plan allowed is there but not in plan price, we raise a warning
+    	## Having a warning allows removal of SKUs
+		warning_list = {}
 		for subplan in [1,3,6,12,18,24]:
 			act_price_col = 'active_plan'+str(subplan)
 			regex = str(subplan)+r',|'+str(subplan)+r'\)'
 			sku_list = df_td.loc[(df_td[act_price_col].isnull()) & (df_td['duration_plan'].str.contains(regex)),['sku','store code']]
 			if len(sku_list)>0:
-				raise ValueError('Missing %d Month price plans for SKUs : '%subplan + str(sku_list) )
+				for sku_code in sku_list.values.tolist():
+					key = tuple(sku_code)
+					if key not in warning_list:
+						warning_list[key] = []
+					warning_list[key].append(str(subplan))
+		
+		# Handle warning about removing sku prices
+		self.price_removal_warning(warning_list)
 
     	## if plan price is there but not in plan allowed > Remove plan price
 		for subplan in [1,3,6,12,18,24]:
