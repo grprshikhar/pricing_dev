@@ -172,7 +172,7 @@ class ian_pricing_report(report_base):
 							f"merged-{self.end_date_7day_1_B}-7day.csv")
 		print_check("Upload complete for 7 day price report")
 		upload_csv_to_sheet('1zqJ13Cu2bNezfe_S9_nZU5xCCsrDwua1',
-							f"{self.folder}/merged-{self.end_date_28day_1_B}-7day.csv",
+							f"{self.folder}/merged-{self.end_date_28day_1_B}-28day.csv",
 							f"merged-{self.end_date_28day_1_B}-28day.csv")
 		print_check("Upload complete for 28 day price report")
 
