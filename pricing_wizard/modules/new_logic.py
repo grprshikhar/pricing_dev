@@ -60,6 +60,7 @@ def new_logic():
     df = pd.DataFrame.from_dict(pd.json_normalize(json_data['results']))
     
     dataframe = pd.concat([dataframe, df])
+
     if not json_data["nextURL"]:
       return dataframe
     nextUrl = "https://prisync.com" + json_data["nextURL"]
@@ -266,8 +267,8 @@ def new_logic():
   for name, group in grouped_results_reduced:
     sku = name[0]
     cat = name[1]
-    SKU_median = group["price"].median()
     group["price"] = group["price"].astype(float)
+    SKU_median = group["price"].median()
     SKU_mean = group["price"].mean()
     number_sites = len(group)
     final_df = final_df.append({'sku':sku, 'Overall_median_price':SKU_median, "Overall_mean_price": SKU_mean, "number_sites" :number_sites}, ignore_index = True)
@@ -369,24 +370,23 @@ def new_logic():
     else:
         rang = quan[3], quan[4]
     subset_3 = subset_2[(subset_2.price>= rang[0]) & (subset_2.price<= rang[1])]
-    ideal_price = float(subset_3.price.mean())
-    if mar >= rang[0] or mar <= rang[1]:
+    ideal_price = subset_3.price.mean()
+    if mar >= rang[0] and mar <= rang[1]:
       r=1
     else:
       r=0  
-    output_list.append([crawl_date,sku, p, mar, m, mode, quan, rang, l_org, l, r,int(ideal_price)])
-    output = pd.DataFrame(output_list)
-    
-
+    output_list.append([crawl_date,sku, p, mar, m, mode, quan, rang, l_org, l, r, ideal_price])
+  
+  output = pd.DataFrame(output_list)
   output.columns = ['crawl_date','Product SKU','Product Name', 'Market Price', 'Median', 'Mode', 'Quantiles', 'Price Range','Number of Observations', 'Number of Observations After Multiplication', 'Result', 'Ideal Price']
   last_df = pd.merge(last_df,output[['Product SKU', 'Price Range', 'Ideal Price']], left_on = 'product_code', right_on = 'Product SKU', how = 'left')
-
-  last_df['Ideal Price'] = last_df['Ideal Price'].round(2)
+  # Fix column types and round 
+  last_df['Ideal Price'] = last_df['Ideal Price'].astype('float').round(2)
   #last_df['Price Range'] = last_df['Price Range'].astype(float).round(2)
-  last_df['Category Mean Rank'] = last_df['Category Mean Rank'].round(2)
-  last_df['Overall_median_price'] = last_df['Overall_median_price'].round(2)
-  last_df['Overall_mean_price'] = last_df['Overall_mean_price'].round(2)
-  last_df['wavg price'] = last_df['wavg price'].round(2)
+  last_df['Category Mean Rank'] = last_df['Category Mean Rank'].astype('float').round(2)
+  last_df['Overall_median_price'] = last_df['Overall_median_price'].astype('float').round(2)
+  last_df['Overall_mean_price'] = last_df['Overall_mean_price'].astype('float').round(2)
+  last_df['wavg price'] = last_df['wavg price'].astype('float').round(2)
 
   last_df = last_df.drop(['Product SKU'], axis=1)
 
@@ -421,7 +421,7 @@ def new_logic():
   # Working on sqlite database  
   print_exclaim("Updating local database with new data")
   conn = sqlite3.connect(database_filename)
-  output = Last_df.applymap(str)
+  output = last_df.applymap(str)
   output.to_sql(name='data_output', con=conn, if_exists = 'append')
   conn.commit()
 
