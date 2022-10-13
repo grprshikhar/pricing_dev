@@ -26,5 +26,6 @@ jobs:
           
       - name : run scraper method
         run: |
+          cd pricing_wizard
           python -c 'from modules.market_price_scraper import market_price_scraper; market_price_scraper()'
           
