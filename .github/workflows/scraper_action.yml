@@ -1,9 +1,8 @@
 name : daily_market_price_scraper
 
 on:
-  workflow_dispatch
-#   schedule:
-#     - cron: '0 0 * * *' # run at midnight UTC 
+  schedule:
+    - cron: '0 0 * * *' # run at midnight UTC 
 
 jobs:
   build:
