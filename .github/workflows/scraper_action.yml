@@ -1,0 +1,29 @@
+name : daily_market_price_scraper
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # run at midnight UTC 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2
+        
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          
+      - name: setup python packages
+        run: |
+          python -m pip install --upgrade pip
+          cd pricing_wizard
+          pip install -r requirements.txt
+          
+      - name : run scraper method
+        run: |
+          python -c 'from modules.market_price_scraper import market_price_scraper; market_price_scraper()'
+          
