@@ -441,13 +441,14 @@ def market_price_scraper_v02_US():
   # Update google drive with new database
   print_exclaim("Updating database in gdrive")
   upload_pricsync_US(database_filename)
-  print_check("Database updated in gdrive")
+  print_check("US Database updated in gdrive")
 
   # Updating gsheet
   print_exclaim("Updating spreadsheet with latest data")
   response = upload_df_to_gsheet_US(output)
   #print_check(response)
-  print_check("Spreadsheet update complete")
+  print_check("US Spreadsheet update complete")
+
 
 
 
