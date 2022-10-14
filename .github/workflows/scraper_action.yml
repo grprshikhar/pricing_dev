@@ -26,6 +26,6 @@ jobs:
       - name : run scraper method
         run: |
           cd pricing_wizard
-          python -c 'from modules.market_price_scraper_v02_EU import market_price_scraper_v02_EU; market_price_scraper_v02_EU()
-                     from modules.market_price_scraper_v02_US import market_price_scraper_v02_EU; market_price_scraper_v02_US()'
+          python -c 'from modules.market_price_scraper_v02_EU import market_price_scraper_v02_EU; market_price_scraper_v02_EU()'
+          python -c 'from modules.market_price_scraper_v02_US import market_price_scraper_v02_EU; market_price_scraper_v02_US()'
           
