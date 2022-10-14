@@ -2,7 +2,7 @@ name : daily_market_price_scraper
 
 on:
   schedule:
-    - cron: '0 0 * * *' # run at midnight UTC 
+    - cron: '0 6 * * *' # run at midnight UTC 
 
 jobs:
   build:
@@ -26,5 +26,6 @@ jobs:
       - name : run scraper method
         run: |
           cd pricing_wizard
-          python -c 'from modules.market_price_scraper import market_price_scraper; market_price_scraper()'
+          python -c 'from modules.market_price_scraper_v02_EU import market_price_scraper_v02_EU; market_price_scraper_v02_EU()
+                     from modules.market_price_scraper_v02_US import market_price_scraper_v02_EU; market_price_scraper_v02_US()'
           
