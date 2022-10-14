@@ -220,7 +220,7 @@ def market_price_scraper_v02_US():
     df['Predictions'] = predictions
     return df
 
-  results = results_rank[results_rank['stock']==True]
+  results = results_rank[results_rank['stock']==True].copy()
   # Isolation forest will work for each distinct id
 
   unique_ids = []
