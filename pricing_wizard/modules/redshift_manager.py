@@ -26,7 +26,7 @@ class redshift_manager(object):
 						database='dev',
 						user=user,
 						password=pwd,
-						timeout=15
+						timeout=15 #increase if connection is laggy
 						)
 		print_check("RedShift connection made.")
 
