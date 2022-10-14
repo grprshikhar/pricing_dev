@@ -16,7 +16,8 @@ from modules.report_runner import report_runner
 # sqlite logger
 from modules.sqlite_logger import sqlite_logger
 # getting market price code
-from modules.market_price_scraper import market_price_scraper 
+from modules.market_price_scraper_v02_EU import market_price_scraper_v02_EU
+from modules.market_price_scraper_v02_US import market_price_scraper_v02_US
 # running price review clustering
 from modules.price_reviewer import price_reviewer
 
@@ -170,5 +171,5 @@ if __name__ == "__main__":
 
 		# 6 : Update Competition Pricing Sheet
 		if run_opts.stage == 6:
-			market_price_scraper()
-
+			market_price_scraper_v02_EU()
+			market_price_scraper_v02_US()

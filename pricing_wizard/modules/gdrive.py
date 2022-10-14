@@ -184,16 +184,16 @@ def upload_log(username):
         file  = service.files().create(body=body, media_body=media).execute()
 
 
-def download_pricsync(file_name='competition_pricing.db'):
-    file_id    = "1-4IfF0U5jsVbmIqzuwj4yJRjlnKD4-DR"
+def download_pricsync(file_name='competition_pricing_v02.db'):
+    file_id    = "120n4bsQwNGFzvJZNZNGICZoeMG2TrR7L"
     file_bytes = download(file_id)
     with open(file_name,'wb') as f:
         f.write(file_bytes.getbuffer())
         f.close()
     print_check(f"Downloaded pricsync database [{file_name}] from gdrive.")
 
-def upload_pricsync(file_name='competition_pricing.db'):
-    file_id    = "1-4IfF0U5jsVbmIqzuwj4yJRjlnKD4-DR"
+def upload_pricsync(file_name='competition_pricing_v02.db'):
+    file_id    = "120n4bsQwNGFzvJZNZNGICZoeMG2TrR7L"
     folder_id  = "1v5dAU9G4xgXO3mdLm9zNMyQte4XPMV4V"
     # Credentials
     creds     = gdrive_api_check(SCOPES)
@@ -204,6 +204,25 @@ def upload_pricsync(file_name='competition_pricing.db'):
     file = service.files().update(fileId=file_id, body=body, media_body=media).execute() 
     print_check(f"Updated pricsync database [{file_name}] in gdrive.")
 
+def download_pricsync_US(file_name='competition_pricing_v02_US.db'):
+    file_id    = "1-A7Wh5j6ka7p9UBjkT69_E5oDShm3JkJ"
+    file_bytes = download(file_id)
+    with open(file_name,'wb') as f:
+        f.write(file_bytes.getbuffer())
+        f.close()
+    print_check(f"Downloaded pricsync database [{file_name}] from gdrive.")
+
+def upload_pricsync_US(file_name='competition_pricing_v02_US.db'):
+    file_id    = "1-A7Wh5j6ka7p9UBjkT69_E5oDShm3JkJ"
+    folder_id  = "1v5dAU9G4xgXO3mdLm9zNMyQte4XPMV4V"
+    # Credentials
+    creds     = gdrive_api_check(SCOPES)
+    service   = build('drive', 'v3', credentials=creds)
+    mime_type = 'application/x-sqlite3'
+    body  = {'name': file_name, 'mimeType': mime_type}
+    media = MediaFileUpload(file_name, mimetype = mime_type)
+    file = service.files().update(fileId=file_id, body=body, media_body=media).execute() 
+    print_check(f"Updated pricsync database [{file_name}] in gdrive.")
 
 def upload_csv_to_sheet(folder_id, out_filename, upload_filename):
     # Credentials
