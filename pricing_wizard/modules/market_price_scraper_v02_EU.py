@@ -453,3 +453,62 @@ def market_price_scraper_v02_EU():
 
 
 
+def market_price_scraper_BO():
+  print_exclaim("updating 30 days average of Market prices")
+  #Imports
+  import modules.gsheet as gsheet
+  from sklearn.ensemble import IsolationForest
+  import pandas as pd
+  import numpy as np
+  from statistics import mean
+  from datetime import datetime
+  import json
+  import requests
+  import scipy.stats as stats
+  import sqlite3 
+  from modules.gdrive import download_pricsync, upload_pricsync
+  from modules.print_utils import print_check, print_exclaim, tabulate_dataframe, print_exclaim_sameline
+  from modules.gsheet import upload_df_to_gsheet
+  from modules.gsheet import upload_df_to_BO_gsheet
+  #from modules.gsheet import gdrive
+  from scipy.stats import gmean
+
+  # Check if the database is already updated
+  database_filename = 'competition_pricing_v02.db'
+  print_exclaim(f"Downloading database [{database_filename}] from gdrive")
+  download_pricsync(database_filename)
+
+  # Make a connection
+  conn = sqlite3.connect(database_filename)
+  last_run = pd.read_sql_query('SELECT *, JULIANDAY(CURRENT_DATE) - JULIANDAY(crawl_date) as datediff FROM data_output where datediff <= 31',conn)
+  last_run_date = last_run["crawl_date"].loc[0]
+  last_run.sort_values(by='crawl_date', ascending=True)
+
+  last_run['Overall_median_price'] = last_run['Overall_median_price'].astype(float)
+  last_run['Overall_mean_price'] = last_run['Overall_mean_price'].astype(float)
+  last_run['wavg price'] = last_run['wavg price'].astype(float)
+  last_run['gmean_price'] = last_run['gmean_price'].astype(float)
+  last_run['Ideal Price'] = last_run['Ideal Price'].astype(float)
+  last_run['brand_price'] = last_run['brand_price'].astype(float)
+  last_run['Amazon_prices'] = last_run['Amazon_prices'].astype(float)
+  last_run['Mediamarkt_prices'] = last_run['Mediamarkt_prices'].astype(float)
+
+
+  last_run["Final_price"] = last_run[['Overall_median_price', 'Overall_mean_price', 'wavg price', 'gmean_price', 'Ideal Price', 'brand_price', 'Amazon_prices', 'Mediamarkt_prices']].mean(axis=1)
+
+  last_run = last_run.groupby(['product_code', 'name', 'brand_name', 'category.name']).agg({'Final_price':'mean'})
+  last_run = last_run.reset_index()
+  last_run.drop_duplicates()
+
+
+  # Updating gsheet
+  print_exclaim("Updating spreadsheet with latest data")
+  response = upload_df_to_BO_gsheet(last_run)
+  #print_check(response)
+  print_check("Spreadsheet update complete")
+
+
+
+
+
+

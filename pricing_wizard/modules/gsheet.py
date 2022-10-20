@@ -135,7 +135,22 @@ def create_tab_in_gsheet(sheet_id, sheet_name):
         pass
 
 
+def upload_df_to_BO_gsheet(df, sheet_id='1u7ZZa76faWR-igCzPkIB2zb2eCYt9Jn6cYwQY12N5Ek', sheet_name='Sheet1!A:S'):
+    # Credentials
+    creds = gsheet_api_check(SCOPES)
+    # Create google service
+    service = build('sheets', 'v4', credentials=creds)
+    # Create sheet service
+    sheet = service.spreadsheets()
+    df_data = [df.columns.values.tolist()]
+    df_data.extend(df.values.tolist())
+    data = [{'range' : sheet_name, 'values' : df_data}]
+    batch_update_values_request_body = {'value_input_option': 'USER_ENTERED', 'data': data }
 
+    request = sheet.values().batchUpdate(spreadsheetId=sheet_id,
+                                         body=batch_update_values_request_body)
+    response = request.execute()
+    return response
 
 
 

@@ -18,6 +18,7 @@ from modules.sqlite_logger import sqlite_logger
 # getting market price code
 from modules.market_price_scraper_v02_EU import market_price_scraper_v02_EU
 from modules.market_price_scraper_v02_US import market_price_scraper_v02_US
+from modules.market_price_scraper_v02_EU import market_price_scraper_BO
 # running price review clustering
 from modules.price_reviewer import price_reviewer
 
@@ -173,3 +174,5 @@ if __name__ == "__main__":
 		if run_opts.stage == 6:
 			market_price_scraper_v02_EU()
 			market_price_scraper_v02_US()
+			market_price_scraper_BO()
+	
