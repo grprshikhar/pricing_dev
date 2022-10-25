@@ -454,7 +454,7 @@ def market_price_scraper_v02_EU():
 
 
 def market_price_scraper_BO():
-  print_exclaim("updating 30 days average of Market prices")
+  #print_exclaim("updating 30 days average of Market prices")
   #Imports
   import modules.gsheet as gsheet
   from sklearn.ensemble import IsolationForest
@@ -492,11 +492,12 @@ def market_price_scraper_BO():
   last_run['brand_price'] = last_run['brand_price'].astype(float)
   last_run['Amazon_prices'] = last_run['Amazon_prices'].astype(float)
   last_run['Mediamarkt_prices'] = last_run['Mediamarkt_prices'].astype(float)
+  last_run['reliability_score'] = last_run['reliability_score'].astype(float)
 
 
   last_run["Final_price"] = last_run[['Overall_median_price', 'Overall_mean_price', 'wavg price', 'gmean_price', 'Ideal Price', 'brand_price', 'Amazon_prices', 'Mediamarkt_prices']].mean(axis=1)
 
-  last_run = last_run.groupby(['product_code', 'name', 'brand_name', 'category.name']).agg({'Final_price':'mean'})
+  last_run = last_run.groupby(['product_code', 'name', 'brand_name', 'category.name']).agg({'Final_price':'mean','reliability_score':'mean'})
   last_run = last_run.reset_index()
   last_run.drop_duplicates()
 
