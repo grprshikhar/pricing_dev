@@ -32,7 +32,7 @@ class eprice_validator(object):
 			6 :  [0.055, 0.16],
 			12 : [0.02, 0.078],
 			18 : [0.03,  0.054],
-			24 : [0.025, 0.041]}
+			24 : [0.025, 0.044]}
 		# EU data
 		self.get_EU_legislation_data()
 
