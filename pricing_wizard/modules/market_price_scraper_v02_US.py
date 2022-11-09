@@ -31,16 +31,16 @@ def market_price_scraper_v02_US():
   conn = sqlite3.connect(database_filename)
   last_run = pd.read_sql_query('SELECT crawl_date FROM data_output ORDER BY crawl_date DESC limit 1',conn)
   last_run_date = last_run["crawl_date"].loc[0]
-  if last_run_date == date_today:
-    print_check("Database already contains price data for today")
-    print_exclaim("Updating spreadsheet with latest data")
-    output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
-    #print (output.dtypes)
-    response = upload_df_to_gsheet_US(output.drop(columns='index'))
-    #print_check(response)
-    return
-  else:
-    print_check(f"Competition prices last scraped on: {last_run_date}")
+  #if last_run_date == date_today:
+  #  print_check("Database already contains price data for today")
+  #  print_exclaim("Updating spreadsheet with latest data")
+  #  output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
+  #  #print (output.dtypes)
+  #  response = upload_df_to_gsheet_US(output.drop(columns='index'))
+  #  #print_check(response)
+  #  return
+  #else:
+  #  print_check(f"Competition prices last scraped on: {last_run_date}")
 
   conn.close()
 
@@ -86,6 +86,10 @@ def market_price_scraper_v02_US():
   x2['link'] = x2['website'].apply(lambda x: x.split('.',1)[1]) 
   # getting the link only
   x2['link_only'] = x2['link'].apply(lambda x: x.rsplit('.',1)[-2])  
+  # dropping anything after the long dash 
+  x2['link_only'] = x2['link_only'].apply(lambda x: x.rsplit('—',1)[0])
+  #removing space after links
+  x2['link_only'] = x2['link_only'].str.strip()
   #dropping not needed columns 
   x2.drop(columns=['website', 'link', 'website_names'], inplace = True, axis = 1) 
   #copying data in column 0 to a new column named values
@@ -317,7 +321,7 @@ def market_price_scraper_v02_US():
   last_df = last_df.drop_duplicates()
   last_df = last_df[['product_code', 'name', 'brand_name','category.name', 'Inhouse_Market_Price', 'number_sites', 'catman trust (condition new)', 'Overall_median_price', 'Overall_mean_price', 'wavg price', 'gmean_price']].copy()
 
-  # Adding reliability score for each SKU
+# Adding reliability score for each SKU
   print_check("Calculating Reliability Score")
 
 
@@ -329,7 +333,7 @@ def market_price_scraper_v02_US():
   last_df["reliability_score"] = last_df["reliability_score"].round(2)
   last_df = last_df[['product_code', 'name', 'brand_name','category.name', 'Inhouse_Market_Price', 'number_sites', 'catman trust (condition new)', 'Category Mean Rank', 'reliability_score','Overall_median_price', 'Overall_mean_price', 'wavg price', 'gmean_price']].copy()
 
-  #Adding the quartiles method
+#Adding the quartiles method
   print_check("Calculating Price Quantiles")
 
   duplicated_df = results_reduced.loc[results_reduced.index.repeat(results_reduced['catman trust (condition new)'])]

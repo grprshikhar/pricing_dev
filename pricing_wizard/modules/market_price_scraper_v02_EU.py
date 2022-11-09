@@ -31,16 +31,16 @@ def market_price_scraper_v02_EU():
   conn = sqlite3.connect(database_filename)
   last_run = pd.read_sql_query('SELECT crawl_date FROM data_output ORDER BY crawl_date DESC limit 1',conn)
   last_run_date = last_run["crawl_date"].loc[0]
-  if last_run_date == date_today:
-    print_check("Database already contains price data for today")
-    print_exclaim("Updating spreadsheet with latest data")
-    output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
-    #print (output.dtypes)
-    response = upload_df_to_gsheet(output.drop(columns='index'))
-    #print_check(response)
-    return
-  else:
-    print_check(f"Competition prices last scraped on: {last_run_date}")
+  #if last_run_date == date_today:
+  #  print_check("Database already contains price data for today")
+  #  print_exclaim("Updating spreadsheet with latest data")
+  #  output = pd.read_sql_query(f'SELECT * FROM data_output where crawl_date="{date_today}"',conn)
+  #  #print (output.dtypes)
+  #  response = upload_df_to_gsheet(output.drop(columns='index'))
+  #  #print_check(response)
+  #  return
+  #else:
+  #  print_check(f"Competition prices last scraped on: {last_run_date}")
 
   conn.close()
 
@@ -86,6 +86,10 @@ def market_price_scraper_v02_EU():
   x2['link'] = x2['website'].apply(lambda x: x.split('.',1)[1]) 
   # getting the link only
   x2['link_only'] = x2['link'].apply(lambda x: x.rsplit('.',1)[-2])  
+  # dropping anything after the long dash 
+  x2['link_only'] = x2['link_only'].apply(lambda x: x.rsplit('—',1)[0])
+  #removing space after links
+  x2['link_only'] = x2['link_only'].str.strip()
   #dropping not needed columns 
   x2.drop(columns=['website', 'link', 'website_names'], inplace = True, axis = 1) 
   #copying data in column 0 to a new column named values
