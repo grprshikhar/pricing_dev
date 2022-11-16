@@ -4,6 +4,7 @@ from reports.ian_pricing_report_new_kpi import process
 from reports.ian_pricing_report_merge import merge
 from modules.print_utils import print_check, print_exclaim
 from modules.gdrive import upload_csv_to_sheet
+from modules.gsheet import get_dataframe
 from datetime import date, timedelta
 
 class ian_pricing_report(report_base):
@@ -37,7 +38,8 @@ class ian_pricing_report(report_base):
 	# Run the report
 	def run_report(self):
 		self.create_clean_folder()
-		self.get_data_from_redshift()
+		#self.get_data_from_redshift()
+		self.get_data_from_gsheet()
 		self.process_data()
 		self.merge_data()
 		self.upload()
@@ -54,6 +56,13 @@ class ian_pricing_report(report_base):
 			files = glob.glob(self.folder+"/*")
 			for f in files:
 				os.remove(f)
+
+	# New Step 1
+	def get_data_from_gsheet(self):
+		df = get_dataframe("1GdXMrpIFKAWJDUGU763pV9_Jb4x2JeWQQjVKGnO2wyI","Data!A:S","Price review data")
+		df.to_csv(self.folder+'/results.csv', mode='w', header=True, index=False)
+		print_exclaim(f"Data saved locally in {self.folder}/results.csv")
+
 
 	# Step 1
 	def get_data_from_redshift(self):

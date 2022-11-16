@@ -21,6 +21,7 @@ class report_base(ABC):
 	@property # Shared property in derived classes
 	@final    # Cannot be changed in derived classes
 	def conn(self):
+		return
 		# Only create once
 		if self._conn:
 			return
