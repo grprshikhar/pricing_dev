@@ -83,6 +83,8 @@ def market_price_scraper_v02_EU():
   x2['website_names'] = x2['website'].str.split('.').str[1] 
   #splitting the last word from the string "stock" or "price"
   x2['criteria'] = x2['website'].str.extract('([^.]+)$', expand=False) 
+  #removing any rows that contain my_position to prevent indexing errors
+  x2 = x2[x2["website"] != "my_position"]
   x2['link'] = x2['website'].apply(lambda x: x.split('.',1)[1]) 
   # getting the link only
   x2['link_only'] = x2['link'].apply(lambda x: x.rsplit('.',1)[-2])  
