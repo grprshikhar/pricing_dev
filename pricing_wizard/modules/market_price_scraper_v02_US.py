@@ -56,20 +56,22 @@ def market_price_scraper_v02_US():
   # Extracting All the Data from the API links
   def get_data(url, dataframe, params):
     print_exclaim_sameline(f"Processing {url}...")
-    
-    response = requests.get(url, headers = params)
-    json_data = json.loads(response.text)
+    retry   = 0
+    retries = 3
+    while retry < retries:
+      try:
+        response = requests.get(url, headers = params)
+        json_data = json.loads(response.text)
+        break
+      except Exception as e:
+        print(e)
+        retry += 1
+        print(retry) #remove after testing
+    #response = requests.get(url, headers = params)
+    #json_data = json.loads(response.text)
     df = pd.DataFrame.from_dict(pd.json_normalize(json_data['results']))
     
     dataframe = pd.concat([dataframe, df])
-
-    if not json_data["nextURL"]:
-      return dataframe
-    nextUrl = "https://prisync.com" + json_data["nextURL"]
-    return get_data(nextUrl, dataframe, params)
-    
-  df = pd.DataFrame()
-  dataframe = get_data(Start_Url, df, params)
 
   # Clean up the line
   print_exclaim_sameline("\n")
@@ -83,6 +85,8 @@ def market_price_scraper_v02_US():
   x2['website_names'] = x2['website'].str.split('.').str[1] 
   #splitting the last word from the string "stock" or "price"
   x2['criteria'] = x2['website'].str.extract('([^.]+)$', expand=False) 
+  #removing any rows that contain my_position to prevent indexing errors
+  x2 = x2[x2["website"] != "my_position"]
   #removing any rows that contain my_position to prevent indexing errors
   x2 = x2[x2["website"] != "my_position"]
   x2['link'] = x2['website'].apply(lambda x: x.split('.',1)[1]) 

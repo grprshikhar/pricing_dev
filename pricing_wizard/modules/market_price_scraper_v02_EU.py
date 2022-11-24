@@ -56,9 +56,19 @@ def market_price_scraper_v02_EU():
   # Extracting All the Data from the API links
   def get_data(url, dataframe, params):
     print_exclaim_sameline(f"Processing {url}...")
-    
-    response = requests.get(url, headers = params)
-    json_data = json.loads(response.text)
+    retry   = 0
+    retries = 3
+    while retry < retries:
+      try:
+        response = requests.get(url, headers = params)
+        json_data = json.loads(response.text)
+        break
+      except Exception as e:
+        print(e)
+        retry += 1
+        print(retry) #remove after testing
+    #response = requests.get(url, headers = params)
+    #json_data = json.loads(response.text)
     df = pd.DataFrame.from_dict(pd.json_normalize(json_data['results']))
     
     dataframe = pd.concat([dataframe, df])
@@ -486,10 +496,13 @@ def market_price_scraper_BO():
 
   # Make a connection
   conn = sqlite3.connect(database_filename)
-  last_run = pd.read_sql_query('SELECT *, JULIANDAY(CURRENT_DATE) - JULIANDAY(crawl_date) as datediff FROM data_output where datediff <= 31',conn)
+  # uncomment after BF 
+  #last_run = pd.read_sql_query('SELECT *, JULIANDAY(CURRENT_DATE) - interval '7 days' - JULIANDAY(crawl_date) as datediff FROM data_output where datediff <= 31',conn)
+  last_run = pd.read_sql_query("SELECT * FROM data_output where crawl_date between '2022-10-14' and '2022-11-14'",conn)
   last_run_date = last_run["crawl_date"].loc[0]
   last_run.sort_values(by='crawl_date', ascending=True)
-
+  last_run['reliability_score'] = last_run['reliability_score'].astype(float)
+  last_run = last_run[last_run['reliability_score'] >= 2.7]
   last_run['Overall_median_price'] = last_run['Overall_median_price'].astype(float)
   last_run['Overall_mean_price'] = last_run['Overall_mean_price'].astype(float)
   last_run['wavg price'] = last_run['wavg price'].astype(float)
