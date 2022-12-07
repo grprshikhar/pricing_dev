@@ -497,8 +497,8 @@ def market_price_scraper_BO():
   # Make a connection
   conn = sqlite3.connect(database_filename)
   # uncomment after BF 
-  #last_run = pd.read_sql_query('SELECT *, JULIANDAY(CURRENT_DATE) - interval '7 days' - JULIANDAY(crawl_date) as datediff FROM data_output where datediff <= 31',conn)
-  last_run = pd.read_sql_query("SELECT * FROM data_output where crawl_date between '2022-10-14' and '2022-11-14'",conn)
+  last_run = pd.read_sql_query('SELECT *, JULIANDAY(CURRENT_DATE) - interval '7 days' - JULIANDAY(crawl_date) as datediff FROM data_output where datediff <= 31',conn)
+  #last_run = pd.read_sql_query("SELECT * FROM data_output where crawl_date between '2022-10-14' and '2022-11-14'",conn)
   last_run_date = last_run["crawl_date"].loc[0]
   last_run.sort_values(by='crawl_date', ascending=True)
   last_run['reliability_score'] = last_run['reliability_score'].astype(float)
