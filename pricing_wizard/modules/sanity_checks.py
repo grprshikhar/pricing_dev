@@ -204,6 +204,10 @@ def show_summary(df_td):
     a=df_td['subcategory'].value_counts().rename_axis('Subcategory').reset_index(name='Price uploads')
     print(colored("Number of uploads for each Subcategory\n",'green')+colored(tabulate(a, headers='keys', tablefmt='psql'),'yellow')+"\n")
 
+    pivot = df_td[['sku','store code']].pivot_table( index='sku', values='store code', columns='store code', aggfunc=len, fill_value=0, dropna=False)
+    print(colored("SKU / Market breakdown","green"))
+    print(colored(tabulate(pivot, headers='keys', tablefmt='psql'),'yellow')+"\n\n")
+
 def show_stats(df_td):
     desc_prices = df_td.describe(exclude=['object','int'])
     print("")
@@ -217,7 +221,5 @@ def show_stats(df_td):
     high_dt.columns = high_dt.columns.str.replace("high_plan", "High Plan ")
     print(colored("New High Price data summary\n",'green')+colored(tabulate(high_dt, headers='keys', tablefmt='psql'),'yellow')+"\n")    
     disc_dt = desc_prices[[col for col in desc_prices.columns if 'disc' in col]]
-    print(colored("Discount data summary\n",'green')+colored(tabulate(disc_dt, headers='keys', tablefmt='psql'),'yellow')+"\n\n")   
-
-
+    print(colored("Discount data summary\n",'green')+colored(tabulate(disc_dt, headers='keys', tablefmt='psql'),'yellow')+"\n")   
 
