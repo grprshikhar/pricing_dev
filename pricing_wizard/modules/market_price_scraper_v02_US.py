@@ -49,9 +49,9 @@ def market_price_scraper_v02_US():
   Start_Url = 'https://prisync.com/api/v2/list/product/summary/startFrom/0'
   params = {'apikey': 'Grover-USA@prisync.com',
               'apitoken': '4fe53a62de572aeb1453b4e6ab7c0b47'}
-  response = requests.get(Start_Url,headers = params)
+  response = requests.get(Start_Url,headers = params, timeout = 40)
   json_data = json.loads(response.text)
-
+  print(response) #should be 200
 
   # Extracting All the Data from the API links
   def get_data(url, dataframe, params):
@@ -60,7 +60,7 @@ def market_price_scraper_v02_US():
     retries = 3
     while retry < retries:
       try:
-        response = requests.get(url, headers = params)
+        response = requests.get(url, headers = params, timeout = 40)
         json_data = json.loads(response.text)
         break
       except Exception as e:
@@ -72,7 +72,15 @@ def market_price_scraper_v02_US():
     df = pd.DataFrame.from_dict(pd.json_normalize(json_data['results']))
     
     dataframe = pd.concat([dataframe, df])
-
+    
+    if not json_data["nextURL"]:
+      return dataframe
+    nextUrl = "https://prisync.com" + json_data["nextURL"]
+    return get_data(nextUrl, dataframe, params)
+    
+  df = pd.DataFrame()
+  dataframe = get_data(Start_Url, df, params)
+  
   # Clean up the line
   print_exclaim_sameline("\n")
   print_check("Data downloaded from API Link")

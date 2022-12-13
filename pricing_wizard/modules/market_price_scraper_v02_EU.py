@@ -49,7 +49,7 @@ def market_price_scraper_v02_EU():
   Start_Url = 'https://prisync.com/api/v2/list/product/summary/startFrom/0'
   params = {'apikey': 'Grover-DE@prisync.com',
               'apitoken': 'e50e8ed3f27a5a24c7ba03297eedf643'}
-  response = requests.get(Start_Url,headers = params)
+  response = requests.get(Start_Url,headers = params, timeout = 40)
   json_data = json.loads(response.text)
 
 
@@ -60,7 +60,7 @@ def market_price_scraper_v02_EU():
     retries = 3
     while retry < retries:
       try:
-        response = requests.get(url, headers = params)
+        response = requests.get(url, headers = params, timeout = 40)
         json_data = json.loads(response.text)
         break
       except Exception as e:
