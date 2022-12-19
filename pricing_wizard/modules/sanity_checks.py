@@ -40,10 +40,13 @@ def check_dataType(df):
 
 def check_discounts(df_td):
     any_errors = []
+    
     # Check that a discount present is available on all rental price plans
-    if df_td[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0)].values.any():
-        SKU = df_td.loc[(df_td.comma_count!=df_td.comma_count_plan+1),'sku']
-        any_errors.append("Discount is missing for "+str(SKU.values))
+    # Ian - We now want to allow some plans to have discounts, when others do not, therefore we should not throw and error here
+    #     - unless we work out a different logic
+    # if df_td[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0)].values.any():
+    #     SKU = df_td.loc[(df_td.comma_count!=df_td.comma_count_plan+1) & (df_td.comma_count>0),'sku']
+    #     any_errors.append("Discount is missing for "+str(SKU.values))
 
     # We should also validate that the discount amount is less than the full price (ie reprice being entered as discount)
     for plan in [1,3,6,12,18,24]:

@@ -126,6 +126,9 @@ class catman_utils(object):
 			else:	
 				df_out = pd.concat([df_out.reset_index(drop=True), df_subplanwise.reset_index(drop=True)], axis=1)
 
+		# NB This behaviour of comma counting is not sufficient when B2B have different plans to B2C - We are just concatenating all price strings
+		#    but we should only be looking at the ones which are relevant for that market
+		#    In addition, we want to allow some plans to not have discounts now
 		df_copy['check'] = pd.Series(df_copy[[col for col in df_copy.columns if re.search(r'^plan\d+', col)]].fillna('').values.tolist()).str.join('')
 		df_copy['check'] = df_copy['check'].fillna('')
 		df_copy['comma_count'] = df_copy.check.str.count(',')
