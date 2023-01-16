@@ -91,7 +91,7 @@ class admin_panel(object):
 		status  = self.put_to_S3(pricingFileName, fileUri)
 		# Check that the status code is OK
 		if status != 200:
-			raise ValueError(f"Error uploading to S3 [code : {retcode}]")
+			raise ValueError(f"Error uploading to S3 [code : {status}]")
 		print_check(f"File {pricingFileName} uploaded to Amazon S3")
 
 		# Step 3 - Provide information (filename, name, scheduled time) to Admin Panel
