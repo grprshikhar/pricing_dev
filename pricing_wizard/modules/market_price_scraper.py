@@ -39,7 +39,7 @@ def market_price_scraper():
     conn.close()
 
     print_exclaim("Downloading data from API Link (Please be patient...)")
-    Start_Url = 'https://prisync.com/api/v2/list/product/summary/startFrom/0'
+    Start_Url = 'https://app.prisync.com/api/v2/list/product/summary/startFrom/0'
     params = {'apikey': 'Grover-DE@prisync.com',
                 'apitoken': 'e50e8ed3f27a5a24c7ba03297eedf643'}
     response = requests.get(Start_Url,headers = params)
