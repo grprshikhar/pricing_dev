@@ -173,18 +173,18 @@ def check_price_change_tag(df):
         print_warning("\n".join(any_warnings))
 
 # For now, if we have a bulky item, our 1M rental should generate same profit as 3M
-def bulky_plan_check(df):
-    any_warnings = []
+#def bulky_plan_check(df):
+#    any_warnings = []
     # Comparing active price because high price not defined when repricing (but does mean discounts might flag this)
-    bulky   = "bulky"
-    high_1M = "active_plan1"
-    high_3M = "active_plan3"
-    if df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1)].empty != True:
-        sku = df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1), "sku"].drop_duplicates()
-        for s in sku:
-            any_warnings.append(f"Bulky sku [{s}] : 1M  < (3 * 3M) high price, required due to increased shipping costs")
-    if any_warnings:
-        print_warning("\n".join(any_warnings))
+#    bulky   = "bulky"
+#    high_1M = "active_plan1"
+#    high_3M = "active_plan3"
+#    if df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1)].empty != True:
+#        sku = df.loc[(df[high_1M] < 3.0*df[high_3M]) & (df[bulky] == 1), "sku"].drop_duplicates()
+#        for s in sku:
+#            any_warnings.append(f"Bulky sku [{s}] : 1M  < (3 * 3M) high price, required due to increased shipping costs")
+#    if any_warnings:
+#        print_warning("\n".join(any_warnings))
 
 
 

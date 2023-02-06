@@ -75,7 +75,7 @@ def market_price_scraper_v02_US():
     
     if not json_data["nextURL"]:
       return dataframe
-    nextUrl = "https://prisync.com" + json_data["nextURL"]
+    nextUrl = "https://app.prisync.com" + json_data["nextURL"]
     return get_data(nextUrl, dataframe, params)
     
   df = pd.DataFrame()

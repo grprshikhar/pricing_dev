@@ -27,12 +27,12 @@ class eprice_validator(object):
 		self.template_filename = ""
 		# Plan limit dictionary
 		self.plan_limit_dict = {
-			1 :  [0.085, 0.5],
-			3 :  [0.068, 0.3],
-			6 :  [0.055, 0.16],
-			12 : [0.02, 0.078],
-			18 : [0.03,  0.054],
-			24 : [0.025, 0.044]}
+			1 :  [0.06, 0.2],
+			3 :  [0.05, 0.12],
+			6 :  [0.04, 0.08],
+			12 : [0.035, 0.075],
+			18 : [0.03,  0.06],
+			24 : [0.025, 0.05]}
 		# EU data
 		self.get_EU_legislation_data()
 
