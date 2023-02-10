@@ -436,9 +436,11 @@ def market_price_scraper_v02_US():
   Mediamarkt_prices_df.rename(columns = {'price':'Mediamarkt_prices'}, inplace = True) 
   last_df = last_df.merge(Mediamarkt_prices_df, how = 'left' , on = 'product_code')
 
+
   last_df["crawl_date"] = date_today
   #print(last_df.columns)
-  
+
+  last_df = last_df.drop_duplicates()  
   # Working on sqlite database  
   print_exclaim("Updating local database with new data")
   conn = sqlite3.connect(database_filename)
