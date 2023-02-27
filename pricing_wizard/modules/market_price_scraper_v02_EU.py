@@ -92,7 +92,9 @@ def market_price_scraper_v02_EU():
   #splitting the first word from the string "summary"
   x2['website_names'] = x2['website'].str.split('.').str[1] 
   #splitting the last word from the string "stock" or "price"
-  x2['criteria'] = x2['website'].str.extract('([^.]+)$', expand=False) 
+  x2['criteria'] = x2['website'].str.extract('([^.]+)$', expand=False)
+  # removing any row in the criteria column that contains string "additional_cost" 
+  x2 = x2[ x2['criteria'].str.contains( 'additional_cost' )==False ]
   #removing any rows that contain my_position to prevent indexing errors
   x2 = x2[x2["website"] != "my_position"]
   x2['link'] = x2['website'].apply(lambda x: x.split('.',1)[1]) 
@@ -454,16 +456,17 @@ def market_price_scraper_v02_EU():
     print_exclaim("Duplicate rows identified in dataframe.")
     print_exclaim("Please check")
   
-  # Update google drive with new database
-  print_exclaim("Updating database in gdrive")
-  upload_pricsync(database_filename)
-  print_check("Database updated in gdrive")
-
   # Updating gsheet
   print_exclaim("Updating spreadsheet with latest data")
   response = upload_df_to_gsheet(output)
   #print_check(response)
   print_check("Spreadsheet update complete")
+
+  # Update google drive with new database
+  print_exclaim("Updating database in gdrive")
+  upload_pricsync(database_filename)
+  print_check("Database updated in gdrive")
+
 
 
 

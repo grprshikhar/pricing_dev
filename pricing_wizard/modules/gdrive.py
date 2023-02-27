@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 from modules.print_utils import print_check, print_exclaim
 
 # Increase default socket timeout (300 seconds)
-socket.setdefaulttimeout(300)
+socket.setdefaulttimeout(600)
 
 # Scope variable - Can probably be placed into the api check on its own
 SCOPES = ['https://www.googleapis.com/auth/drive']

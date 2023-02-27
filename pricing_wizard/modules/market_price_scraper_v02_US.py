@@ -93,6 +93,8 @@ def market_price_scraper_v02_US():
   x2['website_names'] = x2['website'].str.split('.').str[1] 
   #splitting the last word from the string "stock" or "price"
   x2['criteria'] = x2['website'].str.extract('([^.]+)$', expand=False) 
+  # removing any row in the criteria column that contains string "additional_cost" 
+  x2 = x2[ x2['criteria'].str.contains( 'additional_cost' )==False ]
   #removing any rows that contain my_position to prevent indexing errors
   x2 = x2[x2["website"] != "my_position"]
   #removing any rows that contain my_position to prevent indexing errors
