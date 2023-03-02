@@ -86,7 +86,7 @@ def exception_hook(exctype, value, tb):
         print_red_bold("--------------------------")
         print_red_bold(value.args[0]+"\n")
         # List of traceback
-        if "invalid literal" in value.args[0]:
+        if "invalid literal" in value.args[0] or 'convert' in value.args[0]:
             err_details = traceback.format_tb(tb)
             for err_info in err_details:
                 if 'pricing_wizard' in err_info:
@@ -112,7 +112,7 @@ def exception_hook(exctype, value, tb):
         print_red_bold("PricingWizard : HttpError from Google API")
         print_red_bold("-----------------------------------------")
         print_red_bold(value)
-        print_green_bold("Please ensure that this spreadsheet is shared with 'Grover' in the share options.\n")
+        print_green_bold("Please ensure that this spreadsheet is shared with 'pricing_analytics@grover.com' in the share options.\n")
         sys.exit(4)
     elif exctype == InterfaceError:
         print_red_bold("PricingWizard : InterfaceError from RedShift")
