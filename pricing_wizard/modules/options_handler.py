@@ -115,13 +115,23 @@ class options_handler(object):
 	# -------------------------------
 	def select_eprice_sheet(self):
 		# Determine if we want the EU or US sheet
-		question = [inquirer.List("type", message="Select the market for repricing SKUs :", choices=["EU","US"])]
+		question = [inquirer.List("type", message="Select the market for repricing SKUs :", choices=["EU","US","Discount Removal","Campaigns"])]
 		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
 		# Assign sheets
 		if answer["type"] == "EU":
 			self.current_sheet_type = "E-Price EU"
 		if answer["type"] == "US":
 			self.current_sheet_type = "E-Price US"
+		if answer["type"] == "Discount Removal":
+			# Hard-coded to shared sheet
+			self.current_sheet_type = "Discount Removal"
+			self.current_sheet = '14w68XfEEZXAYNqB60d7-56sO6-jKHvDSvYOjDjNlBLs'
+			return
+		if answer["type"] == "Campaigns":
+			self.current_sheet_type = "Campaigns"
+			self.current_sheet = self.get_campaign_sheet_ids()
+			return
+
 		# E-Price sheet option
 		question = [inquirer.List("yn", message="Use default or update e-sheet URL :", choices=["Use default","Update"])]
 		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
@@ -196,6 +206,24 @@ class options_handler(object):
 				print_check (f"Data for [{self.current_user}] stored just for this session.")
 
 	# -------------------------------
+	# Control campaign sheet data
+	# -------------------------------
+	def get_campaign_sheet_ids(self):
+		print_exclaim("Campaign sheet data is stored in [1IN7y2rr1tGu3B_DfDUFgYHIy0gEhoeAyy-RvR8ERg_w]")
+		# Campaign control sheet
+		import modules.gsheet as gsheet
+		control_sheet_id = "1IN7y2rr1tGu3B_DfDUFgYHIy0gEhoeAyy-RvR8ERg_w"
+		campaign_range   = 'Campaign!A:C'
+		df = gsheet.get_dataframe(control_sheet_id, campaign_range, 'Campaign sheets')
+		# Pull the data options
+		campaign_names = df[df['active'] == 'Yes']['campaign_name'].to_list()
+		question = [inquirer.List("type", message="Select the campaign :", choices=campaign_names)]
+		# Convert response to sheet id
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
+		sheet_id = df.loc[df['campaign_name'] == answer['type']]['campaign_pricing_sheet_id'].iloc[0]
+		return sheet_id
+
+	# -------------------------------
 	# Add a new user to the settings
 	# -------------------------------
 	def add_user_to_json(self):
@@ -252,7 +280,7 @@ class options_handler(object):
 		# This option can control the flow of the program
 		# Just keep the order the same but can rename these without breaking code
 		# Ensure "Exit" is last option as this looks best in terminal option
-		stages = ["Reprice SKUs (B2C, B2B)", "Reprice SKUs (Partners)", "Price new SKUs", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Update Competition Pricing for BO", "Exit"]
+		stages = ["Reprice SKUs (B2C, B2B, Discount Removal, Campaigns)", "Reprice SKUs (Partners)", "Price new SKUs", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Update Competition Pricing for BO", "Exit"]
 		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
 		answer = inquirer.prompt(question, theme=self._theme2, raise_keyboard_interrupt=True)
 		self.stage = stages.index(answer["stage"])
