@@ -63,12 +63,15 @@ def data_collector():
   # PP & RRP Percentages
   pp_perc = gsheet.get_dataframe("1XpMzxJrcjs6o0sOzIQB9JE4rhXFq9dZJkufkzeO5hfs","RRP&PP!A:AI","pp_perc")
   pp_perc = pp_perc[['product_sku','m1_pp_perc','m3_pp_perc','m6_pp_perc','m12_pp_perc','m18_pp_perc','m24_pp_perc']]
-  pp_perc.drop_duplicates()
+  pp_perc = pp_perc[pp_perc["product_sku"] != ""]
+  pp_perc.dropna(subset = ['product_sku'], inplace = True)
   print(pp_perc)
 
   rrp_perc = gsheet.get_dataframe("1XpMzxJrcjs6o0sOzIQB9JE4rhXFq9dZJkufkzeO5hfs","RRP&PP!A:AI","rrp_perc")
   rrp_perc = rrp_perc[['product_sku','m1_rrp_perc','m3_rrp_perc','m6_rrp_perc','m12_rrp_perc','m18_rrp_perc','m24_rrp_perc','any_discounted']]
+  rrp_perc = rrp_perc[rrp_perc["product_sku"] != ""]
   rrp_perc.drop_duplicates()
+  rrp_perc.dropna(subset = ['product_sku'], inplace = True)
   print(rrp_perc)
 
   # Average purchase Age
@@ -90,6 +93,7 @@ def data_collector():
   # Organic traffic last 4 weeks 
   organic_traffic_last_4weeks = gsheet.get_dataframe("1zB8QTkvXZXQc0ttdAIePuuuUhokhnHxHkrerO4CEeeg","Marketing&Performance!A:AB","organic_traffic_last_4weeks")
   organic_traffic_last_4weeks = organic_traffic_last_4weeks[['product_sku','organic_traffic_last_4weeks']]
+  organic_traffic_last_4weeks = organic_traffic_last_4weeks.drop_duplicates()
   print(organic_traffic_last_4weeks)
 
   # Discounted
@@ -99,50 +103,54 @@ def data_collector():
 
 
   # Merging the dataframes into one
-  main_df = pd.merge(stock_with_incoming, stock_without_incoming, on = 'product_sku', how = 'left')
+  main_df = avg_age.copy(deep = True) 
+  main_df = pd.merge(main_df, stock_with_incoming, on = 'product_sku', how = 'left')
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = pd.merge(main_df, stock_without_incoming, on = 'product_sku', how = 'left')
+  print(main_df.shape)
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, incoming_stock, on = 'product_sku', how = 'left')
   print(main_df.shape)
-  main_df.drop_duplicates()
-  main_df = pd.merge(main_df, avg_age, on = 'product_sku', how = 'left')
-  print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
+  #main_df = pd.merge(main_df, avg_age, on = 'product_sku', how = 'left')
+  #print(main_df.shape)
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, months_old, on = 'product_sku', how = 'left')
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, acquired_subs, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, mos_incoming, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, days_oos, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, submitted_orders, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, avg_purchase_age, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, daily_asv, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, organic_traffic_last_4weeks, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, normalised_acquired_subs, on = 'product_sku', how = 'left') 
   print(main_df.shape)
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, pp_perc, on = 'product_sku', how = 'left')
   print(main_df.shape)
-  main_df.drop_duplicates()
-  main_df.to_csv("before_crash.csv")
+  main_df = main_df.drop_duplicates()
   main_df = pd.merge(main_df, rrp_perc, on = 'product_sku', how = 'left')
-  main_df.drop_duplicates()
+  main_df = main_df.drop_duplicates()
+  main_df = main_df[main_df["product_sku"] != ""]
   print(main_df.shape)
-
+  main_df = main_df.drop_duplicates(subset = ['product_sku'])
+  print(main_df.shape)
   print("ALL merges done")
 
   # Data Cleaning and formatting 
