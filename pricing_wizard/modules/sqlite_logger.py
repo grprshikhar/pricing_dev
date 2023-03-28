@@ -57,6 +57,7 @@ class sqlite_logger(object):
 									store_code TEXT,
 									newness TEXT,
 									m1_margin TEXT,
+									m3_margin TEXT,
 									m6_margin TEXT,
 									m12_margin TEXT,
 									m18_margin TEXT,
@@ -65,7 +66,7 @@ class sqlite_logger(object):
 									price_change_tag TEXT,
 									price_change_reason TEXT,
 									id TEXT)"""
-											 
+		
 		init_price_change = """CREATE TABLE IF NOT EXISTS 
 							   price_changes(TimeStamp DateTime,
 							   				 ScheduledFor DateTime,
