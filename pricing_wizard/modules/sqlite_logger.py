@@ -62,7 +62,7 @@ class sqlite_logger(object):
 											 m12_margin TEXT,
 											 m18_margin TEXT,
 											 m24_margin TEXT,
-											 combined_margin TEX
+											 combined_margin TEXT,
 											 price_change_tag TEXT,
 											 price_change_reason TEXT,
 											 id TEXT
@@ -220,7 +220,7 @@ class sqlite_logger(object):
 												 m12_margin ,
 												 m18_margin ,
 												 m24_margin ,
-												 combined_margin 
+												 combined_margin,
 												 price_change_tag ,
 												 price_change_reason ,
 												 id 
@@ -237,7 +237,7 @@ class sqlite_logger(object):
 													  		 '{row['m12_margin']}',
 													  		 '{row['m18_margin']}',
 													  		 '{row['m24_margin']}',
-													  		 '{row['combined_margin']}'
+													  		 '{row['combined_margin']}',
 													  		 '{row['price change tag']}',
 													  		 '{price_change_reason}',
 													  		 '{ID}'

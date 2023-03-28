@@ -273,6 +273,8 @@ class eprice_validator(object):
 		s = sqlite_logger()
 		s.add_price_upload((datetime.datetime.utcnow() if scheduledTime == "null" else scheduledTime),
 						   self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
+		s.add_margins((datetime.datetime.utcnow() if scheduledTime == "null" else scheduledTime),
+						   self.df_td[['sku','store code','new','m1_margin','m3_margin','m6_margin','m12_margin','m18_margin','m24_margin', 'combined_margin', 'price change tag']])
 		print_check("Upload complete!")
 
 
