@@ -50,23 +50,22 @@ class sqlite_logger(object):
 
 	def initialise_tables(self):
 		init_margins = """CREATE TABLE IF NOT EXISTS 
-							   margins(TimeStamp DateTime,
-							   				 ScheduledFor DateTime,
-											 User TEXT,
-											 product_sku TEXT,
-											 store_code TEXT,
-											 newness TEXT,
-											 m1_margin TEXT,
-											 m3_margin TEXT,
-											 m6_margin TEXT,
-											 m12_margin TEXT,
-											 m18_margin TEXT,
-											 m24_margin TEXT,
-											 combined_margin TEXT,
-											 price_change_tag TEXT,
-											 price_change_reason TEXT,
-											 id TEXT
-											 )"""
+						   margins(TimeStamp DateTime,
+									ScheduledFor DateTime,
+									User TEXT,
+									product_sku TEXT,
+									store_code TEXT,
+									newness TEXT,
+									m1_margin TEXT,
+									m6_margin TEXT,
+									m12_margin TEXT,
+									m18_margin TEXT,
+									m24_margin TEXT,
+									combined_margin TEXT,
+									price_change_tag TEXT,
+									price_change_reason TEXT,
+									id TEXT)"""
+											 
 		init_price_change = """CREATE TABLE IF NOT EXISTS 
 							   price_changes(TimeStamp DateTime,
 							   				 ScheduledFor DateTime,
