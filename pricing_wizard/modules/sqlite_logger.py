@@ -64,7 +64,13 @@ class sqlite_logger(object):
 											 rental_plan_24_month TEXT,
 											 price_change_tag TEXT,
 											 price_change_reason TEXT,
-											 id TEXT
+											 id TEXT,
+											 m1_pp_perc TEXT,
+											 m3_pp_perc TEXT,
+											 m6_pp_perc TEXT,
+											 m12_pp_perc TEXT,
+											 m18_pp_perc TEXT,
+											 m24_pp_perc TEXT
 											 )"""
 		init_warnings = """CREATE TABLE IF NOT EXISTS 
 						   warnings(TimeStamp DateTime,
@@ -74,7 +80,13 @@ class sqlite_logger(object):
 						   			product_sku TEXT,
 						   			store_code TEXT,
 						   			Warning TEXT,
-						   			id TEXT
+						   			id TEXT,
+						   			m1_pp_perc TEXT,
+									m3_pp_perc TEXT,
+									m6_pp_perc TEXT,
+									m12_pp_perc TEXT,
+									m18_pp_perc TEXT,
+									m24_pp_perc TEXT
 						   			)""" 
 		# Generate database
 		self.make_connection(5)
