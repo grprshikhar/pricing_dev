@@ -49,6 +49,24 @@ class sqlite_logger(object):
 		raise ValueError("Error connecting to SQLITE logging database. Please investigate.")
 
 	def initialise_tables(self):
+		init_margins = """CREATE TABLE IF NOT EXISTS 
+						   margins(TimeStamp DateTime,
+									ScheduledFor DateTime,
+									User TEXT,
+									product_sku TEXT,
+									store_code TEXT,
+									newness TEXT,
+									m1_margin TEXT,
+									m3_margin TEXT,
+									m6_margin TEXT,
+									m12_margin TEXT,
+									m18_margin TEXT,
+									m24_margin TEXT,
+									combined_margin TEXT,
+									price_change_tag TEXT,
+									price_change_reason TEXT,
+									id TEXT)"""
+		
 		init_price_change = """CREATE TABLE IF NOT EXISTS 
 							   price_changes(TimeStamp DateTime,
 							   				 ScheduledFor DateTime,
@@ -79,6 +97,7 @@ class sqlite_logger(object):
 		# Generate database
 		self.make_connection(5)
 		# Generate write lock
+		self.database.execute(init_margins)
 		self.database.execute(init_price_change)
 		self.database.execute(init_warnings)
 		self.database.commit()
@@ -178,5 +197,53 @@ class sqlite_logger(object):
 			self.database.execute(insertion)
 		self.database.commit()
 		self.database.close()
-		
 
+	def add_margins(self, scheduledFor, df):
+		# Generate write lock
+		self.make_connection(5)
+		timestamp = str(datetime.datetime.utcnow())
+		ID        = open(".active_session.dat","r").readlines()[0].strip()
+		# 'SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag'
+		# 'sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag'
+		# Not currently using
+		price_change_reason = ""
+		for idx,row in df.iterrows():
+			insertion = f"""INSERT INTO margins(TimeStamp ,
+								   				 ScheduledFor ,
+												 User ,
+												 product_sku ,
+												 store_code ,
+												 newness ,
+												 m1_margin ,
+												 m3_margin ,
+												 m6_margin ,
+												 m12_margin ,
+												 m18_margin ,
+												 m24_margin ,
+												 combined_margin,
+												 price_change_tag ,
+												 price_change_reason ,
+												 id 
+													  )
+													  VALUES('{timestamp}',
+													  		 '{self.user}',
+													  		 '{scheduledFor}',
+													  		 '{row['sku']}',
+													  		 '{row['store code']}',
+													  		 '{row['new']}',
+													  		 '{row['m1_margin']}',
+													  		 '{row['m3_margin']}',
+													  		 '{row['m6_margin']}',
+													  		 '{row['m12_margin']}',
+													  		 '{row['m18_margin']}',
+													  		 '{row['m24_margin']}',
+													  		 '{row['combined_margin']}',
+													  		 '{row['price change tag']}',
+													  		 '{price_change_reason}',
+													  		 '{ID}'
+													  		 )"""
+			# Now insert
+			self.database.execute(insertion)
+		self.database.commit()
+		# End write lock
+		self.database.close()
