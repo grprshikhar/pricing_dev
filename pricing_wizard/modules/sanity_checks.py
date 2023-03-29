@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from termcolor import colored,cprint
-from modules.print_utils import print_exclaim, print_warning
+from modules.print_utils import print_exclaim, print_warning, print_check
 try:
     import sys
     import colorama
@@ -172,6 +172,21 @@ def check_price_change_tag(df):
     if any_warnings:
         print_warning("\n".join(any_warnings))
 
+def check_margin_columns(df):
+    any_warnings = []
+    required_cols = ['m1_margin', 'm3_margin', 'm6_margin', 'm12_margin', 'm18_margin', 'm24_margin', 'combined_margin']
+    for col in required_cols:
+        if col not in df.columns:
+            any_warnings.append(f"{col} : Margin Columns are missing please add Margin columns (MATRIX sheet CQ -> CW) to the export tab ")
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
+        return False
+    else:
+        return True
+
+
+
+
 # For now, if we have a bulky item, our 1M rental should generate same profit as 3M
 #def bulky_plan_check(df):
 #    any_warnings = []
@@ -225,4 +240,7 @@ def show_stats(df_td):
     print(colored("New High Price data summary\n",'green')+colored(tabulate(high_dt, headers='keys', tablefmt='psql'),'yellow')+"\n")    
     disc_dt = desc_prices[[col for col in desc_prices.columns if 'disc' in col]]
     print(colored("Discount data summary\n",'green')+colored(tabulate(disc_dt, headers='keys', tablefmt='psql'),'yellow')+"\n")   
+
+
+
 
