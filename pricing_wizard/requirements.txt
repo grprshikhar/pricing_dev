@@ -12,6 +12,5 @@ google-api-python-client
 gql[all]
 google-cloud-logging
 redshift-connector
-sklearn
 matplotlib
 scikit-learn
