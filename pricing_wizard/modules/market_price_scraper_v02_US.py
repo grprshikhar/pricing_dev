@@ -284,8 +284,18 @@ def market_price_scraper_v02_US():
 
   grouped_results_reduced = results_reduced.groupby(["product_code","category.name"])
 
-  final_df = pd.DataFrame(columns=['sku','Overall_median_price', 'Overall_mean_price', 'number_sites'])
+#  final_df = pd.DataFrame(columns=['sku','Overall_median_price', 'Overall_mean_price', 'number_sites'])
 
+#  for name, group in grouped_results_reduced:
+#    sku = name[0]
+#    cat = name[1]
+#    group["price"] = group["price"].astype(float)
+#    SKU_median = group["price"].median()
+#    SKU_mean = group["price"].mean()
+#    number_sites = len(group)
+#    final_df = final_df.append({'sku':sku, 'Overall_median_price':SKU_median, "Overall_mean_price": SKU_mean, "number_sites" :number_sites}, ignore_index = True)
+
+  final_df = pd.DataFrame(columns=['sku','Overall_median_price', 'Overall_mean_price', 'number_sites'])
   for name, group in grouped_results_reduced:
     sku = name[0]
     cat = name[1]
@@ -293,7 +303,8 @@ def market_price_scraper_v02_US():
     SKU_median = group["price"].median()
     SKU_mean = group["price"].mean()
     number_sites = len(group)
-    final_df = final_df.append({'sku':sku, 'Overall_median_price':SKU_median, "Overall_mean_price": SKU_mean, "number_sites" :number_sites}, ignore_index = True)
+    df = pd.DataFrame({'sku':[sku], 'Overall_median_price':[SKU_median], "Overall_mean_price": [SKU_mean], "number_sites" :[number_sites]})
+    final_df = pd.concat([final_df, df], ignore_index=True)
 
   sku_prices = final_df.copy(deep = True)
 
