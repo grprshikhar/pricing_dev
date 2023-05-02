@@ -204,16 +204,16 @@ def upload_pricsync(file_name='competition_pricing_v02.db'):
     file = service.files().update(fileId=file_id, body=body, media_body=media).execute() 
     print_check(f"Updated pricsync database [{file_name}] in gdrive.")
 
-def download_pricsync_US(file_name='competition_pricing_v02_US.db'):
-    file_id    = "1-A7Wh5j6ka7p9UBjkT69_E5oDShm3JkJ"
+def download_pricsync_US(file_name='competition_pricing_v02.1_US.db'):
+    file_id    = "1RfSVEXEhGTxADU3QQqt7j07qcDEgDWNq"
     file_bytes = download(file_id)
     with open(file_name,'wb') as f:
         f.write(file_bytes.getbuffer())
         f.close()
     print_check(f"Downloaded pricsync database [{file_name}] from gdrive.")
 
-def upload_pricsync_US(file_name='competition_pricing_v02_US.db'):
-    file_id    = "1-A7Wh5j6ka7p9UBjkT69_E5oDShm3JkJ"
+def upload_pricsync_US(file_name='competition_pricing_v02.1_US.db'):
+    file_id    = "1RfSVEXEhGTxADU3QQqt7j07qcDEgDWNq"
     folder_id  = "1v5dAU9G4xgXO3mdLm9zNMyQte4XPMV4V"
     # Credentials
     creds     = gdrive_api_check(SCOPES)

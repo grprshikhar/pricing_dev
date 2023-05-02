@@ -23,7 +23,7 @@ def market_price_scraper_v02_US():
   print_exclaim("Updating Competition Pricing for US")
 
   # Check if the database is already updated
-  database_filename = 'competition_pricing_v02_US.db'
+  database_filename = 'competition_pricing_v02.1_US.db'
   print_exclaim(f"Downloading database [{database_filename}] from gdrive")
   download_pricsync_US(database_filename)
 
@@ -51,7 +51,7 @@ def market_price_scraper_v02_US():
               'apitoken': '4fe53a62de572aeb1453b4e6ab7c0b47'}
   response = requests.get(Start_Url,headers = params, timeout = 40)
   json_data = json.loads(response.text)
-  print(response) #should be 200
+  #print(response) #should be 200
 
   # Extracting All the Data from the API links
   def get_data(url, dataframe, params):
@@ -440,32 +440,45 @@ def market_price_scraper_v02_US():
   Amazon_prices_df.rename(columns = {'price':'Amazon_prices'}, inplace = True) 
   last_df = last_df.merge(Amazon_prices_df, how = 'left' ,on = 'product_code')
 
+  # creating a column for Bestbuy Prices
 
-  # creating a column for Mediamarkt Prices
+  results["bestbuy_prices"] = results['link_only'].str.contains('bestbuy')
+  bestbuy_prices = results[results.bestbuy_prices != False]
+  bestbuy_prices_df = bestbuy_prices[['product_code','price']].copy()
+  bestbuy_prices_df.rename(columns = {'price':'bestbuy_prices'}, inplace = True) 
+  last_df = last_df.merge(bestbuy_prices_df, how = 'left' ,on = 'product_code')
 
-  results["Mediamarkt_prices"] = results['link_only'].str.contains('mediamarkt')
-  Mediamarkt_prices = results[results.Mediamarkt_prices != False]
-  Mediamarkt_prices_df = Mediamarkt_prices[['product_code','price']].copy()
-  Mediamarkt_prices_df.rename(columns = {'price':'Mediamarkt_prices'}, inplace = True) 
-  last_df = last_df.merge(Mediamarkt_prices_df, how = 'left' , on = 'product_code')
+#  # creating a column for Mediamarkt Prices#
 
+#  results["Mediamarkt_prices"] = results['link_only'].str.contains('mediamarkt')
+#  Mediamarkt_prices = results[results.Mediamarkt_prices != False]
+#  Mediamarkt_prices_df = Mediamarkt_prices[['product_code','price']].copy()
+#  Mediamarkt_prices_df.rename(columns = {'price':'Mediamarkt_prices'}, inplace = True) 
+#  last_df = last_df.merge(Mediamarkt_prices_df, how = 'left' , on = 'product_code')
 
+  last_df.rename(columns = {'category.name':'category_name'}, inplace = True) 
   last_df["crawl_date"] = date_today
-  #print(last_df.columns)
-
   last_df = last_df.drop_duplicates()  
+  #print(last_df.columns)
+  #last_df.to_csv("test_us_scraped.csv")
+  
+  # Updating gsheet
+  print_exclaim("Updating spreadsheet with latest data")
+  last_df = last_df.applymap(str)
+  response = upload_df_to_gsheet_US(last_df)
+  #print_check(response)
+  print_check("US Spreadsheet update complete")
+
   # Working on sqlite database  
   print_exclaim("Updating local database with new data")
   conn = sqlite3.connect(database_filename)
   output = last_df.applymap(str)
   output.to_sql(name='data_output', con=conn, if_exists = 'append')
   conn.commit()
-
   # Run a check
   new_df2 = pd.read_sql_query('SELECT * FROM data_output',conn)
   conn.close()
   print_check("Local database updated")
-
   # Check for duplicate rows
   if new_df2[new_df2.duplicated()].empty != True:
     print_exclaim("Duplicate rows identified in dataframe.")
@@ -476,11 +489,7 @@ def market_price_scraper_v02_US():
   upload_pricsync_US(database_filename)
   print_check("US Database updated in gdrive")
 
-  # Updating gsheet
-  print_exclaim("Updating spreadsheet with latest data")
-  response = upload_df_to_gsheet_US(output)
-  #print_check(response)
-  print_check("US Spreadsheet update complete")
+  
 
 
 
