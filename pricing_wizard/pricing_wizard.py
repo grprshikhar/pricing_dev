@@ -21,6 +21,7 @@ from modules.market_price_scraper_v02_US import market_price_scraper_v02_US
 from modules.market_price_scraper_v02_EU import market_price_scraper_BO
 # running price review clustering
 from modules.price_reviewer import price_reviewer
+from modules.msh_upload_formatter import msh_process_dataframes
 
 
 # ------------------------------------------------------------------------ #
@@ -174,9 +175,14 @@ if __name__ == "__main__":
 		if run_opts.stage == 6:
 			market_price_scraper_v02_EU()
 			market_price_scraper_v02_US()
+
 		# 7 : Update Competition Prices for BO MKT Price
 		if run_opts.stage == 7:
 			market_price_scraper_BO()
+
+		# 8 : Run MSH sheet file processor function
+		if run_opts.stage == 8:
+			msh_process_dataframes()
 
 
 
