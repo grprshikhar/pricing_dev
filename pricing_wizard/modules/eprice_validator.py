@@ -50,6 +50,8 @@ class eprice_validator(object):
 	def get_EU_legislation_data(self):
 		self.df_dsd   = gsheet.get_dataframe("1C6GKgcEO7HKn_Zfv3XmMd1tMoC_RGJQFfgkFQOoWVSA","A:C","Days since discount")
 		self.df_30day = gsheet.get_dataframe("1XLpVyvbidRFt_Y0wm1gqL-DGqZBTObRdv84eDFhGEzw","A:N","30 day low price")
+		self.df_median_high_price_30day = gsheet.get_dataframe("1oAqwyHo2I6A-dWaAe4ycHP735Uo68kLLceOzPlZgQ2Q","A:G","Sheet 1")
+
 
 	# Assign dataframe
 	def set_data(self, df):
@@ -122,7 +124,7 @@ class eprice_validator(object):
 
 	def post_sanity_checks(self):
 		print_exclaim("Checking against current EU rule interpretation")
-		check_EU_rules(self.df_td, self.df_dsd, self.df_30day)
+		check_EU_rules(self.df_td, self.df_dsd, self.df_30day, self.df_median_high_price_30day)
 		print_check("EU rule interpretation passed")			
 
 	def summarise(self):
