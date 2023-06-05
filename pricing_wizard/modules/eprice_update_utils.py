@@ -49,7 +49,6 @@ def check_discount_anchor(df_main, df_ref):
 		print_warning("\n".join(any_warnings))
 
 
-import numpy as np
 
 def check_EU_rules(df, df_dsd, df_30day, df_median_high_price_30day):
     # Propagating old prices from export sheet (or they are nan from new pricing)
@@ -103,11 +102,13 @@ def check_EU_rules(df, df_dsd, df_30day, df_median_high_price_30day):
                 continue
 
             # NEW CHECK: Check if the current plan high price is greater than the median high price
-            col_median_high_price_30day = f"m{rp}_median_high_price"
+            col_median_high_price_30day = f"median_m{rp}_high_price" 
             try:
                 median_high_price_30day = float(
                     df_median_high_price_30day.loc[
-                        (df_median_high_price_30day["product_sku"] == sku), col_median_high_price_30day
+                        (df_median_high_price_30day["product_sku"] == sku) &
+                        (df_median_high_price_30day["store_parent"] == market),
+                        col_median_high_price_30day
                     ].values[0]
                 )
                 if active_high_price > median_high_price_30day:
