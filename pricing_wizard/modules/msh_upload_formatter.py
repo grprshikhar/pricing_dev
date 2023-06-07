@@ -20,21 +20,19 @@ def msh_process_dataframes():
       return df1[mask]
 
 
-  # Function to export chunks of the DataFrame as separate xlsx files
+  # Function to export chunks of the DataFrame as separate xls files
   def export_chunks(df, folder_name, chunk_size=24):
       num_chunks = (len(df) - 1) // chunk_size + 1
       
-      # Create a folder to store the xlsx files
+      # Create a folder to store the xls files
       if not os.path.exists(folder_name):
           os.makedirs(folder_name)
       
       for i in range(num_chunks):
           chunk = df.iloc[i * chunk_size: (i + 1) * chunk_size]
-          filename = os.path.join(folder_name, f'chunk_{i+1}.xlsx')
-          chunk.to_excel(filename, index=False)
+          filename = os.path.join(folder_name, f'chunk_{i+1}.xls')
+          chunk.to_excel(filename, index=False, engine='xlsxwriter')
           print(f'Exported {filename}')
-
-
 
   print_exclaim("Downloading Data From Google Sheets")
 
@@ -56,10 +54,3 @@ def msh_process_dataframes():
   filtered_saturn_df = remove_rows_with_same_sku(export_saturn_offline, empty_saturn)
   export_chunks(empty_saturn, 'exported_empty_saturn_chunks')
   export_chunks(filtered_saturn_df, 'exported_saturn_chunks_filtered')
-
-
-
-
-
-
-
