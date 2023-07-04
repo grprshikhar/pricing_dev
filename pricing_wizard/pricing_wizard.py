@@ -127,6 +127,16 @@ def suppress_pandas_xlwt_warning():
 	import pandas
 	pandas.options.io.excel.xls.writer = 'xlwt'
 
+def run_partner_uploads(run_opts):
+    run_opts.is_partner_upload = True
+    run_opts.validate_user() 
+    #print("user validated")
+    data_processor = msh_process_dataframes(run_opts)
+    #print("msh process df ")
+    data_processor.process_data()
+    #print("process data ")
+
+
 # ------------------------------------------------------------------------ #
 # Main program - control program flow
 # ------------------------------------------------------------------------ #
@@ -182,7 +192,7 @@ if __name__ == "__main__":
 
 		# 8 : Run MSH sheet file processor function
 		if run_opts.stage == 8:
-			msh_process_dataframes()
+			run_partner_uploads(run_opts)
 
 
 
