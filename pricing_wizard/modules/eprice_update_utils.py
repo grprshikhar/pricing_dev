@@ -53,6 +53,7 @@ def check_discount_anchor(df_main, df_ref):
 def check_EU_rules(df, df_dsd, df_30day, df_median_high_price_30day):
     # Propagating old prices from export sheet (or they are nan from new pricing)
     any_warnings = []
+    any_errors = []
     df_copy = df.copy(deep=True)
     market_sku = df_copy[["store code", "sku"]].values
     rp_plans = [1, 3, 6, 12, 18, 24]
@@ -112,7 +113,7 @@ def check_EU_rules(df, df_dsd, df_30day, df_median_high_price_30day):
                     ].values[0]
                 )
                 if active_high_price > median_high_price_30day:
-                    any_warnings.append(
+                    any_errors.append(
                         f"{market} {sku} {rp:2}M rental plan : High price violates EU law : [{active_high_price} vs median {median_high_price_30day}]"
                     )
             except:
@@ -145,12 +146,15 @@ def check_EU_rules(df, df_dsd, df_30day, df_median_high_price_30day):
                     if is_high_price_lower_than_30day_low:
                         continue
                     else:
-                        any_warnings.append(
-                            f"{market} {sku} {rp:2}M rental plan : High price for discount not using the lowest 30-day price : [{active_high_price} vs {low_30day}]"
-                        )
+                        pass
+                        #any_warnings.append(
+                        #    f"{market} {sku} {rp:2}M rental plan : High price for discount not using the lowest 30-day price : [{active_high_price} vs {low_30day}]"
+                        #)
                 except:
                     #any_warnings.append(f"{market} {sku} {rp:2}M rental plan : Lowest 30-day value is missing.")
                     pass
     # Done with checks - report back
     if any_warnings:
         print_warning("\n".join(any_warnings))
+    if any_errors:
+        raise ValueError("\n".join(any_errors))
