@@ -3,6 +3,7 @@ import modules.gsheet as gsheet
 import pandas as pd
 import sys
 from modules.print_utils import print_warning
+from modules.warning_tracker import warning_tracker, warning_object
 
 class catman_utils(object):
 	def __init__(self, is_partner = False):
@@ -112,7 +113,7 @@ class catman_utils(object):
 		for subplan in [1,3,6,12,18,24]:
 			df_subplanwise = df_plans_out.filter(regex=str(subplan)+"$")
 			df_subplanwise = df_subplanwise.applymap(str)
-			to_allot = df_subplanwise[('plan'+str(subplan))].str.split(',', 1, expand=True)
+			to_allot = df_subplanwise[('plan'+str(subplan))].str.split(',', n=1, expand=True)
 			if issubclass(type(to_allot), pd.core.frame.DataFrame) and to_allot.shape[1]!=1:
 				df_subplanwise['active_plan'+str(subplan)], df_subplanwise['high_plan'+str(subplan)] = pd.to_numeric(to_allot[0],errors='coerce'),pd.to_numeric(to_allot[1],errors='coerce')
 			else :
@@ -155,6 +156,8 @@ class catman_utils(object):
 
 	# Function to handle warning for removing prices/skus
 	def price_removal_warning(self, skus):
+		# Singleton warning tracker
+		wt = warning_tracker()
 		# Empty list - Nothing to worry about
 		if len(skus) == 0:
 			return
@@ -162,6 +165,8 @@ class catman_utils(object):
 		message_list = []
 		for sku_store in skus:
 			message_list.append(f"Missing prices/price removal : {sku_store} for rental plan(s) {','.join(skus[sku_store])}")
+			for rp in skus[sku_store]:
+				wt.add_warning(warning_object('Price removal',sku_store[0],'',sku_store[1],rp,'Missing prices for rental plan'))
 		print_warning("\n".join(message_list))
 
 		

@@ -13,6 +13,7 @@ import modules.admin_panel as admin_panel
 from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
 from modules.eprice_update_utils import check_discount_anchor, check_EU_rules
 from modules.sqlite_logger import sqlite_logger
+from modules.warning_tracker import warning_tracker, warning_object
 
 
 class eprice_validator(object):
@@ -118,9 +119,6 @@ class eprice_validator(object):
 		sanity_checks.check_price_change_tag(self.df_td)
 		print_check("Price change tag checked")
 		print_exclaim("Passed sanity checks")
-		
-		
-
 
 	def post_sanity_checks(self):
 		print_exclaim("Checking against current EU rule interpretation")
@@ -128,6 +126,10 @@ class eprice_validator(object):
 		print_check("EU rule interpretation passed")			
 
 	def summarise(self):
+		# Print out all warnings
+		wt = warning_tracker()
+		wt.build()
+		wt.print()
 		# Breakdown the output for review
 		# - Summary of category/plans
 		answer_yes = self.run_opts.yn_question("View upload data summary :")
