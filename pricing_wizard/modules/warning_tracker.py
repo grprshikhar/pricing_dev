@@ -26,6 +26,13 @@ class warning_tracker(object):
 	def build(self):
 		import pandas
 		self.data = pandas.concat(self.warnings, ignore_index=True)
+		self.data = self.data.groupby(['Warning','Info','SKU','Name']).agg({'Rental Plan':lambda x: set(x),
+																			'Store':lambda x: set(x)}).reset_index()
+		self.data = self.data.sort_values(['SKU','Warning'])
+		from modules.sku_data import sku_data
+		skus = sku_data()
+		self.data['Name'] = self.data['SKU'].apply(lambda x : skus.get_name(x))
+
 
 	def print(self):
 		if self.data.empty:

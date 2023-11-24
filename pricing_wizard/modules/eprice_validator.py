@@ -10,10 +10,9 @@ import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
 import modules.admin_panel as admin_panel
-from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
+from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe, print_all_warnings
 from modules.eprice_update_utils import check_discount_anchor, check_EU_rules
 from modules.sqlite_logger import sqlite_logger
-from modules.warning_tracker import warning_tracker, warning_object
 
 
 class eprice_validator(object):
@@ -127,9 +126,7 @@ class eprice_validator(object):
 
 	def summarise(self):
 		# Print out all warnings
-		wt = warning_tracker()
-		wt.build()
-		wt.print()
+		print_all_warnings()
 		# Breakdown the output for review
 		# - Summary of category/plans
 		answer_yes = self.run_opts.yn_question("View upload data summary :")

@@ -118,7 +118,7 @@ def check_rrp_perc(df_td,plan_limit_dict):
     # Singleton warning tracker
     wt = warning_tracker()
     # Print out the options being used
-    print_exclaim("Price % guidelines being checked \n")
+    print_exclaim("Price % guidelines being checked")
     # Convert dict to 100* value for better comprehension when printed out
     plan_limit_dict_print = {k: [100*x for x in v] for k, v in plan_limit_dict.items()}
     # print(colored(tabulate(plan_limit_dict_print,
@@ -135,7 +135,6 @@ def check_rrp_perc(df_td,plan_limit_dict):
             sku = df_td.loc[(df_td[act_pp]<=low_limit),['store code','sku',act_pp]]
             any_warnings.append( str(k)+"M Plan Price is too cheap for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
             for x in sku.values:
-                print (x,k)
                 wt.add_warning(warning_object('RRP %',x[1],'',x[0],k,f'Price is too cheap (< {low_limit})'))
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
