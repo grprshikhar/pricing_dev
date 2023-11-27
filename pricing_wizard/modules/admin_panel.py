@@ -20,10 +20,10 @@ class admin_panel(object):
 		# Different locations for production and staging sites
 		if self.to_production:
 			self.authorisation_url = "https://api.getgrover.com/api/v1/oauth/token"
-			self.graphql_url       = "https://graphql.grover.com/graphql"
+			self.graphql_url       = "https://supergraph.grover.com/graphql"
 		else:
 			self.authorisation_url = "https://apiqa.getgrover.com/api/v1/oauth/token"
-			self.graphql_url       = "https://graphql-staging.grover.com/graphql"
+			self.graphql_url       = "https://supergraph-staging.grover.com/graphql"
 		print_check(f"Configured Admin Panel tool for {'Production' if self.to_production else 'Staging'} site")
 		# print_check(f"Authorisation URL : {self.authorisation_url}")
 		# print_check(f"GraphQL URL       : {self.graphql_url}")
