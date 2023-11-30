@@ -295,7 +295,7 @@ class new_price_validator(object):
 				df_eprice[eprice_col] = self.df_skus[gm_col]
 
 		# Now set "newness"
-		df_eprice["new"] = "new"
+		df_eprice["new"] = "NEW"
 		df_eprice = df_eprice.fillna('')
 		return df_eprice
 
