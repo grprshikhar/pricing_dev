@@ -10,7 +10,7 @@ import modules.catman_utils as catman_utils
 import modules.sanity_checks as sanity_checks
 import modules.redshift_manager as redshift_manager
 import modules.admin_panel as admin_panel
-from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe
+from modules.print_utils import print_check, print_exclaim, print_green, tabulate_dataframe, print_all_warnings
 from modules.eprice_update_utils import check_discount_anchor, check_EU_rules
 from modules.sqlite_logger import sqlite_logger
 
@@ -118,9 +118,6 @@ class eprice_validator(object):
 		sanity_checks.check_price_change_tag(self.df_td)
 		print_check("Price change tag checked")
 		print_exclaim("Passed sanity checks")
-		
-		
-
 
 	def post_sanity_checks(self):
 		print_exclaim("Checking against current EU rule interpretation")
@@ -128,6 +125,8 @@ class eprice_validator(object):
 		print_check("EU rule interpretation passed")			
 
 	def summarise(self):
+		# Print out all warnings
+		print_all_warnings()
 		# Breakdown the output for review
 		# - Summary of category/plans
 		answer_yes = self.run_opts.yn_question("View upload data summary :")
@@ -203,9 +202,9 @@ class eprice_validator(object):
 		# Ask for an optional additional descriptor to the filename
 		description   = self.run_opts.text_question(f"Add optional descriptor to output filename [{out_filename}_<...>.xls] :")
 		if description != "":
-			out_filename += "_"+description+".xls"
+			out_filename += "_"+description+".xlsx"
 		else:
-			out_filename += ".xls"
+			out_filename += ".xlsx"
 		print_exclaim(f"Output file will be named [{out_filename}]")
 		# Now save the file locally
 		# NOTE - If we need xls output, we use xlwt package which is deprecated
@@ -232,41 +231,52 @@ class eprice_validator(object):
 		# Generate standardized Admin Panel naming
 		adminPanelName  = self.template_filename
 
-		# Configure scheduled upload time - 5 minutes - Note we put into isoformat with milliseconds and add "Z" zone
-		# print_exclaim(f"Scheduling upload for 1 minutes time")
-		# Ask if we want a specific time
-		answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
-		if not answer_yes:
-			print_green(f"Provide time for upload in Berlin timezone")
-			# Add a regex check for format
-			pattern = re.compile(r'\d\d\-\d\d\-\d\d\:\d\d\.\d\d')
-			# Generate a retry loop until its correct
-			match = False
-			while not match:
-				# Get the user string
-				time_string = self.run_opts.text_question("Provide the specified Berlin date/time with format [YY-MM-dd:hh.mm] :")
-				# See if we found a full match (None type if no match found)
-				match = (pattern.fullmatch(time_string) != None)
+		# Create a loop for the final step
+		stay_looping = True
+		while stay_looping:
+			# Ask if we want a specific time
+			answer_yes = self.run_opts.yn_question("Do you wish to upload prices immediately :")
+			if not answer_yes:
+				print_green(f"Provide time for upload in Berlin timezone")
+				# Add a regex check for format
+				pattern = re.compile(r'\d\d\-\d\d\-\d\d\:\d\d\.\d\d')
+				# Generate a retry loop until its correct
+				match = False
+				while not match:
+					# Get the user string
+					time_string = self.run_opts.text_question("Provide the specified Berlin date/time with format [YY-MM-dd:hh.mm] :")
+					# See if we found a full match (None type if no match found)
+					match = (pattern.fullmatch(time_string) != None)
+	
+				# Now use the valid string but still catch error incase of problem
+				try:
+					# Create timezone object
+					scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M")
+					# Convert to Berlin locale timezone object
+					scheduledTime = pytz.timezone('Europe/Berlin').localize(scheduledTime,is_dst=None)
+					# Now convert to UTC
+					scheduledTime = scheduledTime.astimezone(pytz.utc)
+					# Now format it for upload (:-6 strips off last 5 characters which are +00.00 for UTC, ie timezone)
+					scheduledTime = scheduledTime.isoformat(timespec='milliseconds')[:-6]+"Z"
+					print_exclaim(f"Pricing Wizard will configure this upload for {scheduledTime}")
+					final_check = self.run_opts.text_question('If this is correct, please type ok :')
+					if final_check != 'ok':
+						print_green("Returning to previous step")
+					else:
+						stay_looping = False
+				except:
+					print_exclaim(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
+			else:
+				print_exclaim(f"Pricing Wizard will configure this upload immediately")
+				final_check = self.run_opts.text_question('If this is correct, please type ok :')
+				if final_check != 'ok':
+					print_green("Returning to previous step")
+					continue
+				else:
+					scheduledTime = "null"
+					stay_looping = False
 
-			# Now use the valid string but still catch error incase of problem
-			try:
-				# Create timezone object
-				scheduledTime = datetime.datetime.strptime(time_string,"%y-%m-%d:%H.%M")
-				# Convert to Berlin locale timezone object
-				scheduledTime = pytz.timezone('Europe/Berlin').localize(scheduledTime,is_dst=None)
-				# Now convert to UTC
-				scheduledTime = scheduledTime.astimezone(pytz.utc)
-				# Now format it for upload (:-6 strips off last 5 characters which are +00.00 for UTC, ie timezone)
-				scheduledTime = scheduledTime.isoformat(timespec='milliseconds')[:-6]+"Z"
-			except:
-				print_exclaim(f"Scheduled time was not provided in correct strftime format [%y-%m-%d:%H.%M vs {time_string}]")
-		else:
-			#time_now      = datetime.datetime.utcnow()
-			#time_now      = pytz.datetime.datetime.now(tz=pytz.timezone('Europe/Berlin')).replace(tzinfo=None)
-			#scheduledTime = (time_now + datetime.timedelta(minutes=2)).isoformat(timespec='milliseconds')+"Z"
-			#print(scheduledTime)
-			# Setting null means we tell AdminPanel to upload 'Now'
-			scheduledTime = "null"
+		return
 
 		# All information available so now we can proceed with passing to admin panel
 		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,

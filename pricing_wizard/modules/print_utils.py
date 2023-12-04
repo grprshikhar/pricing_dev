@@ -48,23 +48,48 @@ def print_yellow_bold(msg):
     logger.get_logger("pricing_wizard",to_file=True).warning( msg_fmt )
 
 def print_warning(msg):
-    # Import the option handler in a limited use case to avoid circular reference
-    from modules.options_handler import options_handler
-    # Import the sqlite_logger in a limited use case to avoid circular reference
-    from modules.sqlite_logger import sqlite_logger
-    print_yellow_bold("PricingWizard : Warning")
-    print_yellow_bold("-----------------------")
-    print_yellow(msg)
-    print_yellow_bold("-----------------------")
-    __run_opts = options_handler()
-    answer = __run_opts.yn_question("Acknowledge this warning and continue :")
-
     # sqlite logging for warnings
+    from modules.sqlite_logger import sqlite_logger
     s = sqlite_logger()
-    s.add_warnings("test",answer,msg)
+    s.add_warnings("test",'pass-through',msg)
+    return
 
+#    # We now skip using print_warning for actual printing
+#
+#    # Import the option handler in a limited use case to avoid circular reference
+#    from modules.options_handler import options_handler
+#    # Import the sqlite_logger in a limited use case to avoid circular reference
+#    
+#    print_yellow_bold("PricingWizard : Warning")
+#    print_yellow_bold("-----------------------")
+#    print_yellow(msg)
+#    print_yellow_bold("-----------------------")
+#    __run_opts = options_handler()
+#    answer = __run_opts.yn_question("Acknowledge this warning and continue :")
+#
+#    # Store the continue decision
+#    from modules.sqlite_logger import sqlite_logger
+#    s = sqlite_logger()
+#    s.add_warnings("summary",answer,'summary')
+#
+#    if not answer:
+#        print_green_bold("Please investigate this warning.")
+#        raise KeyboardInterrupt
+
+def print_all_warnings():
+    from modules.warning_tracker import warning_tracker
+    wt = warning_tracker()
+    wt.build()
+    print_yellow_bold("-------------------------------")
+    print_yellow_bold("PricingWizard : Warning Summary")
+    print_yellow_bold("-------------------------------")
+    print(colored(tabulate(wt.data, headers='keys', tablefmt='psql'),'yellow')+"\n") 
+    
+    from modules.options_handler import options_handler
+    __run_opts = options_handler()
+    answer = __run_opts.yn_question("Do you acknowledge these warnings and wish to continue :")
     if not answer:
-        print_green_bold("Please investigate this warning.")
+        print_green_bold("Please investigate these warnings.")
         raise KeyboardInterrupt
 
 def tabulate_dataframe(df):

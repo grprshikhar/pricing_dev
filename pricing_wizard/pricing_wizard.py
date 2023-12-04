@@ -125,7 +125,10 @@ def suppress_pandas_xlwt_warning():
 	import warnings
 	warnings.simplefilter(action='ignore', category=FutureWarning)
 	import pandas
-	pandas.options.io.excel.xls.writer = 'xlwt'
+	try:
+		pandas.options.io.excel.xls.writer = 'xlwt'
+	except:
+		pass
 
 def run_partner_uploads(run_opts):
     run_opts.is_partner_upload = True

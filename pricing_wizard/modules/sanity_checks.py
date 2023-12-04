@@ -1,6 +1,8 @@
 from tabulate import tabulate
 from termcolor import colored,cprint
 from modules.print_utils import print_exclaim, print_warning, print_check
+from modules.warning_tracker import warning_tracker, warning_object
+
 try:
     import sys
     import colorama
@@ -113,8 +115,10 @@ plan_limit_dict = {
 '''
 
 def check_rrp_perc(df_td,plan_limit_dict):
+    # Singleton warning tracker
+    wt = warning_tracker()
     # Print out the options being used
-    print_exclaim("Price % guidelines being checked \n")
+    print_exclaim("Price % guidelines being checked")
     # Convert dict to 100* value for better comprehension when printed out
     plan_limit_dict_print = {k: [100*x for x in v] for k, v in plan_limit_dict.items()}
     # print(colored(tabulate(plan_limit_dict_print,
@@ -130,16 +134,21 @@ def check_rrp_perc(df_td,plan_limit_dict):
         if df_td.loc[(df_td[act_pp]<=low_limit)].empty!=True:
             sku = df_td.loc[(df_td[act_pp]<=low_limit),['store code','sku',act_pp]]
             any_warnings.append( str(k)+"M Plan Price is too cheap for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
+            for x in sku.values:
+                wt.add_warning(warning_object('RRP %',x[1],'',x[0],k,f'Price is too cheap (< {low_limit})'))
         
         if df_td.loc[(df_td[act_pp]>=high_limit)].empty!=True:
             sku = df_td.loc[(df_td[act_pp]>=high_limit),['store code','sku',act_pp]]
             any_warnings.append( str(k)+"M Plan Price is too expensive for SKUs \n"+ "\n".join([str(x) for x in sku.values]) )
+            for x in sku.values:
+                wt.add_warning(warning_object('RRP %',x[1],'',x[0],k,f'Price is too expensive (> {high_limit})'))
 
     # Track all cases of RRP issues to better inform the user
     if any_warnings:
         print_warning("\n".join(any_warnings))
 
 def last_digit_9 (df_td):
+    wt = warning_tracker()
     # Error tracker
     any_warnings = []
     for plan in [1,3,6,12,18,24]:
@@ -147,37 +156,46 @@ def last_digit_9 (df_td):
         if df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9)].empty!=True:
             sku = df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9),'sku'].drop_duplicates()
             any_warnings.append( str(plan)+"M Plan has non Charm prices for SKUs : "+str(sku.values) )
+            for x in sku.values:
+                wt.add_warning(warning_object('Charm prices',x,'',None,plan,'Missing charm pricing ending in XX.9'))
 
     # Track all cases of charm pricing not used to better inform the user
     if any_warnings:
         print_warning("\n".join(any_warnings))
 
 def check_minimum(df_td, minval):
+    wt = warning_tracker()
     any_warnings = []
     for plan in [1,3,6,12,18,24]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]<minval)].empty != True:
            sku = df_td.loc[(df_td[pc]<minval), 'sku'].drop_duplicates()
            any_warnings.append( str(plan) + f"M Plan has low price (below {minval}€ or {minval}$) : " + str(sku.values) )
+           for x in sku.values:
+                wt.add_warning(warning_object('Minimum price',x,'',None,plan,f'Low price is below minimum value (< {minval})'))
     if any_warnings:
         print_warning("\n".join(any_warnings))
 
 # Check the price change tag is provided
 def check_price_change_tag(df):
+    wt = warning_tracker()
     any_warnings = []
     if df.loc[(df['price change tag'] == "")].empty != True:
         sku = df.loc[(df['price change tag'] == ""), 'sku'].drop_duplicates()
         for s in sku:
             any_warnings.append(f"{s} : No price change tag provided")
+            wt.add_warning(warning_object('Price change tag',s,'',None,None,'Missing price change tag'))
     if any_warnings:
         print_warning("\n".join(any_warnings))
 
 def check_margin_columns(df):
+    wt = warning_tracker()
     any_warnings = []
     required_cols = ['m1_margin', 'm3_margin', 'm6_margin', 'm12_margin', 'm18_margin', 'm24_margin', 'combined_margin']
     for col in required_cols:
         if col not in df.columns:
             any_warnings.append(f"{col} : Margin Columns are missing please add Margin columns (MATRIX sheet CQ -> CW) to the export tab ")
+            wt.add_warning(warning_object('Margin columns',None,'',None,None,f'Missing margin column ({col})'))
     if any_warnings:
         print_warning("\n".join(any_warnings))
         return False
