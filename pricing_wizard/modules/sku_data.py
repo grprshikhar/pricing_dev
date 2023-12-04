@@ -26,7 +26,10 @@ class sku_data(object):
 		self.df = self.df.set_index('product_sku')
 
 	def get_name(self, sku):
-		name = self.df.loc[sku,'product_name']
-		name = name[:50]
+		try:
+			name = self.df.loc[sku,'product_name']
+			name = name[:50]
+		except:
+			name = 'Not found'
 		return name
 
