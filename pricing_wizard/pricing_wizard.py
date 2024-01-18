@@ -187,7 +187,7 @@ if __name__ == "__main__":
 		# 6 : Update Competition Pricing Sheet
 		if run_opts.stage == 6:
 			market_price_scraper_v02_EU()
-			market_price_scraper_v02_US()
+			#market_price_scraper_v02_US()
 
 		# 7 : Update Competition Prices for BO MKT Price
 		if run_opts.stage == 7:
