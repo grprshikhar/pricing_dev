@@ -52,7 +52,6 @@ class eprice_validator(object):
 		self.df_30day = gsheet.get_dataframe("1XLpVyvbidRFt_Y0wm1gqL-DGqZBTObRdv84eDFhGEzw","A:N","30 day low price")
 		self.df_median_high_price_30day = gsheet.get_dataframe("1oAqwyHo2I6A-dWaAe4ycHP735Uo68kLLceOzPlZgQ2Q","A:N","Sheet 1")
 
-
 	# Assign dataframe
 	def set_data(self, df):
 		# Set data, then do the rest
@@ -120,13 +119,19 @@ class eprice_validator(object):
 		print_exclaim("Passed sanity checks")
 
 	def post_sanity_checks(self):
+		# EU pricing
 		print_exclaim("Checking against current EU rule interpretation")
 		check_EU_rules(self.df_td, self.df_dsd, self.df_30day, self.df_median_high_price_30day)
-		print_check("EU rule interpretation passed")			
+		print_check("EU rule interpretation passed")
+
 
 	def summarise(self):
 		# Print out all warnings
 		print_all_warnings()
+		# Perform the campaign check after reviewing the other warnings
+		from modules.marketing_check import marketing_check
+		mc = marketing_check()
+		self.df_td = mc.perform_check(self.df_td)
 		# Breakdown the output for review
 		# - Summary of category/plans
 		answer_yes = self.run_opts.yn_question("View upload data summary :")
