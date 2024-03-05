@@ -25,6 +25,10 @@ class warning_tracker(object):
 
 	def build(self):
 		import pandas
+		# Error handle, if there are no warnings, nothing to do
+		if not self.warnings:
+			return
+
 		self.data = pandas.concat(self.warnings, ignore_index=True)
 		self.data = self.data.groupby(['Warning','SKU','Name','Info']).agg({'Rental Plan':lambda x: ','.join(sorted([str(a) for a in set(x)])),
 																			'Store':lambda x: ','.join(sorted([str(a) for a in set(x)]))}).reset_index()

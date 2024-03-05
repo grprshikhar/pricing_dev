@@ -5,6 +5,7 @@ from tabulate import tabulate
 from googleapiclient.errors import HttpError
 from redshift_connector.error import InterfaceError, ProgrammingError
 import modules.logger as logger
+import os
 
 # Print utility
 def print_check(msg):
@@ -80,6 +81,10 @@ def print_all_warnings():
     from modules.warning_tracker import warning_tracker
     wt = warning_tracker()
     wt.build()
+    # If there are no warnings, no need to print
+    if wt.data.empty:
+        return
+    # Otherwise, print and request approval
     print_yellow_bold("-------------------------------")
     print_yellow_bold("PricingWizard : Warning Summary")
     print_yellow_bold("-------------------------------")
@@ -103,6 +108,14 @@ def print_exclaim_sameline(msg):
 
 def exception_hook(exctype, value, tb):
     print("")
+    try:
+        if os.environ['PW_DEBUG'] == 'TRUE':
+            print_red (exctype)
+            print_red (value)
+            for e in traceback.format_tb(tb):
+                print_red (e)
+    except:
+        pass
     if exctype == KeyboardInterrupt:
         print_green_bold(f"PricingWizard : Ending session! {value}\n")
         sys.exit(0)
