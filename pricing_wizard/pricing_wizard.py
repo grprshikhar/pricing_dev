@@ -22,6 +22,8 @@ from modules.market_price_scraper_v02_EU import market_price_scraper_BO
 # running price review clustering
 from modules.price_reviewer import price_reviewer
 from modules.msh_upload_formatter import msh_process_dataframes
+# pricing engine
+from modules.pricing_engine import pricing_engine
 
 
 # ------------------------------------------------------------------------ #
@@ -139,6 +141,22 @@ def run_partner_uploads(run_opts):
     data_processor.process_data()
     #print("process data ")
 
+def run_pricing_engine(run_opts):
+	# B2C/B2B upload function
+	run_opts.is_partner_upload = False
+	# Validate the user information
+	run_opts.validate_user() 
+	# Local file	
+	engine = pricing_engine('price_pivot.csv')
+	engine.generate_eprice_dataframe()
+	ep_validator = eprice_validator(run_opts=run_opts, dataframe=engine.df)
+	# Run post-sanity checks
+	ep_validator.post_sanity_checks()
+	# Display the output
+	ep_validator.summarise()
+	# Upload output to google drive and admin panel
+	ep_validator.upload()
+
 
 # ------------------------------------------------------------------------ #
 # Main program - control program flow
@@ -196,6 +214,10 @@ if __name__ == "__main__":
 		# 8 : Run MSH sheet file processor function
 		if run_opts.stage == 8:
 			run_partner_uploads(run_opts)
+
+		# 9 : Pricing Engine
+		if run_opts.stage == 9:
+			run_pricing_engine(run_opts)
 
 
 

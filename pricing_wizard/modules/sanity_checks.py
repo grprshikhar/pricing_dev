@@ -69,6 +69,8 @@ def check_discounts(df_td):
 
         
 def check_plan_hierarchy(df_td):
+    # Build up errors
+    error_list = []
     # Longer plan active values can't be more expensive than shorter
     list_plans = [1,3,6,12,18,24]
     i=0
@@ -82,7 +84,8 @@ def check_plan_hierarchy(df_td):
         
         if df_td.loc[(df_td[agnst]!='') & (df_td[pc]!='') & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
             sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            raise ValueError(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+            #raise ValueError(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+            error_list.append(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
 
 
     # Longer plan high values can't be more expensive than shorter
@@ -97,7 +100,12 @@ def check_plan_hierarchy(df_td):
         
         if df_td.loc[(df_td[agnst].str.contains(',')) & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
             sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            raise ValueError(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+            #raise ValueError(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+            error_list.append(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+
+    # Raise error if exist
+    if error_list:
+        raise ValueError("\n".join(error_list))
             
 
 ### Setting plan wise Hard boundaries in %RRP
