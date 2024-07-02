@@ -32,7 +32,8 @@ class warning_tracker(object):
 		self.data = pandas.concat(self.warnings, ignore_index=True)
 		self.data = self.data.groupby(['Warning','SKU','Name','Info']).agg({'Rental Plan':lambda x: ','.join(sorted([str(a) for a in set(x)])),
 																			'Store':lambda x: ','.join(sorted([str(a) for a in set(x)]))}).reset_index()
-		self.data = self.data.sort_values(['SKU','Warning'])
+		# Reorder this
+		self.data = self.data.sort_values(['Warning','SKU'])
 		self.data = self.data.reset_index(drop=True)
 		from modules.sku_data import sku_data
 		skus = sku_data()

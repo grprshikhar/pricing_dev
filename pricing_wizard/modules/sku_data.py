@@ -12,8 +12,9 @@ class sku_data(object):
 		if not self._initialised:
 			import pandas
 			import modules.gsheet as gsheet
-			self.sheet_id      = '1ooNFnyAMhc-udmDateahGvuQ4njo0O2Fb1p_bx29Knw'
-			self.data_range    = 'Product Data!C:G'
+			# Switch from product sheet to the central product info sheet
+			self.sheet_id      = '1HbL--6GmFC-Kupwpaw3XcSFC7xQO1MRRgixG7OqF8Ew'
+			self.data_range    = 'Product Data!A:E'
 			self.df            = gsheet.get_dataframe(self.sheet_id, self.data_range, "SKU product data")
 			self.config()
 			self._initialised = True
