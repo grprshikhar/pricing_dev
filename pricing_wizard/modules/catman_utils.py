@@ -195,6 +195,7 @@ class catman_utils(object):
 			act_price_col = 'active_plan'+str(subplan)
 			regex = str(subplan)+r',|'+str(subplan)+r'\)'
 			sku_list = df_td.loc[(df_td[act_price_col].isnull()) & (df_td['duration_plan'].str.contains(regex)),['sku','store code']]
+			
 			if len(sku_list)>0:
 				for sku_code in sku_list.values.tolist():
 					key = tuple(sku_code)

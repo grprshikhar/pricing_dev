@@ -69,6 +69,8 @@ def check_discounts(df_td):
 
         
 def check_plan_hierarchy(df_td):
+    # Warnings
+    wt = warning_tracker()
     # Build up errors
     error_list = []
     # Longer plan active values can't be more expensive than shorter
@@ -82,10 +84,15 @@ def check_plan_hierarchy(df_td):
         pc_act = "active_plan"+str(plan)
         agnst_act = "active_plan"+str(ag)   
         
-        if df_td.loc[(df_td[agnst]!='') & (df_td[pc]!='') & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
-            sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            #raise ValueError(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+        if df_td.loc[(df_td[agnst]!='') & (df_td[pc]!='') & (df_td[agnst_act]<df_td[pc_act])].empty!=True:
+            sku = df_td.loc[(df_td[agnst_act]<df_td[pc_act]),'sku']
             error_list.append(str(plan)+"M Plan Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+        
+        if df_td.loc[(df_td[agnst]!='') & (df_td[pc]!='') & (df_td[agnst_act]==df_td[pc_act])].empty!=True:
+            sku = df_td.loc[(df_td[agnst_act]==df_td[pc_act]),'sku']
+            for sku_v in sku.values:
+                wt.add_warning(warning_object("Equal plans",sku,'','All',str(plan),f"Equal to {ag} plan"))
+
 
 
     # Longer plan high values can't be more expensive than shorter
@@ -98,10 +105,14 @@ def check_plan_hierarchy(df_td):
         pc_act = "high_plan"+str(plan)
         agnst_act = "high_plan"+str(ag) 
         
-        if df_td.loc[(df_td[agnst].str.contains(',')) & (df_td[agnst_act]<=df_td[pc_act])].empty!=True:
-            sku = df_td.loc[(df_td[agnst_act]<=df_td[pc_act]),'sku']
-            #raise ValueError(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+        if df_td.loc[(df_td[agnst].str.contains(',')) & (df_td[agnst_act]<df_td[pc_act])].empty!=True:
+            sku = df_td.loc[(df_td[agnst_act]<df_td[pc_act]),'sku']
             error_list.append(str(plan)+"M Plan High Price is Expensive than "+str(ag)+"M for "+str(sku.values))
+
+        if df_td.loc[(df_td[agnst].str.contains(',')) & (df_td[agnst_act]==df_td[pc_act])].empty!=True:
+            sku = df_td.loc[(df_td[agnst_act]==df_td[pc_act]),'sku']
+            for sku_v in sku.values:
+                wt.add_warning(warning_object("Equal high plans",sku,'','All',str(plan),f"Equal to {ag} plan"))
 
     # Raise error if exist
     if error_list:
