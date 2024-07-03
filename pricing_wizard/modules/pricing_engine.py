@@ -2,16 +2,30 @@ import pandas
 import modules.gsheet as gsheet
 from modules.warning_tracker import warning_tracker, warning_object
 from modules.sku_data import sku_data
+from modules.print_utils import print_exclaim
 
 class pricing_engine(object):
-	def __init__(self, csv_filename):
+	def __init__(self, csv_filename, ab_filename=None):
 		self.csv_filename     = csv_filename
 		self.df               = None
 		self.df_stores        = None
 		self.engine_dataframe = pandas.read_csv(self.csv_filename)
+		self.ab_filename      = None
+		self.ab_dataframe     = None
+		self.ab_skus          = None
+		if ab_filename:
+			self.ab_filename = ab_filename
+			self.get_ab_filter()
 		self.get_store_codes()
 		self.get_rrp()
 	
+	def get_ab_filter(self):
+		# This function is only to be used when we are running ab test
+		print_exclaim("Configuring to run with AB test group only")
+		self.ab_dataframe = pandas.read_excel(self.ab_filename, 'AB group selection')
+		self.ab_skus      = self.ab_dataframe[self.ab_dataframe['Group']=='target']['Product SKU'].to_list()
+
+
 	def get_store_codes(self):
 		# We need to include the store information
 		sheet_id       = '153fzJOWK7HFnNil_LMd6sLz1kOFz4ZVBxy-etsCnIGA'
@@ -100,6 +114,27 @@ class pricing_engine(object):
 		self.df['bulky']               = 0
 		self.df = self.df.fillna('')
 
+		# We also need to drop out any entries where there are no prices at all 
+		# as this would indicate that we decativate the SKU which is not intended behaviour
+		rows_before_drop = self.df.shape[0]
+		print(self.df[['plan1','plan3','plan6','plan12','plan18','plan24']])
+		self.df = self.df.dropna(subset=['plan1','plan3','plan6','plan12','plan18','plan24'], how='all')
+		# Reset index as iloc used later
+		self.df = self.df.reset_index(drop=True)
+		rows_after_drop  = self.df.shape[0]
+		if rows_before_drop != rows_after_drop:
+			self.add_warning(['all'],f'Dropped {rows_before_drop - rows_after_drop} SKUs due to no prices being calculated')
+
+		# AB filtering
+		if self.ab_skus:
+			rows_before_filter = self.df.shape[0]
+			self.df = self.df[self.df['sku'].isin(self.ab_skus)]
+			# Reset index as iloc used later
+			self.df = self.df.reset_index(drop=True)
+			rows_after_filter  = self.df.shape[0]
+			self.add_warning(['AB'],f'Total SKUs reduced from {rows_before_filter} to {rows_after_filter} by selecting target group only')
+
+		print (self.df)
 
 	def add_warning(self, skus, info):
 		# Singleton warning tracker
