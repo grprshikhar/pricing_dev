@@ -117,8 +117,15 @@ class pricing_engine(object):
 		# We also need to drop out any entries where there are no prices at all 
 		# as this would indicate that we decativate the SKU which is not intended behaviour
 		rows_before_drop = self.df.shape[0]
-		print(self.df[['plan1','plan3','plan6','plan12','plan18','plan24']])
-		self.df = self.df.dropna(subset=['plan1','plan3','plan6','plan12','plan18','plan24'], how='all')
+		# As we use strings, need to check if they are all empty, and then invert to drop them
+		self.df = self.df[~(
+							(self.df['plan1'].eq('')) & 
+							(self.df['plan3'].eq('')) & 
+							(self.df['plan6'].eq('')) & 
+							(self.df['plan12'].eq('')) & 
+							(self.df['plan18'].eq('')) & 
+							(self.df['plan24'].eq(''))
+							)]
 		# Reset index as iloc used later
 		self.df = self.df.reset_index(drop=True)
 		rows_after_drop  = self.df.shape[0]
