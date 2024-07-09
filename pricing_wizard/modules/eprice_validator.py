@@ -23,6 +23,7 @@ class eprice_validator(object):
 		self.is_partner  = self.run_opts.is_partner_upload
 		self.redshift    = None
 		self.admin_panel = None
+		self.n_rows_per_file = 100
 		# Template file name when created
 		self.template_filename = ""
 		# Plan limit dictionary
@@ -213,15 +214,25 @@ class eprice_validator(object):
 		print_exclaim(f"Output file will be named [{out_filename}]")
 		# Now save the file locally
 		# NOTE - If we need xls output, we use xlwt package which is deprecated
-		with pandas.ExcelWriter(out_filename) as writer:
-			rental_plans.to_excel(writer, sheet_name="rental_plans",index=False)
-		print_check("File written locally")
-		# Store the local tempalte filename
-		self.template_filename = out_filename
-		# Now upload the file
-		gdrive.upload(out_filename)
+		self.template_filename = []
+		# Quick generator function
+		def chunker(seq, size):
+			return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+
+		for ifile, rental_plan_chunk in enumerate(chunker(rental_plans, self.n_rows_per_file)):
+			tmp_filename = out_filename.replace('.xls',f'_{ifile}.xls')
+			self.template_filename.append(tmp_filename)
+			with pandas.ExcelWriter(tmp_filename) as writer:
+				rental_plan_chunk.to_excel(writer, sheet_name="rental_plans",index=False)
+			print_check(f"File [{tmp_filename}] written locally")
+
+		# Loop over files and upload to google drive
+		for f in self.template_filename:
+			# Now upload the file
+			gdrive.upload(f)
+
 		# Should be done!
-		print_check("File uploaded to Google Drive")
+		print_check("File(s) uploaded to Google Drive")
 
 	def upload_template_to_adminpanel(self):
 		# Need the user to select Staging or Production version of site
@@ -234,7 +245,7 @@ class eprice_validator(object):
 			self.admin_panel.configure()
 			
 		# Generate standardized Admin Panel naming
-		adminPanelName  = self.template_filename
+		#adminPanelName  = self.template_filename
 
 		# Create a loop for the final step
 		stay_looping = True
@@ -282,9 +293,10 @@ class eprice_validator(object):
 					stay_looping = False
 
 		# All information available so now we can proceed with passing to admin panel
-		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
-								        adminPanelName  = adminPanelName,
-								        scheduledTime   = scheduledTime)
+		for adminPanelName in self.template_filename:
+			self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
+									        adminPanelName  = adminPanelName,
+									        scheduledTime   = scheduledTime)
 
 		# sqlite logging for price uploads
 		s = sqlite_logger()

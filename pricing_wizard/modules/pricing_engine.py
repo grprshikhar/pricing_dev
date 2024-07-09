@@ -141,6 +141,12 @@ class pricing_engine(object):
 			rows_after_filter  = self.df.shape[0]
 			self.add_warning(['AB'],f'Total SKUs reduced from {rows_before_filter} to {rows_after_filter} by selecting target group only')
 
+		# Special
+		#specials = ['GRB77P14155','GRB131P18408','GRB59P12342','GRB224P17849']
+
+		#self.df = self.df[self.df['sku'].isin(specials)]
+		#self.df = self.df.reset_index(drop=True)
+
 		print (self.df)
 
 	def add_warning(self, skus, info):
