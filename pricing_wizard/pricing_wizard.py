@@ -149,7 +149,7 @@ def run_pricing_engine(run_opts):
 	# Local file
 	answer = run_opts.yn_question('Apply AB Test filtering?')
 	if answer:
-		ab_filename = 'groups_selected_2024-06-26_variant_1.xlsx'
+		ab_filename = '20240711_AB_groups.xlsx'
 	else:
 		ab_filename = None
 	engine = pricing_engine('price_pivot.csv', ab_filename)
