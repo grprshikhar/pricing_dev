@@ -3,6 +3,7 @@ import modules.gsheet as gsheet
 from modules.warning_tracker import warning_tracker, warning_object
 from modules.sku_data import sku_data
 from modules.print_utils import print_exclaim
+from datetime import datetime
 
 class pricing_engine(object):
 	def __init__(self, csv_filename, ab_filename=None):
@@ -108,9 +109,11 @@ class pricing_engine(object):
 		self.df.loc[:,'rrp']  = self.df.loc[:,'rrp'].fillna(-1)
 
 		# Others
+		# Make a string which timestamps the run day
+		price_change_string = f'pricing engine {datetime.datetime.now().strftime('%y-%m-%d-%H%M')}'
 		self.df["new"] = ""
-		self.df['price change tag']    = 'pricing engine test'
-		self.df['price change reason'] = 'pricing engine test'
+		self.df['price change tag']    = price_change_string
+		self.df['price change reason'] = price_change_string
 		self.df['bulky']               = 0
 		self.df = self.df.fillna('')
 
