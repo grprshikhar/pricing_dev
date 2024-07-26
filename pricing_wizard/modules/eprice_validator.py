@@ -23,6 +23,7 @@ class eprice_validator(object):
 		self.is_partner  = self.run_opts.is_partner_upload
 		self.redshift    = None
 		self.admin_panel = None
+		self.n_rows_per_file = 100
 		# Template file name when created
 		self.template_filename = ""
 		# Plan limit dictionary
@@ -62,6 +63,7 @@ class eprice_validator(object):
 	def get_data(self):
 		# Pull data and get dataframe
 		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Repricing sheet")
+		self.block_ab_target()
 		self.checks()
 		
 	# Run consistent checks regardless of how dataframe is created
@@ -81,6 +83,22 @@ class eprice_validator(object):
 		self.df['bulky']       = self.df['bulky'].astype(int)
 		# Ensure type - float
 		self.df['rrp']         = self.df['rrp'].astype(float)
+
+	def block_ab_target(self):
+		# AB target group blocking
+		if self.run_opts.block_ab_target:
+			ab_filename  = gdrive.download_ab()
+			ab_dataframe = pandas.read_excel(ab_filename, 'AB group selection')
+			ab_skus      = ab_dataframe[ab_dataframe['Group']=='target']['Product SKU'].to_list()
+			skus_before  = self.df.shape[0]
+			removed_skus = self.df[self.df['sku'].isin(ab_skus)]['sku'].to_list()
+			self.df      = self.df[~self.df['sku'].isin(ab_skus)]
+			# Reset index as iloc used later
+			self.df = self.df.reset_index(drop=True)
+			skus_after  = self.df.shape[0]
+			print_exclaim(f'AB Target Group : Total SKUs reduced from {skus_before} to {skus_after} by removing target group SKUs')
+			for sku in removed_skus:
+				print_exclaim(f' - Removed : {sku}')
 
 	def sanity_check(self):
 		# Use catman utils and sanity check functions to ensure format is valid
@@ -123,7 +141,6 @@ class eprice_validator(object):
 		print_exclaim("Checking against current EU rule interpretation")
 		check_EU_rules(self.df_td, self.df_dsd, self.df_30day, self.df_median_high_price_30day)
 		print_check("EU rule interpretation passed")
-
 
 	def summarise(self):
 		# Print out all warnings
@@ -213,15 +230,25 @@ class eprice_validator(object):
 		print_exclaim(f"Output file will be named [{out_filename}]")
 		# Now save the file locally
 		# NOTE - If we need xls output, we use xlwt package which is deprecated
-		with pandas.ExcelWriter(out_filename) as writer:
-			rental_plans.to_excel(writer, sheet_name="rental_plans",index=False)
-		print_check("File written locally")
-		# Store the local tempalte filename
-		self.template_filename = out_filename
-		# Now upload the file
-		gdrive.upload(out_filename)
+		self.template_filename = []
+		# Quick generator function
+		def chunker(seq, size):
+			return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+
+		for ifile, rental_plan_chunk in enumerate(chunker(rental_plans, self.n_rows_per_file)):
+			tmp_filename = out_filename.replace('.xls',f'_{ifile}.xls')
+			self.template_filename.append(tmp_filename)
+			with pandas.ExcelWriter(tmp_filename) as writer:
+				rental_plan_chunk.to_excel(writer, sheet_name="rental_plans",index=False)
+			print_check(f"File [{tmp_filename}] written locally")
+
+		# Loop over files and upload to google drive
+		for f in self.template_filename:
+			# Now upload the file
+			gdrive.upload(f)
+
 		# Should be done!
-		print_check("File uploaded to Google Drive")
+		print_check("File(s) uploaded to Google Drive")
 
 	def upload_template_to_adminpanel(self):
 		# Need the user to select Staging or Production version of site
@@ -234,7 +261,7 @@ class eprice_validator(object):
 			self.admin_panel.configure()
 			
 		# Generate standardized Admin Panel naming
-		adminPanelName  = self.template_filename
+		#adminPanelName  = self.template_filename
 
 		# Create a loop for the final step
 		stay_looping = True
@@ -261,6 +288,7 @@ class eprice_validator(object):
 					scheduledTime = pytz.timezone('Europe/Berlin').localize(scheduledTime,is_dst=None)
 					# Now convert to UTC
 					scheduledTime = scheduledTime.astimezone(pytz.utc)
+					scheduledTimeDTFmt = scheduledTime
 					# Now format it for upload (:-6 strips off last 5 characters which are +00.00 for UTC, ie timezone)
 					scheduledTime = scheduledTime.isoformat(timespec='milliseconds')[:-6]+"Z"
 					print_exclaim(f"Pricing Wizard will configure this upload for {scheduledTime}")
@@ -279,17 +307,27 @@ class eprice_validator(object):
 					continue
 				else:
 					scheduledTime = "null"
+					scheduledTimeDTFmt = "null"
 					stay_looping = False
 
 		# All information available so now we can proceed with passing to admin panel
-		self.admin_panel.upload_pricing(pricingFileName = self.template_filename,
-								        adminPanelName  = adminPanelName,
-								        scheduledTime   = scheduledTime)
+		for icount,adminPanelName in enumerate(self.template_filename):
+			if scheduledTime == 'null':
+				self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
+										        adminPanelName  = adminPanelName,
+										        scheduledTime   = scheduledTime)
+			else:
+				# Offset each schedule to prevent overloading
+				dt = datetime.timedelta(seconds=icount*10)
+				scheduledTime = (scheduledTimeDTFmt+dt).isoformat(timespec='milliseconds')[:-6]+"Z"
+				self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
+										        adminPanelName  = adminPanelName,
+										        scheduledTime   = scheduledTime)
 
 		# sqlite logging for price uploads
 		s = sqlite_logger()
 		s.add_price_upload((datetime.datetime.utcnow() if scheduledTime == "null" else scheduledTime),
-						   self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
+					   		self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
 		
 		#checking if margin columns are there 
 		if sanity_checks.check_margin_columns(self.df):

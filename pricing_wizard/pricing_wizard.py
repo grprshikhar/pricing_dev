@@ -36,6 +36,10 @@ def validate_and_upload_eprice(run_opts):
 	run_opts.validate_user() 
 	# Verify the URL to be used
 	run_opts.select_eprice_sheet()
+	# Confirm if we are blocking ab target group
+	yn = run_opts.yn_question("Block AB Target group?")
+	if yn:
+		run_opts.block_ab_target = True
 	# Create eprice validator and runs checks
 	data_range = 'Export!A:AI'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
@@ -146,8 +150,13 @@ def run_pricing_engine(run_opts):
 	run_opts.is_partner_upload = False
 	# Validate the user information
 	run_opts.validate_user() 
-	# Local file	
-	engine = pricing_engine('price_pivot.csv')
+	# Local file
+	answer = run_opts.yn_question('Apply AB Test filtering?')
+	if answer:
+		ab_filename = '20240711_AB_groups.xlsx'
+	else:
+		ab_filename = None
+	engine = pricing_engine('price_pivot.csv', ab_filename)
 	engine.generate_eprice_dataframe()
 	ep_validator = eprice_validator(run_opts=run_opts, dataframe=engine.df)
 	# Run post-sanity checks
