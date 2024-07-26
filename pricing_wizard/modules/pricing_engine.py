@@ -3,7 +3,7 @@ import modules.gsheet as gsheet
 from modules.warning_tracker import warning_tracker, warning_object
 from modules.sku_data import sku_data
 from modules.print_utils import print_exclaim
-from datetime import datetime
+import datetime
 
 class pricing_engine(object):
 	def __init__(self, csv_filename, ab_filename=None):
@@ -110,7 +110,7 @@ class pricing_engine(object):
 
 		# Others
 		# Make a string which timestamps the run day
-		price_change_string = f'pricing engine {datetime.datetime.now().strftime('%y-%m-%d-%H%M')}'
+		price_change_string = f"pricing engine {datetime.datetime.now().strftime('%y-%m-%d-%H%M')}"
 		self.df["new"] = ""
 		self.df['price change tag']    = price_change_string
 		self.df['price change reason'] = price_change_string
@@ -144,11 +144,10 @@ class pricing_engine(object):
 			rows_after_filter  = self.df.shape[0]
 			self.add_warning(['AB'],f'Total SKUs reduced from {rows_before_filter} to {rows_after_filter} by selecting target group only')
 
-		# Special
-		#specials = ['GRB77P14155','GRB131P18408','GRB59P12342','GRB224P17849']
-
-		#self.df = self.df[self.df['sku'].isin(specials)]
-		#self.df = self.df.reset_index(drop=True)
+		# Special - If we need to focus on a specific SKU, uncomment and define in the list
+		# specials = ['GRB470P14904']
+		# self.df = self.df[self.df['sku'].isin(specials)]
+		# self.df = self.df.reset_index(drop=True)
 
 		print (self.df)
 

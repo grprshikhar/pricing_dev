@@ -272,6 +272,7 @@ class eprice_validator(object):
 					scheduledTime = pytz.timezone('Europe/Berlin').localize(scheduledTime,is_dst=None)
 					# Now convert to UTC
 					scheduledTime = scheduledTime.astimezone(pytz.utc)
+					scheduledTimeDTFmt = scheduledTime
 					# Now format it for upload (:-6 strips off last 5 characters which are +00.00 for UTC, ie timezone)
 					scheduledTime = scheduledTime.isoformat(timespec='milliseconds')[:-6]+"Z"
 					print_exclaim(f"Pricing Wizard will configure this upload for {scheduledTime}")
@@ -290,18 +291,27 @@ class eprice_validator(object):
 					continue
 				else:
 					scheduledTime = "null"
+					scheduledTimeDTFmt = "null"
 					stay_looping = False
 
 		# All information available so now we can proceed with passing to admin panel
-		for adminPanelName in self.template_filename:
-			self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
-									        adminPanelName  = adminPanelName,
-									        scheduledTime   = scheduledTime)
+		for icount,adminPanelName in enumerate(self.template_filename):
+			if scheduledTime == 'null':
+				self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
+										        adminPanelName  = adminPanelName,
+										        scheduledTime   = scheduledTime)
+			else:
+				# Offset each schedule to prevent overloading
+				dt = datetime.timedelta(seconds=icount*10)
+				scheduledTime = (scheduledTimeDTFmt+dt).isoformat(timespec='milliseconds')[:-6]+"Z"
+				self.admin_panel.upload_pricing(pricingFileName = adminPanelName,
+										        adminPanelName  = adminPanelName,
+										        scheduledTime   = scheduledTime)
 
 		# sqlite logging for price uploads
 		s = sqlite_logger()
 		s.add_price_upload((datetime.datetime.utcnow() if scheduledTime == "null" else scheduledTime),
-						   self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
+					   		self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']])
 		
 		#checking if margin columns are there 
 		if sanity_checks.check_margin_columns(self.df):
