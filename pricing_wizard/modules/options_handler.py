@@ -20,6 +20,7 @@ class options_handler(object):
 		self._theme             = None
 		self.sqlite_logger      = None
 		self.is_partner_upload  = False
+		self.block_ab_target    = False
 		# Call setup
 		self.setup()
 

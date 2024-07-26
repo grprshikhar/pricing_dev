@@ -63,6 +63,7 @@ class eprice_validator(object):
 	def get_data(self):
 		# Pull data and get dataframe
 		self.df = gsheet.get_dataframe(self.sheet_id, self.data_range, "Repricing sheet")
+		self.block_ab_target()
 		self.checks()
 		
 	# Run consistent checks regardless of how dataframe is created
@@ -82,6 +83,22 @@ class eprice_validator(object):
 		self.df['bulky']       = self.df['bulky'].astype(int)
 		# Ensure type - float
 		self.df['rrp']         = self.df['rrp'].astype(float)
+
+	def block_ab_target(self):
+		# AB target group blocking
+		if self.run_opts.block_ab_target:
+			ab_filename  = gdrive.download_ab()
+			ab_dataframe = pandas.read_excel(ab_filename, 'AB group selection')
+			ab_skus      = ab_dataframe[ab_dataframe['Group']=='target']['Product SKU'].to_list()
+			skus_before  = self.df.shape[0]
+			removed_skus = self.df[self.df['sku'].isin(ab_skus)]['sku'].to_list()
+			self.df      = self.df[~self.df['sku'].isin(ab_skus)]
+			# Reset index as iloc used later
+			self.df = self.df.reset_index(drop=True)
+			skus_after  = self.df.shape[0]
+			print_exclaim(f'AB Target Group : Total SKUs reduced from {skus_before} to {skus_after} by removing target group SKUs')
+			for sku in removed_skus:
+				print_exclaim(f' - Removed : {sku}')
 
 	def sanity_check(self):
 		# Use catman utils and sanity check functions to ensure format is valid
@@ -124,7 +141,6 @@ class eprice_validator(object):
 		print_exclaim("Checking against current EU rule interpretation")
 		check_EU_rules(self.df_td, self.df_dsd, self.df_30day, self.df_median_high_price_30day)
 		print_check("EU rule interpretation passed")
-
 
 	def summarise(self):
 		# Print out all warnings

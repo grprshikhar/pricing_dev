@@ -234,6 +234,16 @@ def upload_csv_to_sheet(folder_id, out_filename, upload_filename):
     media = MediaFileUpload(out_filename, mimetype = 'text/csv')
     file  = service.files().create(body=body, media_body=media).execute()
 
+def download_ab():
+    file_name = '20240711_AB_groups.xlsx'
+    file_id   = '12qax8c1Hu_BGRw_0FwmnTnfznuipyLWm'
+    file_bytes = download(file_id)
+    with open(file_name,'wb') as f:
+        f.write(file_bytes.getbuffer())
+        f.close()
+    print_check(f"Downloaded AB groups [{file_name}] from gdrive.") 
+    return file_name
+
 
 
 

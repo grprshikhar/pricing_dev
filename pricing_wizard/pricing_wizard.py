@@ -36,6 +36,10 @@ def validate_and_upload_eprice(run_opts):
 	run_opts.validate_user() 
 	# Verify the URL to be used
 	run_opts.select_eprice_sheet()
+	# Confirm if we are blocking ab target group
+	yn = run_opts.yn_question("Block AB Target group?")
+	if yn:
+		run_opts.block_ab_target = True
 	# Create eprice validator and runs checks
 	data_range = 'Export!A:AI'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
