@@ -151,12 +151,8 @@ def run_pricing_engine(run_opts):
 	# Validate the user information
 	run_opts.validate_user() 
 	# Local file
-	answer = run_opts.yn_question('Apply AB Test filtering?')
-	if answer:
-		ab_filename = '20240711_AB_groups.xlsx'
-	else:
-		ab_filename = None
-	engine = pricing_engine('price_pivot.csv', ab_filename)
+	ab_answer = run_opts.yn_question('Apply AB Test filtering?')
+	engine = pricing_engine('price_pivot.csv', ab_answer)
 	engine.generate_eprice_dataframe()
 	ep_validator = eprice_validator(run_opts=run_opts, dataframe=engine.df)
 	# Run post-sanity checks
