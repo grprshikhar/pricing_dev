@@ -7,7 +7,7 @@ from modules.print_utils import print_exclaim
 import datetime
 
 class pricing_engine(object):
-	def __init__(self, csv_filename, ab_filename=None):
+	def __init__(self, csv_filename, ab_filter=False):
 		self.csv_filename     = csv_filename
 		self.df               = None
 		self.df_stores        = None
@@ -15,8 +15,8 @@ class pricing_engine(object):
 		self.ab_filename      = None
 		self.ab_dataframe     = None
 		self.ab_skus          = None
-		if ab_filename:
-			self.ab_filename = ab_filename
+		self.ab_filter        = ab_filter
+		if self.ab_filter:
 			self.get_ab_filter()
 		self.get_store_codes()
 		self.get_rrp()
@@ -27,7 +27,6 @@ class pricing_engine(object):
 		self.ab_filename  = gdrive.download_ab()
 		self.ab_dataframe = pandas.read_excel(self.ab_filename, 'AB group selection')
 		self.ab_skus      = self.ab_dataframe[self.ab_dataframe['Group']=='target']['Product SKU'].to_list()
-
 
 	def get_store_codes(self):
 		# We need to include the store information
