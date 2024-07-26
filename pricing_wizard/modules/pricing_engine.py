@@ -1,5 +1,6 @@
 import pandas
 import modules.gsheet as gsheet
+import modules.gdrive as gdrive
 from modules.warning_tracker import warning_tracker, warning_object
 from modules.sku_data import sku_data
 from modules.print_utils import print_exclaim
@@ -23,6 +24,7 @@ class pricing_engine(object):
 	def get_ab_filter(self):
 		# This function is only to be used when we are running ab test
 		print_exclaim("Configuring to run with AB test group only")
+		self.ab_filename  = gdrive.download_ab()
 		self.ab_dataframe = pandas.read_excel(self.ab_filename, 'AB group selection')
 		self.ab_skus      = self.ab_dataframe[self.ab_dataframe['Group']=='target']['Product SKU'].to_list()
 
