@@ -2,7 +2,7 @@ inquirer
 pandas==1.5.3
 openpyxl
 xlwt
-numpy
+numpy==1.26.4
 tabulate
 termcolor
 pyfiglet
