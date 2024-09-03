@@ -66,6 +66,9 @@ Check if your Ubuntu installation contains a recent python3 version
 If this says `Python 3.9.X` or greater, then you just need to ensure the python package manager is available:
 
  - `sudo apt install python3-pip`
+
+  Need to be in the folder with pricing wizard
+  
  - `pip3 install -r requirements.txt`
 
 And you should be ready to go!
@@ -84,6 +87,10 @@ If the python3 is older (or not installed), follow these additional commands
    - This should be the same as the OSX instructions to install the required modules.
    - If you get a message to update pip3, please follow the instructions.
 
+## Note on numpy
+If you hit an error on installation versions it is because pandas needs numpy 1.20+ but cannot work with numpy 2.X so use 1.23 to fix this
+
+pip install numpy==1.23
 
 
 ## Usage
