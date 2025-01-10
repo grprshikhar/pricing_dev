@@ -150,9 +150,9 @@ def run_pricing_engine(run_opts):
 	run_opts.is_partner_upload = False
 	# Validate the user information
 	run_opts.validate_user() 
-	# Local file
-	ab_answer = run_opts.yn_question('Apply AB Test filtering?')
-	engine = pricing_engine('price_pivot.csv', ab_answer)
+	# Verify the URL to be used
+	run_opts.select_pricing_engine_sheet()
+	engine = pricing_engine(run_opts)
 	engine.generate_eprice_dataframe()
 	ep_validator = eprice_validator(run_opts=run_opts, dataframe=engine.df)
 	# Run post-sanity checks
@@ -195,34 +195,36 @@ if __name__ == "__main__":
 		if run_opts.stage == 2:
 			price_new_skus(run_opts)
 
-		# 3 : Run a redshift-based report
+		# 3 : Pricing Engine
 		if run_opts.stage == 3:
+			run_pricing_engine(run_opts)
+
+		# 4 : Run a redshift-based report
+		if run_opts.stage == 4:
 			redshift_report(run_opts)
 
-		# 4 : Separate option for pricing review
-		if run_opts.stage == 4:
+		# 5 : Separate option for pricing review
+		if run_opts.stage == 5:
 			price_review_clustering()
 
-		# 5 : Just print out the data stored in the json file for cross-checks on-the-fly
-		if run_opts.stage == 5:
+		# 6 : Just print out the data stored in the json file for cross-checks on-the-fly
+		if run_opts.stage == 6:
 			run_opts.info()
 
-		# 6 : Update Competition Pricing Sheet
-		if run_opts.stage == 6:
+		# 7 : Update Competition Pricing Sheet
+		if run_opts.stage == 7:
 			market_price_scraper_v02_EU()
 			#market_price_scraper_v02_US()
 
-		# 7 : Update Competition Prices for BO MKT Price
-		if run_opts.stage == 7:
+		# 8 : Update Competition Prices for BO MKT Price
+		if run_opts.stage == 8:
 			market_price_scraper_BO()
 
-		# 8 : Run MSH sheet file processor function
-		if run_opts.stage == 8:
+		# 9 : Run MSH sheet file processor function
+		if run_opts.stage == 9:
 			run_partner_uploads(run_opts)
 
-		# 9 : Pricing Engine
-		if run_opts.stage == 9:
-			run_pricing_engine(run_opts)
+		
 
 
 
