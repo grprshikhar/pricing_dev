@@ -1,32 +1,24 @@
 import pandas
+import numpy as np
 import modules.gsheet as gsheet
 import modules.gdrive as gdrive
 from modules.warning_tracker import warning_tracker, warning_object
 from modules.sku_data import sku_data
-from modules.print_utils import print_exclaim
+from modules.print_utils import print_exclaim, print_check
 import datetime
 
 class pricing_engine(object):
-	def __init__(self, csv_filename, ab_filter=False):
-		self.csv_filename     = csv_filename
+	def __init__(self, run_opts):
+		self.run_opts         = run_opts
+		self.sheet_range      = f"{run_opts.get_user()}!A4:N"
+		self.engine_dataframe = gsheet.get_dataframe(self.run_opts.current_sheet, self.sheet_range, f"Pricing engine hightouch sheet with tab name {run_opts.get_user()}")
 		self.df               = None
 		self.df_stores        = None
-		self.engine_dataframe = pandas.read_csv(self.csv_filename)
-		self.ab_filename      = None
-		self.ab_dataframe     = None
-		self.ab_skus          = None
-		self.ab_filter        = ab_filter
-		if self.ab_filter:
-			self.get_ab_filter()
 		self.get_store_codes()
 		self.get_rrp()
-	
-	def get_ab_filter(self):
-		# This function is only to be used when we are running ab test
-		print_exclaim("Configuring to run with AB test group only")
-		self.ab_filename  = gdrive.download_ab()
-		self.ab_dataframe = pandas.read_excel(self.ab_filename, 'AB group selection')
-		self.ab_skus      = self.ab_dataframe[self.ab_dataframe['Group']=='target']['Product SKU'].to_list()
+		self.apply_user_filtering()
+		self.generate_upload_format()
+
 
 	def get_store_codes(self):
 		# We need to include the store information
@@ -49,6 +41,22 @@ class pricing_engine(object):
 		self.df_mm_mkt['final mkt']        = pandas.to_numeric(self.df_mm_mkt['final mkt'])
 		self.df_bo_rrp['bo_rrp']           = pandas.to_numeric(self.df_bo_rrp['bo_rrp'])
 		self.df_bo_rrp['purchase_price']   = pandas.to_numeric(self.df_bo_rrp['purchase_price'])
+
+	def apply_user_filtering(self):
+		starting_nsku = self.engine_dataframe.shape[0]
+		self.engine_dataframe = self.engine_dataframe.loc[self.engine_dataframe["to_upload"] == "Yes",:]
+		filtered_nsku = self.engine_dataframe.shape[0]
+		print_check(f"Pricing engine recommendations filtered from {starting_nsku} SKUs to {filtered_nsku} SKUs")
+
+	def generate_upload_format(self):
+		# Apply some reformatting to put back into the price_pivot format
+		self.engine_dataframe.loc[:,"item_group_id"] = self.engine_dataframe["product_sku"]
+		self.engine_dataframe.loc[:,"subscription_1_months"] = np.where(self.engine_dataframe["subscription_1_months_low"] == self.engine_dataframe["subscription_1_months_high"],    self.engine_dataframe["subscription_1_months_low"].astype(str)  , self.engine_dataframe["subscription_1_months_low"].astype(str)  + "," + self.engine_dataframe["subscription_1_months_high"].astype(str))
+		self.engine_dataframe.loc[:,"subscription_3_months"] = np.where(self.engine_dataframe["subscription_3_months_low"] == self.engine_dataframe["subscription_3_months_high"],    self.engine_dataframe["subscription_3_months_low"].astype(str)  , self.engine_dataframe["subscription_3_months_low"].astype(str)  + "," + self.engine_dataframe["subscription_3_months_high"].astype(str))
+		self.engine_dataframe.loc[:,"subscription_6_months"] = np.where(self.engine_dataframe["subscription_6_months_low"] == self.engine_dataframe["subscription_6_months_high"],    self.engine_dataframe["subscription_6_months_low"].astype(str)  , self.engine_dataframe["subscription_6_months_low"].astype(str)  + "," + self.engine_dataframe["subscription_6_months_high"].astype(str))
+		self.engine_dataframe.loc[:,"subscription_12_months"] = np.where(self.engine_dataframe["subscription_12_months_low"] == self.engine_dataframe["subscription_12_months_high"], self.engine_dataframe["subscription_12_months_low"].astype(str) , self.engine_dataframe["subscription_12_months_low"].astype(str) + "," + self.engine_dataframe["subscription_12_months_high"].astype(str))
+		self.engine_dataframe.loc[:,"subscription_18_months"] = np.where(self.engine_dataframe["subscription_18_months_low"] == self.engine_dataframe["subscription_18_months_high"], self.engine_dataframe["subscription_18_months_low"].astype(str) , self.engine_dataframe["subscription_18_months_low"].astype(str) + "," + self.engine_dataframe["subscription_18_months_high"].astype(str))
+		self.engine_dataframe.loc[:,"subscription_24_months"] = np.where(self.engine_dataframe["subscription_24_months_low"] == self.engine_dataframe["subscription_24_months_high"], self.engine_dataframe["subscription_24_months_low"].astype(str) , self.engine_dataframe["subscription_24_months_low"].astype(str) + "," + self.engine_dataframe["subscription_24_months_high"].astype(str))
 
 	def generate_eprice_dataframe(self):
 		# Columns : Pricing Engine -> eprice export
@@ -135,20 +143,6 @@ class pricing_engine(object):
 		rows_after_drop  = self.df.shape[0]
 		if rows_before_drop != rows_after_drop:
 			self.add_warning(['all'],f'Dropped {rows_before_drop - rows_after_drop} SKUs due to no prices being calculated')
-
-		# AB filtering
-		if self.ab_skus:
-			rows_before_filter = self.df.shape[0]
-			self.df = self.df[self.df['sku'].isin(self.ab_skus)]
-			# Reset index as iloc used later
-			self.df = self.df.reset_index(drop=True)
-			rows_after_filter  = self.df.shape[0]
-			self.add_warning(['AB'],f'Total SKUs reduced from {rows_before_filter} to {rows_after_filter} by selecting target group only')
-
-		# Special - If we need to focus on a specific SKU, uncomment and define in the list
-		# specials = ['GRB470P14904']
-		# self.df = self.df[self.df['sku'].isin(specials)]
-		# self.df = self.df.reset_index(drop=True)
 
 		print (self.df)
 

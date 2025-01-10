@@ -31,7 +31,7 @@ class options_handler(object):
 		# Read json data
 		try:
 			self.user_data = json.load(open(self.user_data_path))
-			self.users     = sorted(list(set(list(self.user_data.keys())) - {"Global"}))
+			self.users     = sorted(list(set(list(self.user_data.keys())) - {"Global","Achille","Shikhar","Mahmoud","Mert"}))
 		except:
 			raise ValueError(f"Error reading user data from {self.user_data_path}")
 
@@ -206,6 +206,36 @@ class options_handler(object):
 			else:
 				print_check (f"Data for [{self.current_user}] stored just for this session.")
 
+	def select_pricing_engine_sheet(self):
+		# Determine if we want the EU or US sheet
+		self.current_sheet_type = "Pricing Engine EU"
+		# E-Price sheet option
+		question = [inquirer.List("yn", message="Use default or update e-sheet URL :", choices=["Use default","Update"])]
+		answer = inquirer.prompt(question, theme=self._theme, raise_keyboard_interrupt=True)
+		# Adding a new sheet with hardcoded data if not available
+		if self.current_sheet_type not in self.user_data[self.current_user]:
+			self.user_data[self.current_user][self.current_sheet_type] = "1RhA2sJTn1cfqsfmmm8VKfoQQbrc550R84A3KHELXgK4"
+			# And save it
+			with open(self.user_data_path, 'w') as fp:
+				json.dump(self.user_data, fp, indent=4)
+		# Now read the options
+		if answer["yn"] == "Use default":
+			self.current_sheet = self.user_data[self.current_user][self.current_sheet_type]
+		if answer["yn"] == "Update":
+			new_id = input(f"Provide new id for {self.current_sheet_type} : ")
+			self.user_data[self.current_user][self.current_sheet_type] = new_id
+			self.current_sheet = new_id
+			# Save updated data
+			answer_yes = self.yn_question("Save updated data to disk :")
+			if answer_yes:
+				with open(self.user_data_path, 'w') as fp:
+					json.dump(self.user_data, fp, indent=4)
+			else:
+				print_check (f"Data for [{self.current_user}] stored just for this session.")
+
+				
+
+
 	# -------------------------------
 	# Control campaign sheet data
 	# -------------------------------
@@ -281,7 +311,7 @@ class options_handler(object):
 		# This option can control the flow of the program
 		# Just keep the order the same but can rename these without breaking code
 		# Ensure "Exit" is last option as this looks best in terminal option
-		stages = ["Reprice SKUs (B2C, B2B, Discount Removal, Campaigns)", "Reprice SKUs (Partners)", "Price new SKUs", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Update Competition Pricing for BO", "MSH Files Processor","Run Pricing Engine Upload","Exit"]
+		stages = ["Reprice SKUs (B2C, B2B, Discount Removal, Campaigns)", "Reprice SKUs (Partners)", "Price new SKUs", "Run Pricing Engine Upload", "Run report", "Suggest price review SKUs", "Review Pricing Wizard data", "Update Competition Pricing", "Update Competition Pricing for BO", "MSH Files Processor","Exit"]
 		question = [inquirer.List("stage", message="Please select your use case :", choices=stages)]
 		answer = inquirer.prompt(question, theme=self._theme2, raise_keyboard_interrupt=True)
 		self.stage = stages.index(answer["stage"])
