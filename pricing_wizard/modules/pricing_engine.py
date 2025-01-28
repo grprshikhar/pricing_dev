@@ -10,8 +10,9 @@ import datetime
 class pricing_engine(object):
 	def __init__(self, run_opts):
 		self.run_opts         = run_opts
-		self.sheet_range      = f"{run_opts.get_user()}!A4:N"
-		self.engine_dataframe = gsheet.get_dataframe(self.run_opts.current_sheet, self.sheet_range, f"Pricing engine hightouch sheet with tab name {run_opts.get_user()}")
+		self.sheet_range      = f"{run_opts.get_user()}!A4:B"
+		self.engine_filter    = gsheet.get_dataframe(self.run_opts.current_sheet, self.sheet_range, f"Pricing engine hightouch sheet with tab name {run_opts.get_user()}")
+		self.engine_dataframe = gsheet.get_dataframe(self.run_opts.current_sheet, 'optimiser_prices!B:N', f"Pricing engine prices")
 		self.df               = None
 		self.df_stores        = None
 		self.get_store_codes()
@@ -43,6 +44,8 @@ class pricing_engine(object):
 		self.df_bo_rrp['purchase_price']   = pandas.to_numeric(self.df_bo_rrp['purchase_price'])
 
 	def apply_user_filtering(self):
+		# First merge the two sheets
+		self.engine_dataframe = pandas.merge(left=self.engine_dataframe, right=self.engine_filter, left_on='product_sku', right_on='sku', how='right')
 		starting_nsku = self.engine_dataframe.shape[0]
 		self.engine_dataframe = self.engine_dataframe.loc[self.engine_dataframe["to_upload"] == "Yes",:]
 		filtered_nsku = self.engine_dataframe.shape[0]
