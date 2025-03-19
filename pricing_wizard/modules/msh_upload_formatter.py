@@ -75,14 +75,17 @@ class msh_process_dataframes(object):
             self.remove_files_in_path(folder_name)
 
         for i in range(num_chunks):
+            timedelta = datetime.timedelta(seconds=10)
+            self.now = self.now+timedelta
+            scheduledTime = (self.now+dt).isoformat(timespec='milliseconds')[:-6]+"Z"
             print(i, num_chunks)
             chunk = df.iloc[i * chunk_size: (i + 1) * chunk_size]
-            print(chunk)
             filename = os.path.join(folder_name, f'chunk_{i+1}.xls')
             #chunk.to_excel(filename, index=False, engine='xlsxwriter')
             with pd.ExcelWriter(filename) as writer:
                 chunk.to_excel(writer, sheet_name= "rental_plans",index=False)
-            self.admin.upload_pricing(filename, filename, "null")
+            # Schedule with incremental time
+            self.admin.upload_pricing(filename, filename, scheduledTime)
             
             print(f'Exported {filename}')
 
@@ -92,13 +95,17 @@ class msh_process_dataframes(object):
         # Filtering and downloading Mediamarkt data
         empty_mm = self.filter_rows(self.rental_plans_export_mm_offline)
         filtered_mm_df = self.remove_rows_with_same_sku(self.rental_plans_export_mm_offline, empty_mm)
+        self.now = datetime.datetime.now() + datetime.timedelta(minutes=2)
         self.export_chunks(empty_mm, 'exported_empty_mm_chunks')
+        self.now = datetime.datetime.now() + datetime.timedelta(minutes=2)
         self.export_chunks(filtered_mm_df, 'exported_mm_chunks_filtered')
 
         # Filtering and downloading Saturn data
         empty_saturn = self.filter_rows(self.rental_plans_export_saturn_offline)
         filtered_saturn_df = self.remove_rows_with_same_sku(self.rental_plans_export_saturn_offline, empty_saturn)
+        self.now = datetime.datetime.now() + datetime.timedelta(minutes=2)
         self.export_chunks(empty_saturn, 'exported_empty_saturn_chunks')
+        self.now = datetime.datetime.now() + datetime.timedelta(minutes=2)
         self.export_chunks(filtered_saturn_df, 'exported_saturn_chunks_filtered')
 
 
