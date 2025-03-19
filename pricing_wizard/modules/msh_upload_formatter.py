@@ -78,7 +78,7 @@ class msh_process_dataframes(object):
             timedelta = datetime.timedelta(seconds=10)
             self.now = self.now+timedelta
             scheduledTime = (self.now+dt).isoformat(timespec='milliseconds')[:-6]+"Z"
-            print(i, num_chunks)
+            print(i, num_chunks, scheduledTime)
             chunk = df.iloc[i * chunk_size: (i + 1) * chunk_size]
             filename = os.path.join(folder_name, f'chunk_{i+1}.xls')
             #chunk.to_excel(filename, index=False, engine='xlsxwriter')
