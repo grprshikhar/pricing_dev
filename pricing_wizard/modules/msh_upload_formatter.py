@@ -76,7 +76,8 @@ class msh_process_dataframes(object):
 
         for i in range(num_chunks):
             self.now = self.now + datetime.timedelta(seconds=60)
-            scheduledTime = (self.now).isoformat(timespec='milliseconds')[:-6]+"Z"
+            t = pytz.timezone('Europe/Berlin').localize(self.now,is_dst=None)
+            scheduledTime = (t).isoformat(timespec='milliseconds')[:-6]+"Z"
             print(i, num_chunks, scheduledTime)
             chunk = df.iloc[i * chunk_size: (i + 1) * chunk_size]
             filename = os.path.join(folder_name, f'chunk_{i+1}.xls')
