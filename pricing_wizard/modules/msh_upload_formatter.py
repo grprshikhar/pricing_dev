@@ -19,12 +19,19 @@ from modules.print_utils import print_check, print_exclaim, print_green, tabulat
 
 class msh_process_dataframes(object):
     def __init__(self, run_opts):
-        print_exclaim("Downloading Data From Google Sheets")
-        # OLD 1Mnd7AGuL5dxzi0oIoUYC7DkljqQR0jyBTpH7tU3llmQ
-        # MM offline data 
-        self.export_mm_offline = gsheet.get_dataframe("1HV742fLqrCi28r7mis6h4Nut2vkeltYiU5N_Dw5Qlqo", "Export MM Offline!A:AD", "Export MM Offline")
-        # Saturn offline data
-        self.export_saturn_offline = gsheet.get_dataframe("1HV742fLqrCi28r7mis6h4Nut2vkeltYiU5N_Dw5Qlqo", "Export SAT Offline!A:AD", "Export SAT Offline")
+        market = run_opts.choice_question('Select MSH market for upload :', ['DE', 'AT'])
+        if market == 'DE':
+            print_exclaim("Downloading Data From Google Sheets (MSH DE)")
+            # MM offline data 
+            self.export_mm_offline = gsheet.get_dataframe("1HV742fLqrCi28r7mis6h4Nut2vkeltYiU5N_Dw5Qlqo", "Export MM Offline!A:AD", "Export MM Offline")
+            # Saturn offline data
+            self.export_saturn_offline = gsheet.get_dataframe("1HV742fLqrCi28r7mis6h4Nut2vkeltYiU5N_Dw5Qlqo", "Export SAT Offline!A:AD", "Export SAT Offline")
+        if market == 'AT':
+            print_exclaim("Downloading Data From Google Sheets (MSH AT)")
+            # MM offline data 
+            self.export_mm_offline = gsheet.get_dataframe("1XeeCXbFn4HbbYHTavhi0l9LhOn22DYW5U0ZBmBk1eEg", "Export MM Offline!A:AD", "Export MM Offline")
+            # Saturn offline data
+            self.export_saturn_offline = gsheet.get_dataframe("1XeeCXbFn4HbbYHTavhi0l9LhOn22DYW5U0ZBmBk1eEg", "Export SAT Offline!A:AD", "Export SAT Offline")
         self.run_opts = run_opts
         self.admin = admin_panel(self.run_opts, True)        
         template_name = gdrive.download_partner_template()
