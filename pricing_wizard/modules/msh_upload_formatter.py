@@ -84,6 +84,7 @@ class msh_process_dataframes(object):
         for i in range(num_chunks):
             self.now = self.now + datetime.timedelta(seconds=60)
             t = pytz.timezone('Europe/Berlin').localize(self.now,is_dst=None)
+            t = t.astimezone(pytz.utc)
             scheduledTime = (t).isoformat(timespec='milliseconds')[:-6]+"Z"
             print(i, num_chunks, scheduledTime)
             chunk = df.iloc[i * chunk_size: (i + 1) * chunk_size]
