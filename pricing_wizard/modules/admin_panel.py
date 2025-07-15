@@ -1,6 +1,8 @@
+import datetime
 import requests
 import json
 import gql
+import os
 from modules.get_password import getpass
 from gql.transport.aiohttp import AIOHTTPTransport
 from modules.graphql_queries import upload_to_S3_staging, upload_to_S3_production, upload_to_admin_panel
@@ -28,7 +30,44 @@ class admin_panel(object):
 		# print_check(f"Authorisation URL : {self.authorisation_url}")
 		# print_check(f"GraphQL URL       : {self.graphql_url}")
 
+	def cookie_help(self):
+		help_text = """ Authentication Token Help
+		  To get the authentication token you need to:
+		    a) Log into Admin Panel
+		    b1) Click Dev Tools (bottom left) and copy the token
+		    b2) Inspect the cookies and retrieve [api_access_token]
+		"""
+		print_exclaim(help_text)
+
 	def authorise(self):
+		if os.path.isfile('.apauth.json'):
+			with open('.apauth.json','r') as authfile:
+				read_data = json.load(authfile)
+			auth_token = read_data['auth_token']
+			timestamp = read_data['timestamp']
+			read_timestamp_dt = datetime.datetime.fromisoformat(timestamp)
+			current_time = datetime.datetime.now()
+			time_difference = current_time - read_timestamp_dt
+			four_hours = datetime.timedelta(hours=4)
+			if time_difference < four_hours:
+				self.auth_token = auth_token
+		if self.auth_token:
+			print_check("Using existing authorisation token for Admin Panel")
+			return				
+		print_exclaim("Preparing authorisation with Admin Panel")
+		auth_token = self.run_opts.text_question('Copy your authentication token here :')
+		self.auth_token = auth_token
+		# Write token and date
+		with open('.apauth.json','w') as authfile:
+			text = {
+			'auth_token':auth_token, 
+			'timestamp': datetime.datetime.now().isoformat()
+			}
+			json.dump(text, authfile)
+
+
+
+	def old_authorise(self):
 		if self.auth_token:
 			print_check("Using existing authorisation token for Admin Panel")
 			return
