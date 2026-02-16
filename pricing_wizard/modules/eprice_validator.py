@@ -33,7 +33,8 @@ class eprice_validator(object):
 			6 :  [0.04, 0.08],
 			12 : [0.035, 0.075],
 			18 : [0.03,  0.06],
-			24 : [0.025, 0.05]}
+			24 : [0.025, 0.05],
+			36 : [0.015, 0.035]}
 		# EU data
 		self.get_EU_legislation_data()
 
@@ -134,6 +135,8 @@ class eprice_validator(object):
 		# Check the price change tag is filled
 		sanity_checks.check_price_change_tag(self.df_td)
 		print_check("Price change tag checked")
+		# Check the price tier column is present
+		sanity_checks.check_price_tier(self.df_td)
 		print_exclaim("Passed sanity checks")
 
 	def post_sanity_checks(self):
@@ -164,9 +167,9 @@ class eprice_validator(object):
 		answer_yes = self.run_opts.yn_question("View full upload data :")
 		if answer_yes:
 			if self.is_partner:
-				disc_dt = self.df_td[['sku','partner name','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+				disc_dt = self.df_td[['sku','partner name','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','plan36']].copy()
 			else:
-				disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24']].copy()
+				disc_dt = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','plan36']].copy()
 			print_green("Full upload data")
 			tabulate_dataframe(disc_dt)
 
@@ -205,13 +208,13 @@ class eprice_validator(object):
 		if self.is_partner:
 			if is_partner_names:
 				# Partner name into partner name column
-				rental_plans[['SKU','Partner Name','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+				rental_plans[['SKU','Partner Name','Newness','1','3','6','12','18','24','36','Price Change Tag','Price Tier']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','plan36','price change tag','price tier']].copy()
 			else:
 				# Partner name into store code column
-				rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+				rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','36','Price Change Tag','Price Tier']] = self.df_td[['sku','partner name','new','plan1','plan3','plan6','plan12','plan18','plan24','plan36','price change tag','price tier']].copy()
 		else:
 			# Store code into store code column
-			rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','Price Change Tag']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','price change tag']].copy()
+			rental_plans[['SKU','Store code','Newness','1','3','6','12','18','24','36','Price Change Tag','Price Tier']] = self.df_td[['sku','store code','new','plan1','plan3','plan6','plan12','plan18','plan24','plan36','price change tag','price tier']].copy()
 		# Clean any NaN again
 		rental_plans  = rental_plans.fillna('')
 		# Configure output file name

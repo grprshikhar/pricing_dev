@@ -51,7 +51,7 @@ def check_discounts(df_td):
     #     any_errors.append("Discount is missing for "+str(SKU.values))
 
     # We should also validate that the discount amount is less than the full price (ie reprice being entered as discount)
-    for plan in [1,3,6,12,18,24]:
+    for plan in [1,3,6,12,18,24,36]:
         active_plan_name = f"active_plan{plan}"
         high_plan_name   = f"high_plan{plan}"
         # Report if active price is greater than high price for discount
@@ -74,9 +74,9 @@ def check_plan_hierarchy(df_td):
     # Build up errors
     error_list = []
     # Longer plan active values can't be more expensive than shorter
-    list_plans = [1,3,6,12,18,24]
+    list_plans = [1,3,6,12,18,24,36]
     i=0
-    for plan in [3,6,12,18,24]:
+    for plan in [3,6,12,18,24,36]:
         ag = list_plans[i]
         i+=1
         pc = "plan"+str(plan)
@@ -97,7 +97,7 @@ def check_plan_hierarchy(df_td):
 
     # Longer plan high values can't be more expensive than shorter
     i=0
-    for plan in [3,6,12,18,24]:
+    for plan in [3,6,12,18,24,36]:
         ag = list_plans[i]
         i+=1
         pc = "plan"+str(plan)
@@ -170,7 +170,7 @@ def last_digit_9 (df_td):
     wt = warning_tracker()
     # Error tracker
     any_warnings = []
-    for plan in [1,3,6,12,18,24]:
+    for plan in [1,3,6,12,18,24,36]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9)].empty!=True:
             sku = df_td.loc[(df_td[pc]*10%10<9) | (df_td[pc]*10%10>9),'sku'].drop_duplicates()
@@ -185,7 +185,7 @@ def last_digit_9 (df_td):
 def check_minimum(df_td, minval):
     wt = warning_tracker()
     any_warnings = []
-    for plan in [1,3,6,12,18,24]:
+    for plan in [1,3,6,12,18,24,36]:
         pc = "active_plan"+str(plan)
         if df_td.loc[(df_td[pc]<minval)].empty != True:
            sku = df_td.loc[(df_td[pc]<minval), 'sku'].drop_duplicates()
@@ -206,6 +206,19 @@ def check_price_change_tag(df):
             wt.add_warning(warning_object('Price change tag',s,'',None,None,'Missing price change tag'))
     if any_warnings:
         print_warning("\n".join(any_warnings))
+
+# Check price tier is provided
+def check_price_tier(df):
+    wt = warning_tracker()
+    any_warnings = []
+    if df.loc[(df['price tier'] == "")].empty != True:
+        sku = df.loc[(df['price tier'] == ""), 'sku'].drop_duplicates()
+        for s in sku:
+            any_warnings.append(f"{s} : No price tier provided")
+            wt.add_warning(warning_object('Price tier',s,'',None,None,'Missing price tier'))
+    if any_warnings:
+        print_warning("\n".join(any_warnings))
+
 
 def check_margin_columns(df):
     wt = warning_tracker()

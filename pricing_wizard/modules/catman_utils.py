@@ -110,7 +110,7 @@ class catman_utils(object):
 		df_plans_out = pd.concat([df_plans.reset_index(drop=True), df_plans.add_prefix("active_")], axis=1)
 		df_plans_out = pd.concat([df_plans_out.reset_index(drop=True), df_plans.add_prefix("high_")], axis=1)
 		rrp = df_copy.rrp
-		for subplan in [1,3,6,12,18,24]:
+		for subplan in [1,3,6,12,18,24,36]:
 			df_subplanwise = df_plans_out.filter(regex=str(subplan)+"$")
 			df_subplanwise = df_subplanwise.applymap(str)
 			to_allot = df_subplanwise[('plan'+str(subplan))].str.split(',', n=1, expand=True)
@@ -138,7 +138,7 @@ class catman_utils(object):
 		df_out = pd.concat([df_copy.reset_index(drop=True), df_out.reset_index(drop=True)], axis=1)
 
 		# Convert type for the old price columns for use later in EU checks
-		for rp in [1,3,6,12,18,24]:
+		for rp in [1,3,6,12,18,24,36]:
 			df_out[f"old_low_plan{rp}"] = pd.to_numeric(df_out[f"old_low_plan{rp}"], errors='coerce')
 			df_out[f"old_high_plan{rp}"] = pd.to_numeric(df_out[f"old_high_plan{rp}"], errors='coerce')
 
@@ -191,7 +191,7 @@ class catman_utils(object):
     	## if plan allowed is there but not in plan price, we raise a warning
     	## Having a warning allows removal of SKUs
 		warning_list = {}
-		for subplan in [1,3,6,12,18,24]:
+		for subplan in [1,3,6,12,18,24,36]:
 			act_price_col = 'active_plan'+str(subplan)
 			regex = str(subplan)+r',|'+str(subplan)+r'\)'
 			sku_list = df_td.loc[(df_td[act_price_col].isnull()) & (df_td['duration_plan'].str.contains(regex)),['sku','store code']]
@@ -207,7 +207,7 @@ class catman_utils(object):
 		self.price_removal_warning(warning_list)
 
     	## if plan price is there but not in plan allowed > Remove plan price
-		for subplan in [1,3,6,12,18,24]:
+		for subplan in [1,3,6,12,18,24,36]:
 			act_price_col = 'active_plan'+str(subplan)
 			plan_tochange = 'plan'+str(subplan)
 			regex         = str(subplan)+r',|'+str(subplan)+r'\)'
