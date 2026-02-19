@@ -41,7 +41,8 @@ def validate_and_upload_eprice(run_opts):
 	# if yn:
 	# 	run_opts.block_ab_target = True
 	# Create eprice validator and runs checks
-	data_range = 'Export!A:AI'
+	#data_range = 'Export!A:AI'
+	data_range = 'Export!A:AK'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Run post-sanity checks
 	validator.post_sanity_checks()
@@ -58,7 +59,8 @@ def validate_and_upload_eprice_partners(run_opts):
 	# Verify the URL to be used
 	run_opts.select_eprice_sheet_partners()
 	# Create eprice validator and runs checks
-	data_range = 'Export!A:AI'
+	#data_range = 'Export!A:AI'
+	data_range = 'Export!A:AK'
 	validator = eprice_validator(run_opts=run_opts, sheet_id=run_opts.current_sheet, data_range=data_range)
 	# Run post-sanity checks
 	validator.post_sanity_checks()
